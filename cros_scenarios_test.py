@@ -41,10 +41,18 @@ class CrosScenariosCase(unittest.TestCase):
             self.assertEqual(cs.test_connection(), True)
 
 
-    def test_enter_s0i3(self):
+    # def test_enter_s0i3(self):
+    #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+    #         try:
+    #             cs.enter_s0i3()
+    #         except:
+    #             self.fail("exception is raised!")
+
+
+    def test_launch_power_loadtest(self):
         with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
             try:
-                cs.enter_s0i3()
+                cs.launch_power_loadtest()
             except:
                 self.fail("exception is raised!")
 

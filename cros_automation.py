@@ -1,4 +1,5 @@
 import logging, argparse, textwrap
+from custom_logger_formatter import CustomLoggerFormatter
 from cros_scenarios import CrosScenarios
 
 # --------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ parser.add_argument(
         scenarios.
         "test": test connection to the test system
         "s0i3": enter s0i3 on the test system
+        "plt": launch power_loadtest on the test system
         "parse": parse top logs
         '''
     )
@@ -49,7 +51,7 @@ if args.scenario == "test":
     elif args.keyfile is None:
         parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
     else:
-        with CrosScenarios(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file) as cs:
+        with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
             cs.test_connection()
 
 elif args.scenario == "s0i3":
@@ -60,8 +62,19 @@ elif args.scenario == "s0i3":
     elif args.keyfile is None:
         parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
     else:
-        with CrosScenarios(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file) as cs:
+        with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
             cs.enter_s0i3()
+
+elif args.scenario == "plt":
+    if args.ip is None:
+        parser.error("test scenario requires test system ip address (-p/--ip)")
+    elif args.username is None:
+        parser.error("test scenario requires test system username (-u/--username)")
+    elif args.keyfile is None:
+        parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
+    else:
+        with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
+            cs.launch_power_loadtest()
 
 else:
     pass

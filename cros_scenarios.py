@@ -15,6 +15,10 @@ class CrosScenarios():
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+        self.stdin = None
+        self.stdout = None
+        self.stderr = None
+
         try:
             if ssh_private_key_file is not None and ssh_private_key_file.strip(): # If you want to make sure that foo really is a boolean and of value True, use the is operator.
                 self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
@@ -69,8 +73,46 @@ class CrosScenarios():
 
         self.logger.info("executing echo mem > /sys/power/state")
         try:
-            self.ssh.exec_command("echo mem > /sys/power/state")
-
-            self.logger.info("test system entered s0i3")
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("echo mem > /sys/power/state")
         except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception when using ssh object in the argument. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.debug(f"ssh console output:")
+        for line in self.stdout.readlines():
+            self.logger.debug(line)
+
+        self.logger.info("test system entered s0i3")
+
+
+    def launch_power_loadtest(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"launching power_loadtest on the test system ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info("executing cd /usr/local/autotest")
+        try:
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest")
+        except paramiko.SSHException:
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.debug(f"ssh console output:")
+        for line in self.stdout.readlines():
+            self.logger.debug(line)
+
+        self.logger.info("executing bin/autotest tests/power_LoadTest/control")
+        try:
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/power_LoadTest/control")
+        except paramiko.SSHException:
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.debug(f"ssh console output:")
+        for line in self.stdout.readlines():
+            self.logger.debug(line)
+
+        self.logger.info("power_loadtest is running on the test system")
+
+    
+    # def launch_aquarium(self):
+    #     self.logger.info("--------------------------------------------------------------------------------")
+    #     self.logger.info(f"launching aquarium on the test system ...")
+    #     self.logger.info("--------------------------------------------------------------------------------")
