@@ -1,4 +1,4 @@
-import logging, argparse
+import logging, argparse, textwrap
 from cros_scenarios import CrosScenarios
 
 # --------------------------------------------------------------------------------
@@ -21,21 +21,47 @@ logger.addHandler(ch)
 # --------------------------------------------------------------------------------
 
 
-parser = argparse.ArgumentParser(description="Automation for scenarios on Chrome OS and Chromium OS")
-parser.add_argument("test_system_ip_address", metavar="ip", type=str, help="test system ip address")
-parser.add_argument("test_system_username", metavar="username", type=str, help="test system username")
-parser.add_argument("--scenario", type=str, default="init_ssh_connection", help="scenarios, default 'init_ssh_connection'. possible values: 'init_ssh_connection', 'enter_s0i3'.")
-parser.add_argument("--ssh_private_key_file", type=str, default=None, help="ssh private key file path")
+parser = argparse.ArgumentParser(description="Automation for scenarios on Chrome OS and Chromium OS", formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument(
+    "scenario",
+    metavar="scenario",
+    type=str,
+    help=textwrap.dedent(
+        '''\
+        scenarios.
+        "test": test connection to the test system
+        "s0i3": enter s0i3 on the test system
+        "parse": parse top logs
+        '''
+    )
+)
+parser.add_argument("-p", "--ip", type=str, default=None, help="test system ip address, default %(default)s.")
+parser.add_argument("-u", "--username", type=str, default=None, help="test system username, default %(default)s.")
+parser.add_argument("-i", "--keyfile", type=str, default=None, help="ssh private key file path, default %(default)s.")
 
 args = parser.parse_args()
 
-cs = CrosScenarios()
+if args.scenario == "test":
+    if args.ip is None:
+        parser.error("test scenario requires test system ip address (-p/--ip)")
+    elif args.username is None:
+        parser.error("test scenario requires test system username (-u/--username)")
+    elif args.keyfile is None:
+        parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
+    else:
+        with CrosScenarios(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file) as cs:
+            cs.test_connection()
 
-if args.scenario == "init_ssh_connection":
-    cs.init_ssh_connection(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file)
-
-elif args.scenario == "enter_s0i3":
-    cs.enter_s0i3(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file)
+elif args.scenario == "s0i3":
+    if args.ip is None:
+        parser.error("test scenario requires test system ip address (-p/--ip)")
+    elif args.username is None:
+        parser.error("test scenario requires test system username (-u/--username)")
+    elif args.keyfile is None:
+        parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
+    else:
+        with CrosScenarios(args.test_system_ip_address, args.test_system_username, args.ssh_private_key_file) as cs:
+            cs.enter_s0i3()
 
 else:
     pass

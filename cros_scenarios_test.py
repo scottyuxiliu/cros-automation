@@ -1,5 +1,7 @@
-import unittest
+import logging, unittest
 from cros_scenarios import CrosScenarios
+
+
 
 class CrosScenariosCase(unittest.TestCase):
     def setUp(self):
@@ -7,6 +9,22 @@ class CrosScenariosCase(unittest.TestCase):
 
         By changing the application configuration to sqlite://, I get SQLAlchemy to use an in-memory SQLite database during the tests. This prevents the unit tests from using the regular database that I use for development.
         """
+
+        self.logger = logging.getLogger('cros_automation')
+        self.logger.setLevel(logging.DEBUG)
+
+        self.fh = logging.FileHandler('cros_automation.log', mode='w') # overwrite existing log file
+        self.fh.setLevel(logging.DEBUG)
+
+        self.ch = logging.StreamHandler()
+        self.ch.setLevel(logging.INFO)
+
+        self.formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
+        self.fh.setFormatter(self.formatter)
+        self.ch.setFormatter(self.formatter)
+
+        self.logger.addHandler(self.fh)
+        self.logger.addHandler(self.ch)
 
         self.test_system_ip_address = "10.6.145.180"
         self.test_system_username = "root"
@@ -17,10 +35,18 @@ class CrosScenariosCase(unittest.TestCase):
         """The tearDown() method is a special method that the unit testing framework executes after each test respectively.
         """
 
-    def test_init_ssh_connection(self):
-        cs = CrosScenarios()
-        cs.init_ssh_connection(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file)
-        self.assertRaises(ValueError)
+
+    def test_test_connection(self):
+        with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+            self.assertEqual(cs.test_connection(), True)
+
+
+    def test_enter_s0i3(self):
+        with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+            try:
+                cs.enter_s0i3()
+            except:
+                self.fail("exception is raised!")
 
 
 if __name__ == '__main__':
