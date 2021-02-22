@@ -61,6 +61,15 @@ class CrosScenarios():
         status = self.ssh.get_transport().is_active()
         if status is True:
             self.logger.info("ssh session is active")
+
+            self.logger.info('executing echo "ssh session is active"')
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+            if self.stdout.channel.recv_exit_status() == 0: # blocking call
+                self.logger.debug(f"ssh console output:")
+                for line in self.stdout.readlines():
+                    self.logger.debug(line)
+            else:
+                self.logger.error(f"stdout.channel.recv_exit_status() returned {self.stdout.channel.recv_exit_status()}")
         else:
             self.logger.info("ssh session is closed")
         return status
