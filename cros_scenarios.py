@@ -1,4 +1,4 @@
-import os, sys, select, logging, argparse
+import os, sys, select, logging, argparse, time
 import paramiko
 
 class CrosScenarios():
@@ -64,12 +64,21 @@ class CrosScenarios():
 
             self.logger.info('executing echo "ssh session is active"')
             self.stdin, self.stdout, self.stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
-            if self.stdout.channel.recv_exit_status() == 0: # blocking call
-                self.logger.debug(f"ssh console output:")
-                for line in self.stdout.readlines():
-                    self.logger.debug(line)
-            else:
-                self.logger.error(f"stdout.channel.recv_exit_status() returned {self.stdout.channel.recv_exit_status()}")
+
+            # wait for the command to finish
+            while not self.stdout.channel.exit_status_ready():
+                time.sleep(1)
+
+            self.logger.debug(f"ssh console output:")
+            for line in self.stdout.readlines():
+                self.logger.debug(line)
+
+            # if self.stdout.channel.recv_exit_status() == 0: # blocking call
+            #     self.logger.debug(f"ssh console output:")
+            #     for line in self.stdout.readlines():
+            #         self.logger.debug(line)
+            # else:
+            #     self.logger.error(f"stdout.channel.recv_exit_status() returned {self.stdout.channel.recv_exit_status()}")
         else:
             self.logger.info("ssh session is closed")
         return status
@@ -121,7 +130,39 @@ class CrosScenarios():
         self.logger.info("power_loadtest is running on the test system")
 
     
-    # def launch_aquarium(self):
-    #     self.logger.info("--------------------------------------------------------------------------------")
-    #     self.logger.info(f"launching aquarium on the test system ...")
-    #     self.logger.info("--------------------------------------------------------------------------------")
+    def launch_aquarium(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"launching aquarium on the test system ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info("executing cd /usr/local/autotest")
+        try:
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest") # non-blocking call
+
+            # wait for the command to finish
+            while not self.stdout.channel.exit_status_ready():
+                time.sleep(1)
+
+            self.logger.debug(f"ssh console output:")
+            for line in self.stdout.readlines():
+                self.logger.debug(line)
+
+        except paramiko.SSHException:
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.info("executing bin/autotest tests/graphics_WebGLAquarium/control")
+        try:
+            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
+
+            # wait for the command to finish
+            while not self.stdout.channel.exit_status_ready():
+                time.sleep(1)
+
+            self.logger.debug(f"ssh console output:")
+            for line in self.stdout.readlines():
+                self.logger.debug(line)
+
+        except paramiko.SSHException:
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.info("aquarium finished on the test system")

@@ -33,6 +33,7 @@ parser.add_argument(
         "test": test connection to the test system
         "s0i3": enter s0i3 on the test system
         "plt": launch power_loadtest on the test system
+        "aquarium": launch aquarium on the test system
         "parse": parse top logs
         '''
     )
@@ -75,6 +76,17 @@ elif args.scenario == "plt":
     else:
         with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
             cs.launch_power_loadtest()
+
+elif args.scenario == "aquarium":
+    if args.ip is None:
+        parser.error("test scenario requires test system ip address (-p/--ip)")
+    elif args.username is None:
+        parser.error("test scenario requires test system username (-u/--username)")
+    elif args.keyfile is None:
+        parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
+    else:
+        with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
+            cs.launch_aquarium()
 
 else:
     pass
