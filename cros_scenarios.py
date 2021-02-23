@@ -7,6 +7,11 @@ class CrosScenarios():
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file=None):
         self.logger = logging.getLogger("cros_automation.CrosScenarios")
+        fh = logging.FileHandler('cros_scenarios.log', mode='w') # overwrite existing log file
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
+        fh.setFormatter(formatter)
+        self.logger.addHandler(fh)
 
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"establishing ssh connection with the test system ...")
@@ -14,10 +19,6 @@ class CrosScenarios():
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        self.stdin = None
-        self.stdout = None
-        self.stderr = None
 
         try:
             if ssh_private_key_file is not None and ssh_private_key_file.strip(): # If you want to make sure that foo really is a boolean and of value True, use the is operator.
@@ -53,6 +54,24 @@ class CrosScenarios():
         self.ssh.close()
 
 
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __read_stdout(self, stdout):
+        """[summary]
+
+        Parameters
+        ----------
+        stdout : [type]
+            [description]
+        """
+        if stdout.channel.recv_exit_status() == 0: # blocking call
+            self.logger.debug(f"stdout:")
+            for line in stdout.readlines():
+                self.logger.debug(line)
+        else:
+            self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+
+
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"test connection to the test system ...")
@@ -63,89 +82,77 @@ class CrosScenarios():
             self.logger.info("ssh session is active")
 
             self.logger.info('executing echo "ssh session is active"')
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
-
-            # wait for the command to finish
-            while not self.stdout.channel.exit_status_ready():
-                time.sleep(1)
-
-            self.logger.debug(f"ssh console output:")
-            for line in self.stdout.readlines():
-                self.logger.debug(line)
-
-            # if self.stdout.channel.recv_exit_status() == 0: # blocking call
-            #     self.logger.debug(f"ssh console output:")
-            #     for line in self.stdout.readlines():
-            #         self.logger.debug(line)
-            # else:
-            #     self.logger.error(f"stdout.channel.recv_exit_status() returned {self.stdout.channel.recv_exit_status()}")
+            try:
+                stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+                self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
         else:
             self.logger.info("ssh session is closed")
         return status
 
 
+    def reboot(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info("reboot the test system ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info("/sbin/reboot -f > /dev/null 2>&1 &")
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
+            self.__read_stdout(stdout)
+        except paramiko.SSHException:
+            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.info("rebooted test system")
+
+
     def enter_s0i3(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"enter s0i3 on the test system ...")
+        self.logger.info("enter s0i3 on the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing echo mem > /sys/power/state")
         try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("echo mem > /sys/power/state")
+            stdin, stdout, stderr = self.ssh.exec_command("echo mem > /sys/power/state")
+            self.__read_stdout(stdout)
         except paramiko.SSHException:
             self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
 
         self.logger.info("test system entered s0i3")
 
 
     def launch_power_loadtest(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launching power_loadtest on the test system ...")
+        self.logger.info("launching power_loadtest on the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing cd /usr/local/autotest")
+        self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control")
         try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest")
+            stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control") # non-blocking call
+            self.__read_stdout(stdout)
         except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
-
-        self.logger.info("executing bin/autotest tests/power_LoadTest/control")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/power_LoadTest/control")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
+            self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
         self.logger.info("power_loadtest is running on the test system")
 
     
     def launch_aquarium(self):
+        """launch graphics_WebGLAquarium on the test system
+
+        20s: preparation
+        45s: 50 fishes
+        45s: 1000 fishes
+        """
+
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launching aquarium on the test system ...")
+        self.logger.info("launching aquarium on the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
         try:
             stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-
-            if stdout.channel.recv_exit_status() == 0: # blocking call
-                self.logger.debug(f"stdout:")
-                for line in stdout.readlines():
-                    self.logger.debug(line)
-            else:
-                self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-
+            self.__read_stdout(stdout)
         except paramiko.SSHException:
             self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
