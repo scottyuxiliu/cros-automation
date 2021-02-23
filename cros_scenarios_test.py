@@ -1,6 +1,6 @@
 import logging, unittest
 from cros_scenarios import CrosScenarios
-
+from cros_data_logger import CrosDataLogger
 
 
 class CrosScenariosCase(unittest.TestCase):
@@ -26,7 +26,7 @@ class CrosScenariosCase(unittest.TestCase):
         self.logger.addHandler(self.fh)
         self.logger.addHandler(self.ch)
 
-        self.test_system_ip_address = "10.6.145.180"
+        self.test_system_ip_address = "10.4.44.5"
         self.test_system_username = "root"
         self.ssh_private_key_file = "C:/Users/scottyuxiliu/Downloads/cezanne_majolica_id_rsa"
 
@@ -40,6 +40,9 @@ class CrosScenariosCase(unittest.TestCase):
         with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
             self.assertEqual(cs.test_connection(), True)
 
+        with CrosDataLogger(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cdl:
+            self.assertEqual(cdl.test_connection(), True)
+
 
     # def test_enter_s0i3(self):
     #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
@@ -49,12 +52,12 @@ class CrosScenariosCase(unittest.TestCase):
     #             self.fail("exception is raised!")
 
 
-    def test_launch_power_loadtest(self):
-        with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
-            try:
-                cs.launch_power_loadtest()
-            except:
-                self.fail("exception is raised!")
+    # def test_launch_power_loadtest(self):
+    #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+    #         try:
+    #             cs.launch_power_loadtest()
+    #         except:
+    #             self.fail("exception is raised!")
 
 
 if __name__ == '__main__':

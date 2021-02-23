@@ -1,12 +1,12 @@
 import os, sys, select, logging, argparse, time
 import paramiko
 
-class CrosScenarios():
+class CrosDataLogger():
     """[summary]
     """
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file=None):
-        self.logger = logging.getLogger("cros_automation.CrosScenarios")
+        self.logger = logging.getLogger("cros_automation.CrosDataLogger")
 
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"establishing ssh connection with the test system ...")
@@ -55,7 +55,7 @@ class CrosScenarios():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"test connection to the test system ...")
+        self.logger.info("test connection to the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -63,7 +63,10 @@ class CrosScenarios():
             self.logger.info("ssh session is active")
 
             self.logger.info('executing echo "ssh session is active"')
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+            try:
+                self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+            except paramiko.SSHException:
+                self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
             # wait for the command to finish
             while not self.stdout.channel.exit_status_ready():
@@ -84,85 +87,30 @@ class CrosScenarios():
         return status
 
 
-    def enter_s0i3(self):
+    def launch_atitool_logging(self, duration=60, output_file_name="pm.csv"):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"enter s0i3 on the test system ...")
+        self.logger.info(f"launching {duration}-second atitool logging on the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing echo mem > /sys/power/state")
+        self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
         try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("echo mem > /sys/power/state")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
-
-        self.logger.info("test system entered s0i3")
-
-
-    def launch_power_loadtest(self):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launching power_loadtest on the test system ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        self.logger.info("executing cd /usr/local/autotest")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
-
-        self.logger.info("executing bin/autotest tests/power_LoadTest/control")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/power_LoadTest/control")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.debug(f"ssh console output:")
-        for line in self.stdout.readlines():
-            self.logger.debug(line)
-
-        self.logger.info("power_loadtest is running on the test system")
-
-    
-    def launch_aquarium(self):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launching aquarium on the test system ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        self.logger.info("executing cd /usr/local/autotest")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest") # non-blocking call
+            stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
 
             # wait for the command to finish
-            while not self.stdout.channel.exit_status_ready():
+            while not stdout.channel.exit_status_ready():
                 time.sleep(1)
 
-            self.logger.debug(f"ssh console output:")
-            for line in self.stdout.readlines():
+            # self.logger.debug("stdin:")
+            # for line in stdin.readlines():
+            #     self.logger.debug(line)
+            self.logger.debug("stdout:")
+            for line in stdout.readlines():
+                self.logger.debug(line)
+            self.logger.debug("stderr:")
+            for line in stderr.readlines():
                 self.logger.debug(line)
 
         except paramiko.SSHException:
             self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.logger.info("executing bin/autotest tests/graphics_WebGLAquarium/control")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-
-            # wait for the command to finish
-            while not self.stdout.channel.exit_status_ready():
-                time.sleep(1)
-
-            self.logger.debug(f"ssh console output:")
-            for line in self.stdout.readlines():
-                self.logger.debug(line)
-
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.info("aquarium finished on the test system")
+        self.logger.info("atitool logging is running on the test system")

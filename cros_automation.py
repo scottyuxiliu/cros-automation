@@ -1,6 +1,7 @@
 import logging, argparse, textwrap
 from custom_logger_formatter import CustomLoggerFormatter
 from cros_scenarios import CrosScenarios
+from cros_data_logger import CrosDataLogger
 
 # --------------------------------------------------------------------------------
 # Set up logging
@@ -31,6 +32,7 @@ parser.add_argument(
         '''\
         scenarios.
         "test": test connection to the test system
+        "idle": do nothing on the test system
         "s0i3": enter s0i3 on the test system
         "plt": launch power_loadtest on the test system
         "aquarium": launch aquarium on the test system
@@ -41,6 +43,10 @@ parser.add_argument(
 parser.add_argument("-p", "--ip", type=str, default=None, help="test system ip address, default %(default)s.")
 parser.add_argument("-u", "--username", type=str, default=None, help="test system username, default %(default)s.")
 parser.add_argument("-i", "--keyfile", type=str, default=None, help="ssh private key file path, default %(default)s.")
+
+parser.add_argument("--atitool", action="store_true", help="enable atitool logging on the test system.")
+parser.add_argument("-t", "--duration", type=int, default=60, help="atitool logging duration in seconds.")
+parser.add_argument("-o", "--output", type=str, default="pm.csv", help="atitool logging output file name.")
 
 args = parser.parse_args()
 
@@ -54,6 +60,18 @@ if args.scenario == "test":
     else:
         with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
             cs.test_connection()
+
+elif args.scenario == "idle":
+    if args.ip is None:
+        parser.error("test scenario requires test system ip address (-p/--ip)")
+    elif args.username is None:
+        parser.error("test scenario requires test system username (-u/--username)")
+    elif args.keyfile is None:
+        parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
+    else:
+        if args.atitool:
+            with CrosDataLogger(args.ip, args.username, args.keyfile) as cdl:
+                cdl.launch_atitool_logging(args.duration, args.output)
 
 elif args.scenario == "s0i3":
     if args.ip is None:
