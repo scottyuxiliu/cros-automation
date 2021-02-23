@@ -103,6 +103,10 @@ elif args.scenario == "aquarium":
     elif args.keyfile is None:
         parser.error("test scenario requires ssh private key file path (-i/--keyfile)")
     else:
+        if args.atitool:
+            with CrosDataLogger(args.ip, args.username, args.keyfile) as cdl:
+                cdl.launch_atitool_logging(args.duration, args.output)
+                
         with CrosScenarios(args.ip, args.username, args.keyfile) as cs:
             cs.launch_aquarium()
 

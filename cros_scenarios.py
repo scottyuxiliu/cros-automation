@@ -135,34 +135,18 @@ class CrosScenarios():
         self.logger.info(f"launching aquarium on the test system ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing cd /usr/local/autotest")
+        self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
         try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("cd /usr/local/autotest") # non-blocking call
+            stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
 
-            # wait for the command to finish
-            while not self.stdout.channel.exit_status_ready():
-                time.sleep(1)
-
-            self.logger.debug(f"ssh console output:")
-            for line in self.stdout.readlines():
-                self.logger.debug(line)
+            if stdout.channel.recv_exit_status() == 0: # blocking call
+                self.logger.debug(f"stdout:")
+                for line in stdout.readlines():
+                    self.logger.debug(line)
+            else:
+                self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
         except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        self.logger.info("executing bin/autotest tests/graphics_WebGLAquarium/control")
-        try:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command("bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-
-            # wait for the command to finish
-            while not self.stdout.channel.exit_status_ready():
-                time.sleep(1)
-
-            self.logger.debug(f"ssh console output:")
-            for line in self.stdout.readlines():
-                self.logger.debug(line)
-
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
         self.logger.info("aquarium finished on the test system")
