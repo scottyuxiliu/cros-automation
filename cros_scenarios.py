@@ -5,7 +5,7 @@ class CrosScenarios():
     """[summary]
     """
 
-    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file=None):
+    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosScenarios")
         fh = logging.FileHandler('cros_scenarios.log', mode='w') # overwrite existing log file
         fh.setLevel(logging.DEBUG)
@@ -20,30 +20,25 @@ class CrosScenarios():
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+        self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
+        ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
+
+        self.logger.info(f"connect to test system with the following details")
+        self.logger.info(f"hostname = {test_system_ip_address}")
+        self.logger.info(f"username = {test_system_username}")
+        self.logger.info(f"ssh_private_key_file = {ssh_private_key_file}")
+
         try:
-            if ssh_private_key_file is not None and ssh_private_key_file.strip(): # If you want to make sure that foo really is a boolean and of value True, use the is operator.
-                self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
-                ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
-
-                self.logger.info(f"connect to test system with the following details")
-                self.logger.info(f"hostname = {test_system_ip_address}")
-                self.logger.info(f"username = {test_system_username}")
-                self.logger.info(f"ssh_private_key_file = {ssh_private_key_file}")
-                self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
-
-                self.logger.info("ssh session established!")
-            else:
-                self.logger.info(f"connect to test system with the following details")
-                self.logger.info(f"hostname = {test_system_ip_address}")
-                self.logger.info(f"username = {test_system_username}")
-                self.ssh.connect(hostname=test_system_ip_address, username=test_system_username)
-
-                self.logger.info("ssh session established!")
-
+            self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+            self.logger.info("ssh session established!")
         except paramiko.AuthenticationException:
-            self.logger.info(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+            self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+            sys.exit(1)
         except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+            sys.exit(1)
+
+        self.debug = debug
 
 
     def __enter__(self):
@@ -99,12 +94,16 @@ class CrosScenarios():
 
         self.logger.info("/sbin/reboot -f > /dev/null 2>&1 &")
         try:
-            stdin, stdout, stderr = self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
-            self.__read_stdout(stdout)
+            if self.debug is True:
+                stdin, stdout, stderr = self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
+                self.__read_stdout(stdout)
+            else:
+                self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
+                
+            self.logger.info("rebooted test system")
         except paramiko.SSHException:
             self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.logger.info("rebooted test system")
 
 
     def enter_s0i3(self):
@@ -151,9 +150,14 @@ class CrosScenarios():
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
         try:
-            stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-            self.__read_stdout(stdout)
+            if self.debug is True: # if debug flag is set, capture stdout from exec_command
+                stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
+                self.__read_stdout(stdout)
+                self.logger.info("aquarium finished on the test system")
+            else:
+                self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
+                time.sleep(1) # exec_command does not work properly without this
+                self.logger.info("aquarium started on the test system")
         except paramiko.SSHException:
             self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.logger.info("aquarium finished on the test system")

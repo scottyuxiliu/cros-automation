@@ -5,7 +5,7 @@ class CrosDataLogger():
     """[summary]
     """
 
-    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file=None):
+    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosDataLogger")
         fh = logging.FileHandler('cros_data_logger.log', mode='w') # overwrite existing log file
         fh.setLevel(logging.DEBUG)
@@ -20,30 +20,24 @@ class CrosDataLogger():
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+        self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
+        ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
+
+        self.logger.info(f"connect to test system with the following details")
+        self.logger.info(f"hostname = {test_system_ip_address}")
+        self.logger.info(f"username = {test_system_username}")
+        self.logger.info(f"ssh_private_key_file = {ssh_private_key_file}")
+
         try:
-            if ssh_private_key_file is not None and ssh_private_key_file.strip(): # If you want to make sure that foo really is a boolean and of value True, use the is operator.
-                self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
-                ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
-
-                self.logger.info(f"connect to test system with the following details")
-                self.logger.info(f"hostname = {test_system_ip_address}")
-                self.logger.info(f"username = {test_system_username}")
-                self.logger.info(f"ssh_private_key_file = {ssh_private_key_file}")
-                self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
-
-                self.logger.info("ssh session established!")
-            else:
-                self.logger.info(f"connect to test system with the following details")
-                self.logger.info(f"hostname = {test_system_ip_address}")
-                self.logger.info(f"username = {test_system_username}")
-                self.ssh.connect(hostname=test_system_ip_address, username=test_system_username)
-
-                self.logger.info("ssh session established!")
-
+            self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
         except paramiko.AuthenticationException:
-            self.logger.info(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+            self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
         except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        self.logger.info("ssh session established!")
+
+        self.debug = debug
 
 
     def __enter__(self):
@@ -86,7 +80,7 @@ class CrosDataLogger():
                 stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
                 self.__read_stdout(stdout)
             except paramiko.SSHException:
-                self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
         else:
             self.logger.info("ssh session is closed")
         return status
@@ -108,12 +102,17 @@ class CrosDataLogger():
 
         self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
         try:
-            stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
-            self.__read_stdout(stdout)
+            if self.debug is True:
+                stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                self.__read_stdout(stdout)
+                self.logger.info("atitool logging finished on the test system")
+            else:
+                self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                time.sleep(1) # exec_command does not work properly without this
+                self.logger.info("atitool logging started on the test system")
         except paramiko.SSHException:
-            self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.logger.info("atitool logging finished on the test system")
 
 
     def download_file(self, remote_file_path, local_file_path):
@@ -136,3 +135,29 @@ class CrosDataLogger():
         sftp.put(local_file_path, remote_file_path)
 
         self.logger.info(f"uploaded {remote_file_path}")
+
+    
+    def remove_file(self, remote_file_path):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"removing {remote_file_path} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        sftp = self.ssh.open_sftp()
+        try:
+            sftp.remove(remote_file_path)
+            self.logger.info(f"removed {remote_file_path}")
+        except IOError:
+            self.logger.error("remote_file_path might be a directory.")
+
+
+    def ls(self, remote_directory):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"ls {remote_directory} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        sftp = self.ssh.open_sftp()
+
+        items = sftp.listdir(remote_directory)
+        items.sort()
+        for item in items:
+            self.logger.info(item)
