@@ -13,29 +13,30 @@ class CrosDataLogger():
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
 
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"establishing ssh connection with the test system ...")
-        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.debug("--------------------------------------------------------------------------------")
+        self.logger.debug(f"establishing ssh connection with the test system ...")
+        self.logger.debug("--------------------------------------------------------------------------------")
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        self.logger.info(f"fetch ssh private key file {ssh_private_key_file}")
+        self.logger.debug(f"fetch ssh private key file {ssh_private_key_file}")
         ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
 
-        self.logger.info(f"connect to test system with the following details")
-        self.logger.info(f"hostname = {test_system_ip_address}")
-        self.logger.info(f"username = {test_system_username}")
-        self.logger.info(f"ssh_private_key_file = {ssh_private_key_file}")
+        self.logger.debug(f"connect to test system with the following details")
+        self.logger.debug(f"hostname = {test_system_ip_address}")
+        self.logger.debug(f"username = {test_system_username}")
+        self.logger.debug(f"ssh_private_key_file = {ssh_private_key_file}")
 
-        try:
-            self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
-        except paramiko.AuthenticationException:
-            self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
-        except paramiko.SSHException:
-            self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+        # try:
+        #     self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        # except paramiko.AuthenticationException:
+        #     self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+        # except paramiko.SSHException:
+        #     self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.logger.info("ssh session established!")
+        self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        self.logger.debug("ssh session established!")
 
         self.debug = debug
 
@@ -87,7 +88,7 @@ class CrosDataLogger():
 
 
     def launch_atitool_logging(self, duration=60, output_file_name="pm.csv"):
-        """[summary]
+        """atitool path should be /usr/local/atitool
 
         Parameters
         ----------

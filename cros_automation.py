@@ -50,8 +50,8 @@ parser.add_argument("-k", "--keyfile", type=str, required=True, help="ssh privat
 
 parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the test system.")
-parser.add_argument("-i", "--input", type=str, default="pm.csv", help="data logging source file name.")
-parser.add_argument("-o", "--output", type=str, default="pm.csv", help="data logging output file name.")
+parser.add_argument("-i", "--input", type=str, help="data logging source file name.")
+parser.add_argument("-o", "--output", type=str, help="data logging output file name.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
 
