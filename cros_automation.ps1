@@ -23,6 +23,7 @@ $duration_aquarium = 120
 
 $delay_after_boot = 180
 
+$test_system_autotest_directory = "/usr/local/autotest"
 $test_system_atitool_directory = "/usr/local/atitool"
 
 function check_directory_exist {
@@ -154,10 +155,10 @@ function measurement {
         create_directory -directory $result_directory
     }
     
-    foreach ($i in 1..$loops) {
-        Write-Verbose "get current result file index ..."
-        $offset = get_current_result_file_index -result_directory $result_directory
+    Write-Verbose "get current result file index ..."
+    $offset = get_current_result_file_index -result_directory $result_directory
 
+    foreach ($i in 1..$loops) {
         Write-Verbose "reboot test system for $scenario scenario, loop $i ..."
         python.exe .\cros_automation.py reboot -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file
 
@@ -174,6 +175,9 @@ function measurement {
 
             Write-Verbose "wait 60 seconds for data logging to finish ..."
             sleep_with_progress_bar -seconds 60
+
+            Write-Verbose "download $scenario result keyval $test_system_autotest_directory/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
+            python .\cros_automation.py download -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -i "$test_system_autotest_directory/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
 
             Write-Verbose "download atitool log $test_system_atitool_directory/pm_log_$($i+$offset).csv to $result_directory ..."
             python .\cros_automation.py download -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -i "$test_system_atitool_directory/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
@@ -196,4 +200,4 @@ function measurement {
     }
 }
 
-measurement -loops 3 -scenario "aquarium" -result_directory "r87_13434.223_default_aquarium_vilboz"
+measurement -loops 1 -scenario "aquarium" -result_directory "r87_13434.223_default_aquarium_vilboz"
