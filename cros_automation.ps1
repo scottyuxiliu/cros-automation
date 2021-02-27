@@ -166,8 +166,10 @@ function measurement {
         sleep_with_progress_bar -seconds $delay_after_boot
 
         if ($scenario -eq "aquarium") {
-            Write-Verbose "start atitool logging to $test_system_atitool_directory/pm_log_$($i+$offset).csv and launch $scenario ..."
+            Write-Verbose "start atitool logging to $test_system_atitool_directory/pm_log_$($i+$offset).csv ..."
             python.exe .\cros_automation.py atitool -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -t $duration_aquarium -o "pm_log_$($i+$offset).csv"
+
+            Write-Verbose "launch $scenario ..."
             python.exe .\cros_automation.py aquarium -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file
 
             Write-Verbose "wait $duration_aquarium seconds for $scenario to finish ..."
