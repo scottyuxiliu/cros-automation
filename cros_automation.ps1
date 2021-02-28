@@ -1,30 +1,36 @@
 #----------------------------------------------------------------------
 # User inputs
 
-$delay_between_loop = 60 # delay $delay_between_loop seconds before starting the next iteration
+$DELAY_BETWEEN_LOOP = 60 # delay $DELAY_BETWEEN_LOOP seconds before starting the next iteration
 
 # --------------
 
-$test_system_ip_address = "10.4.44.5"
-$test_system_username = "root"
-$test_system_ssh_private_key_file = "id_rsa"
+$TEST_SYS_IP = "10.4.39.203"
+$TEST_SYS_USERNAME = "root"
+$TEST_SYS_KEYFILE = "id_rsa"
 
 # --------------
 # the downloads directory on host system. when collecting data on the host system, all results are output to this directory by default.
-# for example, $downloads_directory = "C:\Users\powerhost\Downloads"
-$downloads_directory = "C:\Users\scottyuxiliu\Downloads"
+# for example, $DOWNLOADS_PATH = "C:\Users\$($env:UserName)\Downloads"
+$DOWNLOADS_PATH = "C:\Users\$($env:UserName)\Downloads"
 
 #----------------------------------------------------------------------
+
+#----------------------------------------------------------------------
+# Constants
 
 $VerbosePreference = "Continue"
 $DebugPreference = "Continue"
 
-$duration_aquarium = 120
+$DELAY_AQUARIUM = 120
+$DELAY_PLT = 3600
 
-$delay_after_boot = 180
+$DELAY_AFTER_BOOT = 180
 
-$test_system_autotest_directory = "/usr/local/autotest"
-$test_system_atitool_directory = "/usr/local/atitool"
+$TEST_SYS_AUTOTEST_PATH = "/usr/local/autotest"
+$TEST_SYS_ATITOOL_PATH = "/usr/local/atitool"
+
+#----------------------------------------------------------------------
 
 function check_directory_exist {
     <#
@@ -144,13 +150,80 @@ function sleep_with_progress_bar($seconds) {
 
 function measurement {
     param (
+        [Parameter(Mandatory=$true)] [string] $scenario,
+        [Parameter(Mandatory=$true)] [string] $result_directory
+    )
+
+    if ($scenario -eq "aquarium") {
+        Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
+        python.exe .\cros_automation.py atitool -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_AQUARIUM -o "pm_log_$($i+$offset).csv"
+
+        Write-Verbose "launch $scenario ..."
+        python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
+
+        Write-Verbose "wait $DELAY_AQUARIUM seconds for $scenario to finish ..."
+        sleep_with_progress_bar -seconds $DELAY_AQUARIUM
+
+        Write-Verbose "wait 60 seconds for data logging to finish ..."
+        sleep_with_progress_bar -seconds 60
+
+        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
+
+        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results"
+
+        Write-Verbose "download atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
+        
+        Write-Verbose "remove atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv on the test system ..."
+        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv"
+        
+        Write-Verbose "list items in $TEST_SYS_ATITOOL_PATH ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_ATITOOL_PATH"
+    }
+    elseif ($scenario -eq "plt") {
+        Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
+        python.exe .\cros_automation.py atitool -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_PLT -o "pm_log_$($i+$offset).csv"
+
+        Write-Verbose "launch $scenario ..."
+        python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
+
+        Write-Verbose "wait $DELAY_PLT seconds for $scenario to finish ..."
+        sleep_with_progress_bar -seconds $DELAY_PLT
+
+        Write-Verbose "wait 60 seconds for data logging to finish ..."
+        sleep_with_progress_bar -seconds 60
+
+        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
+
+        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results"
+
+        Write-Verbose "download atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
+        
+        Write-Verbose "remove atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv on the test system ..."
+        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv"
+        
+        Write-Verbose "list items in $TEST_SYS_ATITOOL_PATH ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_ATITOOL_PATH"
+    }
+    else {
+        Write-Verbose "$scenario is not supported. supported scenarios are: aquarium"
+    }
+}
+
+function example {
+    param (
         [Parameter(Mandatory=$true)] [string] $loops,
         [Parameter(Mandatory=$true)] [string] $scenario,
         [Parameter(Mandatory=$true)] [string] $result_directory
     )
 
     Write-Verbose "set up result directory ..."
-    $result_directory = "$downloads_directory\$result_directory"
+    $result_directory = "$DOWNLOADS_PATH\$result_directory"
     if( -not ( check_directory_exist -directory $result_directory ) ) {
         create_directory -directory $result_directory
     }
@@ -160,46 +233,18 @@ function measurement {
 
     foreach ($i in 1..$loops) {
         Write-Verbose "reboot test system for $scenario scenario, loop $i ..."
-        python.exe .\cros_automation.py reboot -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file
+        python.exe .\cros_automation.py reboot -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
 
-        Write-Verbose "wait $delay_after_boot seconds before running $scenario ..."
-        sleep_with_progress_bar -seconds $delay_after_boot
+        Write-Verbose "wait $DELAY_AFTER_BOOT seconds before running $scenario ..."
+        sleep_with_progress_bar -seconds $DELAY_AFTER_BOOT
 
-        if ($scenario -eq "aquarium") {
-            Write-Verbose "start atitool logging to $test_system_atitool_directory/pm_log_$($i+$offset).csv ..."
-            python.exe .\cros_automation.py atitool -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -t $duration_aquarium -o "pm_log_$($i+$offset).csv"
-
-            Write-Verbose "launch $scenario ..."
-            python.exe .\cros_automation.py aquarium -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file
-
-            Write-Verbose "wait $duration_aquarium seconds for $scenario to finish ..."
-            sleep_with_progress_bar -seconds $duration_aquarium
-
-            Write-Verbose "wait 60 seconds for data logging to finish ..."
-            sleep_with_progress_bar -seconds 60
-
-            Write-Verbose "download $scenario result keyval $test_system_autotest_directory/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
-            python .\cros_automation.py download -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -i "$test_system_autotest_directory/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
-
-            Write-Verbose "download atitool log $test_system_atitool_directory/pm_log_$($i+$offset).csv to $result_directory ..."
-            python .\cros_automation.py download -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -i "$test_system_atitool_directory/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
-            
-            Write-Verbose "remove atitool log $test_system_atitool_directory/pm_log_$($i+$offset).csv on the test system ..."
-            python .\cros_automation.py remove -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -i "$test_system_atitool_directory/pm_log_$($i+$offset).csv"
-            
-            Write-Verbose "list items in $test_system_atitool_directory ..."
-            python .\cros_automation.py ls -p $test_system_ip_address -u $test_system_username -k $test_system_ssh_private_key_file -d "$test_system_atitool_directory"
-
-        }
-        else {
-            Write-Verbose "$scenario is not supported. supported scenarios are: aquarium"
-        }
+        measurement -scenario $scenario -result_directory $result_directory
 
         if($i -ne $loops) {
-            Write-Verbose "wait $delay_between_loop seconds to start loop $($i+1) ..." 
-            sleep_with_progress_bar -seconds $delay_between_loop
+            Write-Verbose "wait $DELAY_BETWEEN_LOOP seconds to start loop $($i+1) ..." 
+            sleep_with_progress_bar -seconds $DELAY_BETWEEN_LOOP
         }
     }
 }
 
-measurement -loops 1 -scenario "aquarium" -result_directory "r87_13434.223_default_aquarium_vilboz"
+example -loops 1 -scenario "aquarium" -result_directory "r87_13434.223_default_aquarium_vilboz"

@@ -1,4 +1,4 @@
-import os, sys, select, logging, argparse, time
+import os, sys, select, logging, time
 import paramiko
 
 class CrosDataLogger():
@@ -153,7 +153,7 @@ class CrosDataLogger():
 
     def ls(self, remote_directory):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"ls {remote_directory} ...")
+        self.logger.info(f"list files in {remote_directory} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()

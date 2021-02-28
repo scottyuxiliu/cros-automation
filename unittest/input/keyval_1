@@ -1,0 +1,11 @@
+avg_fps_0050_fishes{perf}=59.8927989993
+avg_fps_1000_fishes{perf}=49.5504495977
+avg_interframe_time_0050_fishes{perf}=0.0166973903535
+avg_interframe_time_1000_fishes{perf}=0.0201799866335
+avg_render_time_0050_fishes{perf}=0.00527984456576
+avg_render_time_1000_fishes{perf}=0.012174499915
+std_interframe_time_0050_fishes{perf}=0.0181118510153
+std_interframe_time_1000_fishes{perf}=0.0194159239875
+std_render_time_0050_fishes{perf}=0.00207165992377
+std_render_time_1000_fishes{perf}=0.00273271410426
+

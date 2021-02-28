@@ -2,6 +2,7 @@ import logging, argparse, textwrap
 from custom_logger_formatter import CustomLoggerFormatter
 from cros_scenarios import CrosScenarios
 from cros_data_logger import CrosDataLogger
+from cros_data_parser import CrosDataParser
 
 # --------------------------------------------------------------------------------
 # Set up logging
@@ -37,20 +38,20 @@ parser.add_argument(
         "atitool": use atitool logging on the test system
         "download": download file [-i/--input] to the local host system [-o/--output]
         "remove": remove file [-i/--input] on the test system
-        "ls": list items in the directory [-d/--directory]
+        "ls": list items in the test system directory [-d/--directory]
 
         data parsing scenarios.
-        "parse": parse top logs
+        "ls-local": list items in the local directory [-d/--directory]
         '''
     )
 )
-parser.add_argument("-p", "--ip", type=str, required=True, help="test system ip address, default %(default)s.")
-parser.add_argument("-u", "--username", type=str, required=True, help="test system username, default %(default)s.")
-parser.add_argument("-k", "--keyfile", type=str, required=True, help="ssh private key file path, default %(default)s.")
+parser.add_argument("-p", "--ip", type=str, help="test system ip address, default %(default)s.")
+parser.add_argument("-u", "--username", type=str, help="test system username, default %(default)s.")
+parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path, default %(default)s.")
 
 parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the test system.")
-parser.add_argument("-i", "--input", type=str, help="data logging source file name.")
+parser.add_argument("-i", "--input", type=str, help="data logging source file name, or data parsing file name.")
 parser.add_argument("-o", "--output", type=str, help="data logging output file name.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
@@ -95,6 +96,10 @@ elif args.scenario == "remove":
 elif args.scenario == "ls":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.ls(args.directory)
+
+elif args.scenario == "ls-local":
+    with CrosDataParser() as cdp:
+        cdp.ls_local(args.directory, args.input)
 
 else:
     pass
