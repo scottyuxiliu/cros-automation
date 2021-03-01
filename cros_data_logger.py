@@ -78,8 +78,12 @@ class CrosDataLogger():
 
             self.logger.info('executing echo "ssh session is active"')
             try:
-                stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
-                self.__read_stdout(stdout)
+                if self.debug is True:
+                    stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+                    self.__read_stdout(stdout)
+                else:
+                    self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
+                    
             except paramiko.SSHException:
                 self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
         else:

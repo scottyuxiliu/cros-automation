@@ -30,7 +30,11 @@ python .\cros_automation.py aquarium -p "192.168.123.456" -u "root" -k "id_rsa"
 List items in a directory
 
 ```
+# list items in a test system directory
 python .\cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
+
+# list items in a local directory
+python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input"
 ```
 
 

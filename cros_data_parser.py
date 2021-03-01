@@ -23,6 +23,18 @@ class CrosDataParser():
 
 
     def __read_path(self, path):
+        """read path in string format and convert it to pathlib.Path() object
+
+        Parameters
+        ----------
+        path : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         path.replace("\\", "/")
         return pathlib.Path(path)
 
@@ -32,6 +44,9 @@ class CrosDataParser():
             self.logger.info("--------------------------------------------------------------------------------")
             self.logger.info(f"list files in {directory} ...")
             self.logger.info("--------------------------------------------------------------------------------")
+
+            name = "*"
+
         elif name.startswith("*") and name.endswith("*"):
             self.logger.info("--------------------------------------------------------------------------------")
             self.logger.info(f"list files in {directory} that have {name.strip('*')} in their file names ...")
@@ -48,3 +63,13 @@ class CrosDataParser():
             self.logger.info("--------------------------------------------------------------------------------")
             self.logger.info(f"list files in {directory} with file names matching {name} ...")
             self.logger.info("--------------------------------------------------------------------------------")
+
+        directory = self.__read_path(directory)
+        items = glob.glob( str(directory.joinpath(name)) )
+        if not items:
+            self.logger.info("(na)")
+        else:
+            for item in items:
+                self.logger.info(item)
+
+        return items
