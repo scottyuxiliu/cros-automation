@@ -1,5 +1,6 @@
 import os, sys, select, logging, time, glob, pathlib
 import paramiko
+import pandas as pd
 
 class CrosDataParser():
     """[summary]
@@ -7,7 +8,8 @@ class CrosDataParser():
 
     def __init__(self):
         self.logger = logging.getLogger("cros_automation.CrosDataParser")
-        fh = logging.FileHandler('cros_data_parser.log', mode='w') # overwrite existing log file
+        fh = logging.FileHandler("cros_data_parser.log", mode="w") # overwrite existing log file
+        # fh = logging.FileHandler("cros_data_parser.log")
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -73,3 +75,23 @@ class CrosDataParser():
                 self.logger.info(item)
 
         return items
+
+
+    def keyvals_to_csv(self, keyvals):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"convert keyvals to .csv files ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        for keyval in keyvals:
+            content_dict = {}
+
+            with open(keyval, "r") as f:
+                for line in f.readlines(): # f.readlines() will point to the end of file after finish
+                    line_items = line.split("=")
+                    self.logger.debug(line_items)
+                    content_dict[ line_items[0].strip() ] =  line_items[-1].strip()
+
+            content_df = pd.DataFrame.from_records( [content_dict] )
+            self.logger.info(f"{keyval} content:\n{content_df}")
+
+            content_df.to_csv(f"{keyval}.csv", index=False)

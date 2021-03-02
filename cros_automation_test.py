@@ -1,4 +1,4 @@
-import logging, unittest
+import logging, unittest, os
 from cros_scenarios import CrosScenarios
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
@@ -33,38 +33,49 @@ class CrosAutomationCase(unittest.TestCase):
     def tearDown(self):
         """The tearDown() method is a special method that the unit testing framework executes after each test respectively.
         """
+        files = ["unittest\\keyval_1.csv", "unittest\\keyval_2.csv", "unittest\\keyval_3.csv", "unittest\\keyval_4.csv"]
+        for f in files:
+            try:
+                os.remove(f)
+            except OSError:
+                pass
+
 
 
     def test_cs_test_connection(self):
         with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file, self.debug) as cs:
             self.assertEqual(cs.test_connection(), True)
 
+
     def test_cdl_test_connection(self):
         with CrosDataLogger(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file, self.debug) as cdl:
             self.assertEqual(cdl.test_connection(), True)
     
+
     def test_cdp_ls_local_1(self):
         """test CrosDataParser.ls_local with name=None
         """
-        expected = ["unittest\\input\\keyval_1", "unittest\\input\\keyval_2", "unittest\\input\\keyval_3", "unittest\\input\\keyval_4"]
+        expected = ["unittest\\keyval_1", "unittest\\keyval_2", "unittest\\keyval_3", "unittest\\keyval_4"]
         result = []
 
         with CrosDataParser() as cdp:
-            result = cdp.ls_local("./unittest/input")
+            result = cdp.ls_local("./unittest")
 
         self.assertCountEqual(result, expected) # compare two lists having the same elements but in a different order
+
 
     def test_cdp_ls_local_2(self):
         """test CrosDataParser.ls_local with name="*keyval*"
         """
-        expected = ["unittest\\input\\keyval_1", "unittest\\input\\keyval_2", "unittest\\input\\keyval_3", "unittest\\input\\keyval_4"]
+        expected = ["unittest\\keyval_1", "unittest\\keyval_2", "unittest\\keyval_3", "unittest\\keyval_4"]
         result = []
 
         with CrosDataParser() as cdp:
-            result = cdp.ls_local("./unittest/input", "*keyval*")
+            result = cdp.ls_local("./unittest", "*keyval*")
 
         self.assertCountEqual(result, expected) # compare two lists having the same elements but in a different order
     
+
     def test_cdp_ls_local_3(self):
         """test CrosDataParser.ls_local with name="*keyval"
         """
@@ -72,21 +83,23 @@ class CrosAutomationCase(unittest.TestCase):
         result = []
 
         with CrosDataParser() as cdp:
-            result = cdp.ls_local("./unittest/input", "*keyval")
+            result = cdp.ls_local("./unittest", "*keyval")
 
         self.assertCountEqual(result, expected) # compare two lists having the same elements but in a different order
     
+
     def test_cdp_ls_local_4(self):
         """test CrosDataParser.ls_local with name="keyval*"
         """
-        expected = ["unittest\\input\\keyval_1", "unittest\\input\\keyval_2", "unittest\\input\\keyval_3", "unittest\\input\\keyval_4"]
+        expected = ["unittest\\keyval_1", "unittest\\keyval_2", "unittest\\keyval_3", "unittest\\keyval_4"]
         result = []
 
         with CrosDataParser() as cdp:
-            result = cdp.ls_local("./unittest/input", "keyval*")
+            result = cdp.ls_local("./unittest", "keyval*")
 
         self.assertCountEqual(result, expected) # compare two lists having the same elements but in a different order
     
+
     def test_cdp_ls_local_5(self):
         """test CrosDataParser.ls_local with name="keyval"
         """
@@ -94,10 +107,20 @@ class CrosAutomationCase(unittest.TestCase):
         result = []
 
         with CrosDataParser() as cdp:
-            result = cdp.ls_local("./unittest/input", "keyval")
+            result = cdp.ls_local("./unittest", "keyval")
 
         self.assertCountEqual(result, expected) # compare two lists having the same elements but in a different order
+    
 
+    def test_cdp_keyvals_to_csv(self):
+        """test CrosDataParser.keyvals_to_csv with name="*keyval*"
+        """
+        with CrosDataParser() as cdp:
+            try:
+                keyvals = cdp.ls_local("./unittest", "*keyval*")
+                cdp.keyvals_to_csv(keyvals)
+            except:
+                self.fail("exception is raised!")
 
 
     # def test_enter_s0i3(self):

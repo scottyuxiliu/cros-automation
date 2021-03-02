@@ -7,7 +7,8 @@ class CrosDataLogger():
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosDataLogger")
-        fh = logging.FileHandler('cros_data_logger.log', mode='w') # overwrite existing log file
+        fh = logging.FileHandler("cros_data_logger.log", mode="w") # overwrite existing log file
+        # fh = logging.FileHandler("cros_data_logger.log")
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -38,6 +39,7 @@ class CrosDataLogger():
         self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
         self.logger.debug("ssh session established!")
 
+        self.test_system_ip_address = test_system_ip_address
         self.debug = debug
 
 
@@ -69,7 +71,7 @@ class CrosDataLogger():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("test connection to the test system ...")
+        self.logger.info(f"test connection to the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -102,7 +104,7 @@ class CrosDataLogger():
             [description], by default "pm.csv"
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launching {duration}-second atitool logging on the test system ...")
+        self.logger.info(f"launch {duration}-second atitool logging on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
@@ -122,7 +124,7 @@ class CrosDataLogger():
 
     def download_file(self, remote_file_path, local_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"downloading {remote_file_path} to {local_file_path} ...")
+        self.logger.info(f"download {remote_file_path} to {local_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()
@@ -133,7 +135,7 @@ class CrosDataLogger():
 
     def upload_file(self, local_file_path, remote_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"uploading {local_file_path} to {remote_file_path} ...")
+        self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()
@@ -144,7 +146,7 @@ class CrosDataLogger():
     
     def remove_file(self, remote_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"removing {remote_file_path} ...")
+        self.logger.info(f"remove {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()

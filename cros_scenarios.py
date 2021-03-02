@@ -7,7 +7,8 @@ class CrosScenarios():
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosScenarios")
-        fh = logging.FileHandler('cros_scenarios.log', mode='w') # overwrite existing log file
+        fh = logging.FileHandler("cros_scenarios.log", mode="w") # overwrite existing log file
+        # fh = logging.FileHandler("cros_scenarios.log")
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -41,6 +42,7 @@ class CrosScenarios():
         self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
         self.logger.debug("ssh session established!")
 
+        self.test_system_ip_address = test_system_ip_address
         self.debug = debug
 
 
@@ -72,7 +74,7 @@ class CrosScenarios():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"test connection to the test system ...")
+        self.logger.info(f"test connection to the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -96,7 +98,7 @@ class CrosScenarios():
 
     def reboot(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("reboot the test system ...")
+        self.logger.info(f"reboot the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: /sbin/reboot -f > /dev/null 2>&1 &")
@@ -115,7 +117,7 @@ class CrosScenarios():
 
     def enter_s0i3(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("enter s0i3 on the test system ...")
+        self.logger.info(f"enter s0i3 on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: echo mem > /sys/power/state")
@@ -133,7 +135,7 @@ class CrosScenarios():
 
     def launch_power_loadtest(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("launching power_loadtest on the test system ...")
+        self.logger.info(f"launch power_loadtest on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control")
@@ -161,7 +163,7 @@ class CrosScenarios():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("launching aquarium on the test system ...")
+        self.logger.info(f"launch aquarium on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")

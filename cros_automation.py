@@ -42,6 +42,7 @@ parser.add_argument(
 
         data parsing scenarios.
         "ls-local": list items in the local directory [-d/--directory]
+        "keyvals-to-csv": convert keyvals [-i/--input] to .csv files in the same directory
         '''
     )
 )
@@ -100,6 +101,11 @@ elif args.scenario == "ls":
 elif args.scenario == "ls-local":
     with CrosDataParser() as cdp:
         cdp.ls_local(args.directory, args.input)
+
+elif args.scenario == "keyvals-to-csv":
+    with CrosDataParser() as cdp:
+        keyvals = cdp.ls_local(args.directory, args.input)
+        cdp.keyvals_to_csv(keyvals)
 
 else:
     pass
