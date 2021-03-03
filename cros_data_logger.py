@@ -1,4 +1,4 @@
-import os, sys, select, logging, time
+import os, sys, select, logging, time, errno, pathlib, stat
 import paramiko
 
 class CrosDataLogger():
@@ -68,6 +68,39 @@ class CrosDataLogger():
         else:
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
+    
+    def __read_path(self, path):
+        """read path in string format and convert it to pathlib.Path() object with Linux convention
+
+        There might be times when you need a representation of a path without access to the underlying file system (in which case it could also make sense to represent a Windows path on a non-Windows system or vice versa). This can be done with PurePath objects.
+
+        Parameters
+        ----------
+        path : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        path.replace("\\", "/")
+        return pathlib.PurePosixPath(path)
+
+        
+    def __exist(self, path):
+        sftp = self.ssh.open_sftp()
+
+        try:
+            sftp.stat(path)
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                sftp.close()
+                return False
+        else:
+            sftp.close()
+            return True
+
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
@@ -93,7 +126,7 @@ class CrosDataLogger():
         return status
 
 
-    def launch_atitool_logging(self, duration=60, output_file_name="pm.csv"):
+    def launch_atitool_logging(self, duration, index, output_file_name="pm.csv"):
         """atitool path should be /usr/local/atitool
 
         Parameters
@@ -107,19 +140,51 @@ class CrosDataLogger():
         self.logger.info(f"launch {duration}-second atitool logging on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+        if index == 0:
+            self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+        else:
+            self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+
         try:
             if self.debug is True:
-                stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                if index == 0:
+                    stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                else:
+                    stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+
                 self.__read_stdout(stdout)
                 self.logger.info("atitool logging finished on the test system")
             else:
-                self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i=1 -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                if index == 0:
+                    self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                else:
+                    self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+
                 time.sleep(1) # exec_command does not work properly without this
                 self.logger.info("atitool logging started on the test system")
         except paramiko.SSHException:
             self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 
+
+    def is_file(self, path):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"check if {path} is a file or a directory ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        path = str( self.__read_path(path) )
+
+        if self.__exist(path):
+            self.logger.info(f"{path} exists")
+            # sftp = self.ssh.open_sftp()
+            # for fileattr in sftp.listdir_attr(path):
+            #     if stat.S_ISDIR(fileattr.st_mode):
+            #         self.logger.info("it is a directory")
+            #         return False
+            #     else:
+            #         self.logger.info("it is a file")
+            #         return True
+        else:
+            self.logger.info(f"no such file or directory: {path}")
 
 
     def download_file(self, remote_file_path, local_file_path):
@@ -131,6 +196,7 @@ class CrosDataLogger():
         sftp.get(remote_file_path, local_file_path)
 
         self.logger.info(f"downloaded {local_file_path}")
+        sftp.close()
 
 
     def upload_file(self, local_file_path, remote_file_path):
@@ -138,10 +204,13 @@ class CrosDataLogger():
         self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        sftp = self.ssh.open_sftp()
-        sftp.put(local_file_path, remote_file_path)
-
-        self.logger.info(f"uploaded {remote_file_path}")
+        if self.__exist(remote_file_path):
+            self.logger.info(f"{remote_file_path} already exists")
+        else:
+            sftp = self.ssh.open_sftp()
+            sftp.put(local_file_path, remote_file_path)
+            self.logger.info(f"uploaded {remote_file_path}")
+            sftp.close()
 
     
     def remove_file(self, remote_file_path):
@@ -152,19 +221,91 @@ class CrosDataLogger():
         sftp = self.ssh.open_sftp()
         try:
             sftp.remove(remote_file_path)
-            self.logger.info(f"removed {remote_file_path}")
         except IOError:
             self.logger.error("remote_file_path might be a directory.")
+        else:
+            self.logger.info(f"removed {remote_file_path}")
+
+        sftp.close()
 
 
-    def ls(self, remote_directory):
+    def extract_file(self, remote_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"list files in {remote_directory} ...")
+        self.logger.info(f"extract {remote_file_path} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if self.__exist(remote_file_path):
+            p = self.__read_path(remote_file_path)
+            directory = str(p.parent)
+            filename = p.name
+
+            self.logger.info(f"executing: cd {directory}; tar -xzvf {filename}")
+
+            try:
+                if self.debug is True:
+                    stdin, stdout, stderr = self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
+                    self.__read_stdout(stdout)
+                    self.logger.info("file extraction finished on the test system")
+                else:
+                    self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
+                    time.sleep(1) # exec_command does not work properly without this
+                    self.logger.info("file extraction started on the test system")
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+        else:
+            self.logger.error(f"no such file: {remote_file_path}")
+
+
+    def mkdir(self, remote_dir):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"create directory {remote_dir} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if self.__exist(remote_dir):
+            self.logger.info(f"{remote_dir} already exists")
+        else:
+            sftp = self.ssh.open_sftp()
+            sftp.mkdir(remote_dir)
+            self.logger.info(f"{remote_dir} created")
+            sftp.close()
+
+
+    def rmdir(self, remote_dir):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"remove directory {remote_dir} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if self.__exist(remote_dir):
+            if self.debug is True:
+                try:
+                    stdin, stdout, stderr = self.ssh.exec_command(f"rm -r {remote_dir}") # non-blocking call
+                    self.__read_stdout(stdout)
+                except paramiko.SSHException:
+                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                else:
+                    self.logger.info(f"removed {remote_dir} on the test system")
+            else:
+                try:
+                    self.ssh.exec_command(f"rm -r {remote_dir}") # non-blocking call
+                except paramiko.SSHException:
+                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                else:
+                    self.logger.info(f"started to remove {remote_dir} on the test system")
+        else:
+            self.logger.error(f"no such directory: {remote_dir}")
+
+
+    def ls(self, remote_dir):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"list files in {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()
 
-        items = sftp.listdir(remote_directory)
+        items = sftp.listdir(remote_dir)
         items.sort()
         for item in items:
             self.logger.info(item)
+
+        sftp.close()

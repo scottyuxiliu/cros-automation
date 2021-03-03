@@ -102,17 +102,22 @@ class CrosScenarios():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: /sbin/reboot -f > /dev/null 2>&1 &")
-        try:
-            if self.debug is True:
+
+        if self.debug is True:
+            try:
                 stdin, stdout, stderr = self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
                 self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
+                self.logger.info("rebooted test system")
+        else:
+            try:
                 self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
-                
-            self.logger.info("rebooted test system")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
+            except paramiko.SSHException:
+                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("started reboot on the test system")
 
 
     def enter_s0i3(self):
@@ -121,16 +126,22 @@ class CrosScenarios():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: echo mem > /sys/power/state")
-        try:
-            if self.debug is True:
+
+        if self.debug is True:
+            try:
                 stdin, stdout, stderr = self.ssh.exec_command("echo mem > /sys/power/state")
                 self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
+                self.logger.info("test system entered s0i3")
+        else:
+            try:
                 self.ssh.exec_command("echo mem > /sys/power/state")
-
-            self.logger.info("test system entered s0i3")
-        except paramiko.SSHException:
-            self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            except paramiko.SSHException:
+                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("started s0i3 entry on the test system")
 
 
     def launch_power_loadtest(self):
@@ -139,15 +150,16 @@ class CrosScenarios():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control")
+
         try:
             if self.debug is True: # if debug flag is set, capture stdout from exec_command
                 stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control") # non-blocking call
                 self.__read_stdout(stdout)
-                self.logger.info("power_loadtest finished on the test system")
+                self.logger.info("finished power_loadtest on the test system")
             else:
                 self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control") # non-blocking call
                 time.sleep(1) # exec_command does not work properly without this. every additional command requires one more second of wait time.
-                self.logger.info("power_loadtest started on the test system")
+                self.logger.info("started power_loadtest on the test system")
 
         except paramiko.SSHException:
             self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")

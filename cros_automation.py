@@ -35,9 +35,11 @@ parser.add_argument(
         "aquarium": launch aquarium on the test system
 
         data logging scenarios.
+        "install-atitool": install atitool given the .tar.gz installation file [-i/--input]
         "atitool": use atitool logging on the test system
         "download": download file [-i/--input] to the local host system [-o/--output]
         "remove": remove file [-i/--input] on the test system
+        "rmdir": remove directory [-d/--directory] on the test system
         "ls": list items in the test system directory [-d/--directory]
 
         data parsing scenarios.
@@ -46,14 +48,15 @@ parser.add_argument(
         '''
     )
 )
-parser.add_argument("-p", "--ip", type=str, help="test system ip address, default %(default)s.")
-parser.add_argument("-u", "--username", type=str, help="test system username, default %(default)s.")
-parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path, default %(default)s.")
+parser.add_argument("-p", "--ip", type=str, help="test system ip address.")
+parser.add_argument("-u", "--username", type=str, help="test system username.")
+parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path.")
 
-parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds.")
+parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds, default %(default)s.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the test system.")
 parser.add_argument("-i", "--input", type=str, help="data logging source file name, or data parsing file name.")
 parser.add_argument("-o", "--output", type=str, help="data logging output file name.")
+parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
 
@@ -82,9 +85,15 @@ elif args.scenario == "aquarium":
     with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.launch_aquarium()
 
+elif args.scenario == "install-atitool":
+    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
+        cdl.mkdir("/usr/local/atitool")
+        cdl.upload_file(args.input, "/usr/local/atitool/atitool.tar.gz")
+        cdl.extract_file("/usr/local/atitool/atitool.tar.gz")
+
 elif args.scenario == "atitool":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.launch_atitool_logging(args.duration, args.output)
+        cdl.launch_atitool_logging(args.duration, args.index, args.output)
 
 elif args.scenario == "download":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
