@@ -18,7 +18,7 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 Capture ATITOOL log
 
 ```
-python .\cros_automation.py atitool -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "atitool_log.csv"
+python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "atitool_log.csv"
 ```
 
 Run graphics_WebGLAquarium
@@ -44,8 +44,20 @@ Download atitool_log.csv to the local host system
 python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
 ```
 
+Upload atitool_log.csv to the local host system
+
+```
+python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i "C:\Users\scottyuxiliu\Downloads\atitool_log.csv" -o "/usr/local/atitool/atitool_log.csv"
+```
+
 Remove atitool_log.csv on the test system
 
 ```
 python .\cros_automation.py remove -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
+```
+
+Remove /usr/local/atitool directory on the test system
+
+```
+python .\cros_automation.py rmdir -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
 ```

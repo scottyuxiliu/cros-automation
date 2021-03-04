@@ -102,6 +102,25 @@ class CrosDataLogger():
             return True
 
 
+    def __exec_command(self, command, delay):
+        if self.debug is True:
+            try:
+                stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
+                self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("finished on the test system")
+        else:
+            try:
+                self.ssh.exec_command(command) # non-blocking call
+                time.sleep(delay) # exec_command does not work properly without this. every additional command requires one more second of wait time.
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("started on the test system")
+
+
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"test connection to the test system {self.test_system_ip_address} ...")
@@ -126,7 +145,39 @@ class CrosDataLogger():
         return status
 
 
-    def launch_atitool_logging(self, duration, index, output_file_name="pm.csv"):
+    def atitool_prog(self, arguments):
+        """atitool path should be /usr/local/atitool
+
+        Parameters
+        ----------
+        arguments : str
+            arguments passed in for atitool to program
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"atitool program with argument(s) {arguments} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info(f"executing: cd /usr/local/atitool; ./atitool {arguments}")
+
+        if self.debug is True:
+            try:
+                stdin, stdout, stderr = self.ssh.exec_command(f"cd /usr/local/atitool; ./atitool {arguments}") # non-blocking call
+                self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("finished atitool programming on the test system")
+        else:
+            try:
+                self.ssh.exec_command(f"cd /usr/local/atitool; ./atitool {arguments}") # non-blocking call
+                time.sleep(1) # exec_command does not work properly without this. every additional command requires one more second of wait time.
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("started atitool programming on the test system")
+
+
+    def atitool_log(self, duration, index, arguments, output_file_name):
         """atitool path should be /usr/local/atitool
 
         Parameters
@@ -137,33 +188,53 @@ class CrosDataLogger():
             [description], by default "pm.csv"
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launch {duration}-second atitool logging on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"atitool log for {duration}-second on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if index == 0:
-            self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-        else:
-            self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-
-        try:
-            if self.debug is True:
-                if index == 0:
-                    stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
-                else:
-                    stdin, stdout, stderr = self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
-
-                self.__read_stdout(stdout)
-                self.logger.info("atitool logging finished on the test system")
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
             else:
-                if index == 0:
-                    self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
-                else:
-                    self.ssh.exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"') # non-blocking call
+                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+        else:
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+            else:
+                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
 
-                time.sleep(1) # exec_command does not work properly without this
-                self.logger.info("atitool logging started on the test system")
-        except paramiko.SSHException:
-            self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
+    def agt_log(self, duration, index, arguments, output_file_name):
+        """agt path should be /usr/local/agt
+
+        Parameters
+        ----------
+        duration : int
+            [description]
+        output_file_name : str
+            [description]
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"agt log for {duration}-second on the test system {self.test_system_ip_address} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if index == 0:
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+            else:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+        else:
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+            else:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
 
 
     def is_file(self, path):
@@ -218,15 +289,18 @@ class CrosDataLogger():
         self.logger.info(f"remove {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        sftp = self.ssh.open_sftp()
-        try:
-            sftp.remove(remote_file_path)
-        except IOError:
-            self.logger.error("remote_file_path might be a directory.")
-        else:
-            self.logger.info(f"removed {remote_file_path}")
+        if self.__exist(remote_file_path):
+            sftp = self.ssh.open_sftp()
+            try:
+                sftp.remove(remote_file_path)
+            except IOError:
+                self.logger.error("remote_file_path might be a directory.")
+            else:
+                self.logger.info(f"removed {remote_file_path}")
 
-        sftp.close()
+            sftp.close()
+        else:
+            self.logger.error(f"no such file: {remote_file_path}")
 
 
     def extract_file(self, remote_file_path):
@@ -245,11 +319,11 @@ class CrosDataLogger():
                 if self.debug is True:
                     stdin, stdout, stderr = self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
                     self.__read_stdout(stdout)
-                    self.logger.info("file extraction finished on the test system")
+                    self.logger.info("finished file extraction on the test system")
                 else:
                     self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
                     time.sleep(1) # exec_command does not work properly without this
-                    self.logger.info("file extraction started on the test system")
+                    self.logger.info("started file extraction on the test system")
             except paramiko.SSHException:
                 self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
 

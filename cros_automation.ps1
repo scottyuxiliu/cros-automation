@@ -156,7 +156,7 @@ function measurement {
 
     if ($scenario -eq "aquarium") {
         Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
-        python.exe .\cros_automation.py atitool -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_AQUARIUM -o "pm_log_$($i+$offset).csv"
+        python.exe .\cros_automation.py atitool-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_AQUARIUM -o "pm_log_$($i+$offset).csv"
 
         Write-Verbose "launch $scenario ..."
         python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
@@ -184,7 +184,7 @@ function measurement {
     }
     elseif ($scenario -eq "plt") {
         Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
-        python.exe .\cros_automation.py atitool -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_PLT -o "pm_log_$($i+$offset).csv"
+        python.exe .\cros_automation.py atitool-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_PLT -o "pm_log_$($i+$offset).csv"
 
         Write-Verbose "launch $scenario ..."
         python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
