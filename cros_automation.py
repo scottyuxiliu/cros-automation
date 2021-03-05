@@ -39,6 +39,7 @@ parser.add_argument(
         "atitool-log": use atitool logging on the test system
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
+        "uninstall-agt": uninstall agt on the test system
         "agt-log": use agt logging on the test system
         "download": download file [-i/--input] to the local host system [-o/--output]
         "upload": upload file [-i/--input] to the test system [-o/--output]
@@ -110,6 +111,20 @@ elif args.scenario == "install-agt":
         cdl.upload_file(args.input, "/usr/local/agt/agt.tar.gz")
         cdl.extract_file("/usr/local/agt/agt.tar.gz")
         cdl.remove_file("/usr/local/agt/agt.tar.gz")
+
+        items = cdl.ls("/usr/local/agt")
+        if len(items) == 1:
+            print(items)
+            print(items[0])
+            print(f"/usr/local/agt/{items[0]}/*")
+            # cdl.move_file(f"/usr/local/agt/{items[0]}/*", "/usr/local/agt")
+            # cdl.rmdir(f"/usr/local/agt/{items[0]}")
+
+
+
+elif args.scenario == "uninstall-agt":
+    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
+        cdl.rmdir("/usr/local/agt")
 
 elif args.scenario == "agt-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:

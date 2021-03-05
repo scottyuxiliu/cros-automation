@@ -102,22 +102,24 @@ class CrosDataLogger():
             return True
 
 
-    def __exec_command(self, command, delay):
+    def __exec_command(self, command):
         if self.debug is True:
             try:
                 stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
-                self.__read_stdout(stdout)
+                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
             except paramiko.SSHException:
                 self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
                 self.logger.info("finished on the test system")
         else:
+            n = len(command.split(";")) # get the number of commands that should be executed
+
             try:
-                self.ssh.exec_command(command) # non-blocking call
-                time.sleep(delay) # exec_command does not work properly without this. every additional command requires one more second of wait time.
+                self.ssh.exec_command(command) # non-blocking call, thus need to add delay after
             except paramiko.SSHException:
                 self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
+                time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
 
 
@@ -194,17 +196,17 @@ class CrosDataLogger():
         if index == 0:
             if arguments is None:
                 self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
                 self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
         else:
             if arguments is None:
                 self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
                 self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
 
 
     def agt_log(self, duration, index, arguments, output_file_name):
@@ -224,17 +226,17 @@ class CrosDataLogger():
         if index == 0:
             if arguments is None:
                 self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
                 self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
         else:
             if arguments is None:
                 self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"', 1)
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
                 self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}', 1)
+                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
 
 
     def is_file(self, path):
@@ -245,15 +247,13 @@ class CrosDataLogger():
         path = str( self.__read_path(path) )
 
         if self.__exist(path):
-            self.logger.info(f"{path} exists")
-            # sftp = self.ssh.open_sftp()
-            # for fileattr in sftp.listdir_attr(path):
-            #     if stat.S_ISDIR(fileattr.st_mode):
-            #         self.logger.info("it is a directory")
-            #         return False
-            #     else:
-            #         self.logger.info("it is a file")
-            #         return True
+            sftp = self.ssh.open_sftp()
+            if stat.S_ISDIR( sftp.stat(path).st_mode ):
+                self.logger.info(f"{path} is a directory")
+                return False
+            else:
+                self.logger.info(f"{path} is a file")
+                return True
         else:
             self.logger.info(f"no such file or directory: {path}")
 
@@ -331,6 +331,15 @@ class CrosDataLogger():
             self.logger.error(f"no such file: {remote_file_path}")
 
 
+    def move_file(self, remote_file_path, remote_dir):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"move {remote_file_path} into {remote_dir} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info(f"executing: mv {remote_file_path} {remote_dir}")
+        self.__exec_command(f"mv {remote_file_path} {remote_dir}")
+
+
     def mkdir(self, remote_dir):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"create directory {remote_dir} ...")
@@ -351,26 +360,25 @@ class CrosDataLogger():
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist(remote_dir):
-            if self.debug is True:
-                try:
-                    stdin, stdout, stderr = self.ssh.exec_command(f"rm -r {remote_dir}") # non-blocking call
-                    self.__read_stdout(stdout)
-                except paramiko.SSHException:
-                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-                else:
-                    self.logger.info(f"removed {remote_dir} on the test system")
-            else:
-                try:
-                    self.ssh.exec_command(f"rm -r {remote_dir}") # non-blocking call
-                except paramiko.SSHException:
-                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-                else:
-                    self.logger.info(f"started to remove {remote_dir} on the test system")
+            self.logger.info(f"executing: rm -r {remote_dir}")
+            self.__exec_command(f"rm -r {remote_dir}")
         else:
             self.logger.error(f"no such directory: {remote_dir}")
 
 
     def ls(self, remote_dir):
+        """[summary]
+
+        Parameters
+        ----------
+        remote_dir : [type]
+            [description]
+
+        Returns
+        -------
+        list
+            all items in remote_dir
+        """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"list files in {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
@@ -383,3 +391,5 @@ class CrosDataLogger():
             self.logger.info(item)
 
         sftp.close()
+
+        return items

@@ -62,7 +62,7 @@ class CrosAutomationCase(unittest.TestCase):
 
     def test_cdl_is_file(self):
         with CrosDataLogger(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file, self.debug) as cdl:
-            self.assertEqual(cdl.is_file("/usr/local/atitool/atitool.tar.gz"), False)
+            self.assertEqual(cdl.is_file("/usr/local/autotest/global_config.ini"), True)
 
 
     def test_cdp_ls_local_1(self):

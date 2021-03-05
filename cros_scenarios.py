@@ -71,6 +71,29 @@ class CrosScenarios():
         else:
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
+    
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __exec_command(self, command, delay):
+        if self.debug is True:
+            try:
+                stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
+                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("finished on the test system")
+        else:
+            n = len(command.split(";")) # get the number of commands that should be executed
+
+            try:
+                self.ssh.exec_command(command) # non-blocking call, thus need to add delay after
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
+                self.logger.info("started on the test system")
+
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
@@ -179,15 +202,4 @@ class CrosScenarios():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
-        try:
-            if self.debug is True: # if debug flag is set, capture stdout from exec_command
-                stdin, stdout, stderr = self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-                self.__read_stdout(stdout)
-                self.logger.info("aquarium finished on the test system")
-            else:
-                self.ssh.exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control") # non-blocking call
-                time.sleep(1) # exec_command does not work properly without this. every additional command requires one more second of wait time.
-                self.logger.info("aquarium started on the test system")
-        except paramiko.SSHException:
-            self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
+        self.__exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control", 1)
