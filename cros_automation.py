@@ -31,16 +31,19 @@ parser.add_argument(
         "reboot": reboot the test system
         "s0i3": enter s0i3 on the test system
         "idle": do nothing on the test system
-        "plt": launch power_loadtest on the test system
+        "plt-1h": launch power_loadtest_1hour on the test system
         "aquarium": launch aquarium on the test system
+        "glbench": launch glbench on the test system
 
         data logging scenarios.
         "install-atitool": install atitool given the .tar.gz installation file [-i/--input]
-        "atitool-log": use atitool logging on the test system
+        "uninstall-atitool": uninstall atitool on the test system
+        "atitool-log": use atitool logging on the test system. support custom arguments [-i/--input].
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "uninstall-agt": uninstall agt on the test system
-        "agt-log": use agt logging on the test system
+        "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
+        "agt-log": use agt logging on the test system. support custom arguments [-i/--input].
         "download": download file [-i/--input] to the local host system [-o/--output]
         "upload": upload file [-i/--input] to the test system [-o/--output]
         "remove": remove file [-i/--input] on the test system
@@ -49,7 +52,8 @@ parser.add_argument(
 
         data parsing scenarios.
         "ls-local": list items in the local directory [-d/--directory]
-        "keyvals-to-csv": convert keyvals [-i/--input] to .csv files in the same directory
+        "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
+        "keyvals-summary": summarize keyval file contents [-d/--directory] to a .csv file [-o/--output]
         '''
     )
 )
@@ -82,13 +86,17 @@ elif args.scenario == "s0i3":
     with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.enter_s0i3()
 
-elif args.scenario == "plt":
+elif args.scenario == "plt-1h":
     with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
-        cs.launch_power_loadtest()
+        cs.launch_power_loadtest_1hour()
 
 elif args.scenario == "aquarium":
     with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.launch_aquarium()
+
+elif args.scenario == "glbench":
+    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
+        cs.launch_glbench()
 
 elif args.scenario == "install-atitool":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
@@ -96,6 +104,10 @@ elif args.scenario == "install-atitool":
         cdl.upload_file(args.input, "/usr/local/atitool/atitool.tar.gz")
         cdl.extract_file("/usr/local/atitool/atitool.tar.gz")
         cdl.remove_file("/usr/local/atitool/atitool.tar.gz")
+
+elif args.scenario == "uninstall-atitool":
+    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
+        cdl.rmdir("/usr/local/atitool")
 
 elif args.scenario == "atitool-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
@@ -130,6 +142,10 @@ elif args.scenario == "agt-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_log(args.duration, args.index, args.input, args.output)
 
+elif args.scenario == "agt-internal-log":
+    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
+        cdl.agt_internal_log(args.duration, args.index, args.input, args.output)
+
 elif args.scenario == "download":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.download_file(args.input, args.output)
@@ -156,8 +172,13 @@ elif args.scenario == "ls-local":
 
 elif args.scenario == "keyvals-to-csv":
     with CrosDataParser() as cdp:
-        keyvals = cdp.ls_local(args.directory, args.input)
-        cdp.keyvals_to_csv(keyvals)
+        keyval_paths = cdp.ls_local(args.directory, "*keyval*")
+        cdp.keyvals_to_csv(keyval_paths)
+
+elif args.scenario == "keyvals-summary":
+    with CrosDataParser() as cdp:
+        keyval_paths = cdp.ls_local(args.directory, "*keyval*")
+        cdp.keyvals_summary(keyval_paths, args.output)
 
 else:
     pass

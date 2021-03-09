@@ -210,7 +210,7 @@ class CrosDataLogger():
 
 
     def agt_log(self, duration, index, arguments, output_file_name):
-        """agt path should be /usr/local/agt
+        """agt path should be /usr/local/agt/agt
 
         Parameters
         ----------
@@ -221,6 +221,36 @@ class CrosDataLogger():
         """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"agt log for {duration}-second on the test system {self.test_system_ip_address} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if index == 0:
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+            else:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+        else:
+            if arguments is None:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+            else:
+                self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+    
+    
+    def agt_internal_log(self, duration, index, arguments, output_file_name):
+        """agt_internal path should be /usr/local/agt/agt_internal
+
+        Parameters
+        ----------
+        duration : int
+            [description]
+        output_file_name : str
+            [description]
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"agt internal log for {duration}-second on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if index == 0:
@@ -263,11 +293,13 @@ class CrosDataLogger():
         self.logger.info(f"download {remote_file_path} to {local_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        sftp = self.ssh.open_sftp()
-        sftp.get(remote_file_path, local_file_path)
-
-        self.logger.info(f"downloaded {local_file_path}")
-        sftp.close()
+        if self.__exist(remote_file_path):
+            sftp = self.ssh.open_sftp()
+            sftp.get(remote_file_path, local_file_path)
+            self.logger.info(f"downloaded {local_file_path}")
+            sftp.close()
+        else:
+            self.logger.error(f"no such file: {remote_file_path}")
 
 
     def upload_file(self, local_file_path, remote_file_path):

@@ -22,8 +22,16 @@ $DOWNLOADS_PATH = "C:\Users\$($env:UserName)\Downloads"
 $VerbosePreference = "Continue"
 $DebugPreference = "Continue"
 
-$DELAY_AQUARIUM = 120
-$DELAY_PLT = 3600
+$SCENARIO_CONST = @{
+    "aquarium" = @{
+        "delay" = 120;
+        "id" = "graphics_WebGLAquarium"
+    }
+    "plt" = @{
+        "delay" = 3600;
+        "id" = "power_LoadTest.1hour"
+    }
+}
 
 $DELAY_AFTER_BOOT = 180
 
@@ -154,52 +162,24 @@ function measurement {
         [Parameter(Mandatory=$true)] [string] $result_directory
     )
 
-    if ($scenario -eq "aquarium") {
+    if ($SCENARIO_CONST.ContainsKey($scenario)) {
         Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
-        python.exe .\cros_automation.py atitool-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_AQUARIUM -o "pm_log_$($i+$offset).csv"
+        python.exe .\cros_automation.py atitool-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("delay") -o "pm_log_$($i+$offset).csv"
 
         Write-Verbose "launch $scenario ..."
         python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
 
-        Write-Verbose "wait $DELAY_AQUARIUM seconds for $scenario to finish ..."
-        sleep_with_progress_bar -seconds $DELAY_AQUARIUM
+        Write-Verbose "wait $($SCENARIO_CONST.Item($scenario).Item('delay')) seconds for $scenario to finish ..."
+        sleep_with_progress_bar -seconds $SCENARIO_CONST.Item($scenario).Item("delay")
 
         Write-Verbose "wait 60 seconds for data logging to finish ..."
         sleep_with_progress_bar -seconds 60
 
-        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
+        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
 
-        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results"
-
-        Write-Verbose "download atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
-        
-        Write-Verbose "remove atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv on the test system ..."
-        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv"
-        
-        Write-Verbose "list items in $TEST_SYS_ATITOOL_PATH ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_ATITOOL_PATH"
-    }
-    elseif ($scenario -eq "plt") {
-        Write-Verbose "start atitool logging to $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv ..."
-        python.exe .\cros_automation.py atitool-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DELAY_PLT -o "pm_log_$($i+$offset).csv"
-
-        Write-Verbose "launch $scenario ..."
-        python.exe .\cros_automation.py aquarium -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
-
-        Write-Verbose "wait $DELAY_PLT seconds for $scenario to finish ..."
-        sleep_with_progress_bar -seconds $DELAY_PLT
-
-        Write-Verbose "wait 60 seconds for data logging to finish ..."
-        sleep_with_progress_bar -seconds 60
-
-        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results/keyval" -o "$result_directory\keyval_$($i+$offset)"
-
-        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/graphics_WebGLAquarium/results"
+        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results"
 
         Write-Verbose "download atitool log $TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv to $result_directory ..."
         python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_ATITOOL_PATH/pm_log_$($i+$offset).csv" -o "$result_directory\pm_log_$($i+$offset).csv"
@@ -211,7 +191,10 @@ function measurement {
         python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_ATITOOL_PATH"
     }
     else {
-        Write-Verbose "$scenario is not supported. supported scenarios are: aquarium"
+        Write-Verbose "$scenario is not supported. supported scenarios are as follows:"
+        foreach ($key in $SCENARIO_CONST.Keys) {
+            Write-Verbose "$key"
+        }
     }
 }
 

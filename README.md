@@ -15,17 +15,27 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 
 ## Common use cases
 
+Run graphics_WebGLAquarium
+
+```
+python .\cros_automation.py aquarium -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
+---
+
 Capture ATITOOL log
 
 ```
 python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "atitool_log.csv"
 ```
 
-Run graphics_WebGLAquarium
+Capture AGT log
 
 ```
-python .\cros_automation.py aquarium -p "192.168.123.456" -u "root" -k "id_rsa"
+python .\cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
 ```
+
+---
 
 List items in a directory
 

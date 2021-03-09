@@ -136,6 +136,17 @@ class CrosAutomationCase(unittest.TestCase):
                 self.fail("exception is raised!")
 
 
+    def test_cdp_keyvals_summary(self):
+        """test CrosDataParser.keyvals_summary
+        """
+        with CrosDataParser() as cdp:
+            try:
+                keyval_paths = cdp.ls_local("./unittest", "*keyval*")
+                cdp.keyvals_summary(keyval_paths, "./unittest/keyval_summary.csv")
+            except:
+                self.fail("exception is raised!")
+
+
     # def test_enter_s0i3(self):
     #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
     #         try:
