@@ -1,6 +1,6 @@
 import logging, argparse, textwrap, time
 from custom_logger_formatter import CustomLoggerFormatter
-from cros_scenarios import CrosScenarios
+from cros_scenario_launcher import CrosScenarioLauncher
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
 
@@ -21,21 +21,19 @@ logger.addHandler(ch)
 
 parser = argparse.ArgumentParser(description="Automation for scenarios on Chrome OS and Chromium OS", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument(
-    "scenario",
-    metavar="scenario",
+    "job",
+    metavar="job",
     type=str,
     help=textwrap.dedent(
         '''\
-        cros scenarios.
+        cros scenario launcher jobs.
         "test": test connection to the test system
         "reboot": reboot the test system
         "s0i3": enter s0i3 on the test system
         "idle": do nothing on the test system
-        "plt-1h": launch power_loadtest_1hour on the test system
-        "aquarium": launch aquarium on the test system
-        "glbench": launch glbench on the test system
+        "launch-scenario": launches an autotest scenario [-w/--scenario] on the test system
 
-        data logging scenarios.
+        cros data logger jobs.
         "install-atitool": install atitool given the .tar.gz installation file [-i/--input]
         "uninstall-atitool": uninstall atitool on the test system
         "atitool-log": use atitool logging on the test system. support custom arguments [-i/--input].
@@ -50,7 +48,7 @@ parser.add_argument(
         "rmdir": remove directory [-d/--directory] on the test system
         "ls": list items in the test system directory [-d/--directory]
 
-        data parsing scenarios.
+        cros data parser jobs.
         "ls-local": list items in the local directory [-d/--directory]
         "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
         "keyvals-summary": summarize keyval file contents [-d/--directory] to a .csv file [-o/--output]
@@ -60,6 +58,8 @@ parser.add_argument(
 parser.add_argument("-p", "--ip", type=str, help="test system ip address.")
 parser.add_argument("-u", "--username", type=str, help="test system username.")
 parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path.")
+
+parser.add_argument("-s", "--scenario", type=str, help="autotest scenario. supported scenarios are plt-1h, aquarium, glbench, ptl.")
 
 parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds, default %(default)s.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the test system.")
@@ -71,53 +71,45 @@ parser.add_argument("--debug", action="store_true", help="enable debug mode. thi
 
 args = parser.parse_args()
 
-if args.scenario == "test":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
+if args.job == "test":
+    with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.test_connection()
 
-elif args.scenario == "idle":
+elif args.job == "idle":
     pass
 
-elif args.scenario == "reboot":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
+elif args.job == "reboot":
+    with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.reboot()
 
-elif args.scenario == "s0i3":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
+elif args.job == "s0i3":
+    with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.enter_s0i3()
 
-elif args.scenario == "plt-1h":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
-        cs.launch_power_loadtest_1hour()
+elif args.job == "launch-scenario":
+    with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
+        cs.launch_scenario(args.scenario)
 
-elif args.scenario == "aquarium":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
-        cs.launch_aquarium()
-
-elif args.scenario == "glbench":
-    with CrosScenarios(args.ip, args.username, args.keyfile, args.debug) as cs:
-        cs.launch_glbench()
-
-elif args.scenario == "install-atitool":
+elif args.job == "install-atitool":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.mkdir("/usr/local/atitool")
         cdl.upload_file(args.input, "/usr/local/atitool/atitool.tar.gz")
         cdl.extract_file("/usr/local/atitool/atitool.tar.gz")
         cdl.remove_file("/usr/local/atitool/atitool.tar.gz")
 
-elif args.scenario == "uninstall-atitool":
+elif args.job == "uninstall-atitool":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.rmdir("/usr/local/atitool")
 
-elif args.scenario == "atitool-log":
+elif args.job == "atitool-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.atitool_log(args.duration, args.index, args.input, args.output)
 
-elif args.scenario == "atitool-prog":
+elif args.job == "atitool-prog":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.atitool_prog(args.input)
 
-elif args.scenario == "install-agt":
+elif args.job == "install-agt":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.mkdir("/usr/local/agt")
         cdl.upload_file(args.input, "/usr/local/agt/agt.tar.gz")
@@ -134,48 +126,48 @@ elif args.scenario == "install-agt":
 
 
 
-elif args.scenario == "uninstall-agt":
+elif args.job == "uninstall-agt":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.rmdir("/usr/local/agt")
 
-elif args.scenario == "agt-log":
+elif args.job == "agt-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_log(args.duration, args.index, args.input, args.output)
 
-elif args.scenario == "agt-internal-log":
+elif args.job == "agt-internal-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_internal_log(args.duration, args.index, args.input, args.output)
 
-elif args.scenario == "download":
+elif args.job == "download":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.download_file(args.input, args.output)
 
-elif args.scenario == "upload":
+elif args.job == "upload":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.upload_file(args.input, args.output)
 
-elif args.scenario == "remove":
+elif args.job == "remove":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.remove_file(args.input)
 
-elif args.scenario == "rmdir":
+elif args.job == "rmdir":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.rmdir(args.directory)
 
-elif args.scenario == "ls":
+elif args.job == "ls":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.ls(args.directory)
 
-elif args.scenario == "ls-local":
+elif args.job == "ls-local":
     with CrosDataParser() as cdp:
         cdp.ls_local(args.directory, args.input)
 
-elif args.scenario == "keyvals-to-csv":
+elif args.job == "keyvals-to-csv":
     with CrosDataParser() as cdp:
         keyval_paths = cdp.ls_local(args.directory, "*keyval*")
         cdp.keyvals_to_csv(keyval_paths)
 
-elif args.scenario == "keyvals-summary":
+elif args.job == "keyvals-summary":
     with CrosDataParser() as cdp:
         keyval_paths = cdp.ls_local(args.directory, "*keyval*")
         cdp.keyvals_summary(keyval_paths, args.output)

@@ -1,14 +1,13 @@
 import os, sys, select, logging, argparse, time
 import paramiko
 
-class CrosScenarios():
+class CrosScenarioLauncher():
     """[summary]
     """
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
-        self.logger = logging.getLogger("cros_automation.CrosScenarios")
-        fh = logging.FileHandler("cros_scenarios.log", mode="w") # overwrite existing log file
-        # fh = logging.FileHandler("cros_scenarios.log")
+        self.logger = logging.getLogger("cros_automation.CrosScenarioLauncher")
+        fh = logging.FileHandler("cros_scenario_launcher.log", mode="w") # overwrite existing log file
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -167,39 +166,29 @@ class CrosScenarios():
                 self.logger.info("started s0i3 entry on the test system")
 
 
-    def launch_power_loadtest_1hour(self):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launch power_loadtest_1hour on the test system {self.test_system_ip_address} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
+    def launch_scenario(self, scenario):
+        """launch an autotest scenario on the test system
 
-        self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control.1hour")
-        self.__exec_command("cd /usr/local/autotest; bin/autotest tests/power_LoadTest/control.1hour")
-    
-
-    def launch_aquarium(self):
-        """launch graphics_WebGLAquarium on the test system
-
-        20s: preparation
-        45s: 50 fishes
-        45s: 1000 fishes
-        """
-
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launch aquarium on the test system {self.test_system_ip_address} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
-        self.__exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_WebGLAquarium/control")
-    
-    
-    def launch_glbench(self):
-        """launch graphics_GLBench on the test system
+        graphics_WebGLAquarium
+            20s: preparation
+            45s: 50 fishes
+            45s: 1000 fishes
 
         """
 
+        scenario_ids = {
+            "plt-1h": "tests/power_LoadTest/control.1hour",
+            "aquarium": "tests/graphics_WebGLAquarium/control",
+            "glbench": "tests/graphics_GLBench/control",
+            "ptl": "tests/power_ThermalLoad/control"
+        }
+
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launch glbench on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"launch {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing: cd /usr/local/autotest; bin/autotest tests/graphics_GLBench/control")
-        self.__exec_command("cd /usr/local/autotest; bin/autotest tests/graphics_GLBench/control")
+        if scenario in scenario_ids:
+            self.logger.info(f"executing: cd /usr/local/autotest; bin/autotest {scenario_ids[scenario]}")
+            self.__exec_command(f"cd /usr/local/autotest; bin/autotest {scenario_ids[scenario]}")
+        else:
+            self.logger.error(f"{scenario} not supported! supported scenarios are {scenario_ids.keys()}")

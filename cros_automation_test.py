@@ -1,5 +1,5 @@
 import logging, unittest, os
-from cros_scenarios import CrosScenarios
+from cros_scenario_launcher import CrosScenarioLauncher
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
 
@@ -43,7 +43,7 @@ class CrosAutomationCase(unittest.TestCase):
 
 
     def test_cs_test_connection(self):
-        with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file, self.debug) as cs:
+        with CrosScenarioLauncher(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file, self.debug) as cs:
             self.assertEqual(cs.test_connection(), True)
 
 
@@ -148,7 +148,7 @@ class CrosAutomationCase(unittest.TestCase):
 
 
     # def test_enter_s0i3(self):
-    #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+    #     with CrosScenarioLauncher(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
     #         try:
     #             cs.enter_s0i3()
     #         except:
@@ -156,7 +156,7 @@ class CrosAutomationCase(unittest.TestCase):
 
 
     # def test_launch_power_loadtest(self):
-    #     with CrosScenarios(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
+    #     with CrosScenarioLauncher(self.test_system_ip_address, self.test_system_username, self.ssh_private_key_file) as cs:
     #         try:
     #             cs.launch_power_loadtest()
     #         except:

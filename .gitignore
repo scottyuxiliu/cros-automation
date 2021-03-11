@@ -132,4 +132,3 @@ dmypy.json
 .pyre/
 
 cros_automation_*.ps1
-power_log.py
