@@ -1,5 +1,7 @@
-import os, sys, select, logging, argparse, time
+import os, sys, select, logging, argparse, time, errno, pathlib
 import paramiko
+
+import cros_constants
 
 class CrosScenarioLauncher():
     """[summary]
@@ -55,6 +57,31 @@ class CrosScenarioLauncher():
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __read_path(self, path, is_linux=False):
+        """read path in string format and convert it to pathlib.Path() object. if is_linux is true, convert it to Linux style path regardless of current Operating System.
+
+        There might be times when you need a representation of a path without access to the underlying file system (in which case it could also make sense to represent a Windows path on a non-Windows system or vice versa). This can be done with PurePath objects.
+
+        Parameters
+        ----------
+        path : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        path.replace("\\", "/")
+
+        if is_linux:
+            return pathlib.PurePosixPath(path)
+        else:
+            return pathlib.Path(path)
+
+
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __read_stdout(self, stdout):
         """[summary]
 
@@ -92,6 +119,35 @@ class CrosScenarioLauncher():
             else:
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
+
+
+    def __exist_local(self, path):
+        p = self.__read_path(path)
+
+        if p.is_file():
+            return True
+        else:
+            return False
+
+
+    def __exist_remote(self, path):
+        sftp = self.ssh.open_sftp()
+
+        try:
+            sftp.stat(path)
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                sftp.close()
+                return False
+        else:
+            sftp.close()
+            return True
+
+
+    def __upload(self, local_file_path, remote_file_path):
+        sftp = self.ssh.open_sftp()
+        sftp.put(local_file_path, remote_file_path)
+        sftp.close()
 
 
     def test_connection(self):
@@ -168,27 +224,34 @@ class CrosScenarioLauncher():
 
     def launch_scenario(self, scenario):
         """launch an autotest scenario on the test system
-
-        graphics_WebGLAquarium
-            20s: preparation
-            45s: 50 fishes
-            45s: 1000 fishes
-
         """
-
-        scenario_ids = {
-            "plt-1h": "tests/power_LoadTest/control.1hour",
-            "aquarium": "tests/graphics_WebGLAquarium/control",
-            "glbench": "tests/graphics_GLBench/control",
-            "ptl": "tests/power_ThermalLoad/control"
-        }
 
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"launch {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if scenario in scenario_ids:
-            self.logger.info(f"executing: cd /usr/local/autotest; bin/autotest {scenario_ids[scenario]}")
-            self.__exec_command(f"cd /usr/local/autotest; bin/autotest {scenario_ids[scenario]}")
+
+        if scenario in cros_constants.AUTOTEST_SCENARIOS:
+            self.logger.info(f"executing: cd {cros_constants.TEST_SYS_AUTOTEST_PATH}; bin/autotest {cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+            self.__exec_command(f"cd {cros_constants.TEST_SYS_AUTOTEST_PATH}; bin/autotest {cros_constants.AUTOTEST_SCENARIOS[scenario]}")
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {scenario_ids.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are {cros_constants.AUTOTEST_SCENARIOS.keys()}")
+
+
+    def prepare_scenario(self, scenario):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"prepare {scenario} on the test system {self.test_system_ip_address} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if scenario in cros_constants.AUTOTEST_SCENARIOS:
+            if self.__exist_remote(f"{cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}"):
+                self.logger.info(f"file already exists: {cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+            else:
+                if self.__exist_local(f"./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}"):
+                    self.logger.info(f"upload ./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]} to {cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+                    self.__upload(f"./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}", f"{cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+                else:
+                    self.logger.error(f"file does not exist! ./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+
+        else:
+            self.logger.error(f"{scenario} not supported! supported scenarios are {cros_constants.AUTOTEST_SCENARIOS.keys()}")

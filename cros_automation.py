@@ -31,7 +31,8 @@ parser.add_argument(
         "reboot": reboot the test system
         "s0i3": enter s0i3 on the test system
         "idle": do nothing on the test system
-        "launch-scenario": launches an autotest scenario [-w/--scenario] on the test system
+        "launch-scenario": launches an autotest scenario [-s/--scenario] on the test system
+        "prepare-scenario": prepares an autotest scenario [-s/--scenario] on the test system
 
         cros data logger jobs.
         "install-atitool": install atitool given the .tar.gz installation file [-i/--input]
@@ -89,6 +90,10 @@ elif args.job == "s0i3":
 elif args.job == "launch-scenario":
     with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
         cs.launch_scenario(args.scenario)
+
+elif args.job == "prepare-scenario":
+    with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as cs:
+        cs.prepare_scenario(args.scenario)
 
 elif args.job == "install-atitool":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:

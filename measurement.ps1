@@ -10,7 +10,10 @@ function measurement {
 
     if ($SCENARIO_CONST.ContainsKey($scenario)) {
         # ----------------------------------------------------------------------
-        # launch sequence: agt -> scenario -> pwr
+        # launch sequence: prepare scenario -> agt -> launch scenario -> pwr
+
+        Write-Verbose "prepare $scenario ..."
+        python.exe .\cros_automation.py prepare-scenario -s $scenario -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
 
         if ($agt_log) {
             Write-Verbose "start agt internal logging to $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
@@ -49,11 +52,11 @@ function measurement {
         # ----------------------------------------------------------------------
         # output result
 
-        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
+        Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
 
-        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results"
+        Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result')) ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))"
 
         if ($agt_log) {
             Write-Verbose "download agt internal log $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."

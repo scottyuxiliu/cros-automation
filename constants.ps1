@@ -9,24 +9,30 @@ $SCENARIO_CONST = @{
         "duration" = 120;
         "agt_log_time" = 180;
         "pwr_log_time" = 120;
-        "id" = "graphics_WebGLAquarium"
-    }
+        "result" = "results/default/graphics_WebGLAquarium/results"
+    };
     "glbench" = @{
         "duration" = 1260;
         "agt_log_time" = 1260;
         "pwr_log_time" = 1260;
-        "id" = "graphics_GLBench"
-    }
+        "result" = "results/default/graphics_GLBench/results"
+    };
     "plt-1h" = @{
         "duration" = 3600;
         "agt_log_time" = 3600;
         "pwr_log_time" = 3600;
-        "id" = "power_LoadTest.1hour"
-    }
+        "result" = "results/default/power_LoadTest.1hour/results"
+    };
     "ptl" = @{
         "duration" = 9000;
         "agt_log_time" = 9600;
         "pwr_log_time" = 9000;
-        "id" = "power_ThermalLoad"
+        "result" = "results/default/power_ThermalLoad/results"
+    };
+    "ptl-30m-1kfish" = @{
+        "duration" = 1800;
+        "agt_log_time" = 2100;
+        "pwr_log_time" = 1800;
+        "result" = "results/default/power_ThermalLoad.option/results"
     }
 }
