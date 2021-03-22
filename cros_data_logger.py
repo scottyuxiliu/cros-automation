@@ -1,6 +1,8 @@
 import os, sys, select, logging, time, errno, pathlib, stat
 import paramiko
 
+from cros_constants import AGT_DIR_PATH
+
 class CrosDataLogger():
     """[summary]
     """
@@ -88,7 +90,19 @@ class CrosDataLogger():
         return pathlib.PurePosixPath(path)
 
         
-    def __exist(self, path):
+    def __exist_remote(self, path):
+        """if path exists on the remote system, return true. otherwise, return false.
+
+        Parameters
+        ----------
+        path : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         sftp = self.ssh.open_sftp()
 
         try:
@@ -210,7 +224,7 @@ class CrosDataLogger():
 
 
     def agt_log(self, duration, index, arguments, output_file_name):
-        """agt path should be /usr/local/agt/agt
+        """agt path should be {AGT_DIR_PATH}/agt
 
         Parameters
         ----------
@@ -223,24 +237,27 @@ class CrosDataLogger():
         self.logger.info(f"agt log for {duration}-second on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if index == 0:
-            if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+        if self.__exist_remote(f"{AGT_DIR_PATH}/agt"):
+            if index == 0:
+                if arguments is None:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                else:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
             else:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                if arguments is None:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                else:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
         else:
-            if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-            else:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+            self.logger.error(f"no such file: {AGT_DIR_PATH}/agt")
     
     
     def agt_internal_log(self, duration, index, arguments, output_file_name):
-        """agt_internal path should be /usr/local/agt/agt_internal
+        """agt_internal path should be {AGT_DIR_PATH}/agt_internal
 
         Parameters
         ----------
@@ -253,20 +270,25 @@ class CrosDataLogger():
         self.logger.info(f"agt internal log for {duration}-second on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if index == 0:
-            if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+        if self.__exist_remote(F"{AGT_DIR_PATH}/agt_internal"):
+            if index == 0:
+                if arguments is None:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                else:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
             else:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                if arguments is None:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                else:
+                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+
         else:
-            if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-            else:
-                self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+            self.logger.error(f"no such file: {AGT_DIR_PATH}/agt_internal")
+            
 
 
     def is_file(self, path):
@@ -276,7 +298,7 @@ class CrosDataLogger():
 
         path = str( self.__read_path(path) )
 
-        if self.__exist(path):
+        if self.__exist_remote(path):
             sftp = self.ssh.open_sftp()
             if stat.S_ISDIR( sftp.stat(path).st_mode ):
                 self.logger.info(f"{path} is a directory")
@@ -293,7 +315,7 @@ class CrosDataLogger():
         self.logger.info(f"download {remote_file_path} to {local_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_file_path):
+        if self.__exist_remote(remote_file_path):
             sftp = self.ssh.open_sftp()
             sftp.get(remote_file_path, local_file_path)
             self.logger.info(f"downloaded {local_file_path}")
@@ -307,7 +329,7 @@ class CrosDataLogger():
         self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_file_path):
+        if self.__exist_remote(remote_file_path):
             self.logger.info(f"{remote_file_path} already exists")
         else:
             sftp = self.ssh.open_sftp()
@@ -321,7 +343,7 @@ class CrosDataLogger():
         self.logger.info(f"remove {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_file_path):
+        if self.__exist_remote(remote_file_path):
             sftp = self.ssh.open_sftp()
             try:
                 sftp.remove(remote_file_path)
@@ -340,7 +362,7 @@ class CrosDataLogger():
         self.logger.info(f"extract {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_file_path):
+        if self.__exist_remote(remote_file_path):
             p = self.__read_path(remote_file_path)
             directory = str(p.parent)
             filename = p.name
@@ -377,7 +399,7 @@ class CrosDataLogger():
         self.logger.info(f"create directory {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_dir):
+        if self.__exist_remote(remote_dir):
             self.logger.info(f"{remote_dir} already exists")
         else:
             sftp = self.ssh.open_sftp()
@@ -391,7 +413,7 @@ class CrosDataLogger():
         self.logger.info(f"remove directory {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist(remote_dir):
+        if self.__exist_remote(remote_dir):
             self.logger.info(f"executing: rm -r {remote_dir}")
             self.__exec_command(f"rm -r {remote_dir}")
         else:

@@ -1,5 +1,7 @@
 TEST_SYS_AUTOTEST_PATH = "/usr/local/autotest"
-
+AGT_DIR_PATH = "/usr/local/agt"
+PERL_DIR_PATH = "/usr/local/perl"
+GCC_DIR_PATH = "/usr/local/gcc"
 
 
 

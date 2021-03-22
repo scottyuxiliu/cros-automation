@@ -71,3 +71,6 @@ Remove /usr/local/atitool directory on the test system
 ```
 python .\cros_automation.py rmdir -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
 ```
+
+## To-do
+1.   Add cold-reset support

@@ -145,6 +145,15 @@ class CrosScenarioLauncher():
 
 
     def __upload(self, local_file_path, remote_file_path):
+        """upload file from local_file_path to remote_file_path
+
+        Parameters
+        ----------
+        local_file_path : str
+            [description]
+        remote_file_path : str
+            [description]
+        """
         sftp = self.ssh.open_sftp()
         sftp.put(local_file_path, remote_file_path)
         sftp.close()
@@ -180,22 +189,7 @@ class CrosScenarioLauncher():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: /sbin/reboot -f > /dev/null 2>&1 &")
-
-        if self.debug is True:
-            try:
-                stdin, stdout, stderr = self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
-                self.__read_stdout(stdout)
-            except paramiko.SSHException:
-                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("rebooted test system")
-        else:
-            try:
-                self.ssh.exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
-            except paramiko.SSHException:
-                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("started reboot on the test system")
+        self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
 
 
     def enter_s0i3(self):
@@ -204,26 +198,11 @@ class CrosScenarioLauncher():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("executing: echo mem > /sys/power/state")
-
-        if self.debug is True:
-            try:
-                stdin, stdout, stderr = self.ssh.exec_command("echo mem > /sys/power/state")
-                self.__read_stdout(stdout)
-            except paramiko.SSHException:
-                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("test system entered s0i3")
-        else:
-            try:
-                self.ssh.exec_command("echo mem > /sys/power/state")
-            except paramiko.SSHException:
-                self.logger.error(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("started s0i3 entry on the test system")
+        self.__exec_command("echo mem > /sys/power/state")
 
 
     def launch_scenario(self, scenario):
-        """launch an autotest scenario on the test system
+        """launch the given autotest scenario on the test system
         """
 
         self.logger.info("--------------------------------------------------------------------------------")

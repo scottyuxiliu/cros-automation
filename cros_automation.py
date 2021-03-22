@@ -3,6 +3,7 @@ from custom_logger_formatter import CustomLoggerFormatter
 from cros_scenario_launcher import CrosScenarioLauncher
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
+from cros_hw_ctrl import CrosHwCtrl
 
 # --------------------------------------------------------------------------------
 # Set up logging
@@ -53,6 +54,9 @@ parser.add_argument(
         "ls-local": list items in the local directory [-d/--directory]
         "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
         "keyvals-summary": summarize keyval file contents [-d/--directory] to a .csv file [-o/--output]
+
+        cros hardware control jobs.
+        "cold-reset": cold reset the test system
         '''
     )
 )
@@ -176,6 +180,10 @@ elif args.job == "keyvals-summary":
     with CrosDataParser() as cdp:
         keyval_paths = cdp.ls_local(args.directory, "*keyval*")
         cdp.keyvals_summary(keyval_paths, args.output)
+
+elif args.job == "cold-reset":
+    with CrosHwCtrl(args.ip, args.username, args.keyfile, args.debug) as chc:
+        pass
 
 else:
     pass
