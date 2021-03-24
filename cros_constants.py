@@ -11,9 +11,24 @@ GCC_DIR_PATH = "/usr/local/gcc"
 #             45s: 1000 fishes
 
 AUTOTEST_SCENARIOS = {
-    "plt-1h": "tests/power_LoadTest/control.1hour",
-    "aquarium": "tests/graphics_WebGLAquarium/control",
-    "glbench": "tests/graphics_GLBench/control",
-    "ptl": "tests/power_ThermalLoad/control",
-    "ptl-30m-1kfish": "tests/power_ThermalLoad/control.30min.1000_fish"
+    "plt-1h": {
+        "method": "autotest",
+        "control": "tests/power_LoadTest/control.1hour"
+    },
+    "aquarium": {
+        "method": "autotest",
+        "control": "tests/graphics_WebGLAquarium/control"
+    },
+    "glbench": {
+        "method": "autotest",
+        "control": "tests/graphics_GLBench/control"
+    },
+    "ptl": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control"
+    },
+    "ptl-30m-1kfish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.30min.1000_fish"
+    }
 }

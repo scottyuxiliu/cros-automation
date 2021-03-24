@@ -1,7 +1,7 @@
 import os, sys, select, logging, argparse, time, errno, pathlib
 import paramiko
 
-import cros_constants
+from cros_constants import TEST_SYS_AUTOTEST_PATH, AUTOTEST_SCENARIOS
 
 class CrosScenarioLauncher():
     """[summary]
@@ -210,11 +210,11 @@ class CrosScenarioLauncher():
         self.logger.info("--------------------------------------------------------------------------------")
 
 
-        if scenario in cros_constants.AUTOTEST_SCENARIOS:
-            self.logger.info(f"executing: cd {cros_constants.TEST_SYS_AUTOTEST_PATH}; bin/autotest {cros_constants.AUTOTEST_SCENARIOS[scenario]}")
-            self.__exec_command(f"cd {cros_constants.TEST_SYS_AUTOTEST_PATH}; bin/autotest {cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+        if scenario in AUTOTEST_SCENARIOS:
+            self.logger.info(f"executing: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
+            self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {cros_constants.AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are {AUTOTEST_SCENARIOS.keys()}")
 
 
     def prepare_scenario(self, scenario):
@@ -222,15 +222,15 @@ class CrosScenarioLauncher():
         self.logger.info(f"prepare {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if scenario in cros_constants.AUTOTEST_SCENARIOS:
-            if self.__exist_remote(f"{cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}"):
-                self.logger.info(f"file already exists: {cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+        if scenario in AUTOTEST_SCENARIOS:
+            if self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
+                self.logger.info(f"file already exists: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
             else:
-                if self.__exist_local(f"./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}"):
-                    self.logger.info(f"upload ./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]} to {cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
-                    self.__upload(f"./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}", f"{cros_constants.TEST_SYS_AUTOTEST_PATH}/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+                if self.__exist_local(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}"):
+                    self.logger.info(f"upload ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']} to {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                    self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
                 else:
-                    self.logger.error(f"file does not exist! ./autotest/{cros_constants.AUTOTEST_SCENARIOS[scenario]}")
+                    self.logger.error(f"file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
 
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {cros_constants.AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are {AUTOTEST_SCENARIOS.keys()}")

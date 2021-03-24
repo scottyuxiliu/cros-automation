@@ -310,81 +310,6 @@ class CrosDataLogger():
             self.logger.info(f"no such file or directory: {path}")
 
 
-    def download_file(self, remote_file_path, local_file_path):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"download {remote_file_path} to {local_file_path} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_file_path):
-            sftp = self.ssh.open_sftp()
-            sftp.get(remote_file_path, local_file_path)
-            self.logger.info(f"downloaded {local_file_path}")
-            sftp.close()
-        else:
-            self.logger.error(f"no such file: {remote_file_path}")
-
-
-    def upload_file(self, local_file_path, remote_file_path):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_file_path):
-            self.logger.info(f"{remote_file_path} already exists")
-        else:
-            sftp = self.ssh.open_sftp()
-            sftp.put(local_file_path, remote_file_path)
-            self.logger.info(f"uploaded {remote_file_path}")
-            sftp.close()
-
-    
-    def remove_file(self, remote_file_path):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove {remote_file_path} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_file_path):
-            sftp = self.ssh.open_sftp()
-            try:
-                sftp.remove(remote_file_path)
-            except IOError:
-                self.logger.error("remote_file_path might be a directory.")
-            else:
-                self.logger.info(f"removed {remote_file_path}")
-
-            sftp.close()
-        else:
-            self.logger.error(f"no such file: {remote_file_path}")
-
-
-    def extract_file(self, remote_file_path):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"extract {remote_file_path} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_file_path):
-            p = self.__read_path(remote_file_path)
-            directory = str(p.parent)
-            filename = p.name
-
-            self.logger.info(f"executing: cd {directory}; tar -xzvf {filename}")
-
-            try:
-                if self.debug is True:
-                    stdin, stdout, stderr = self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
-                    self.__read_stdout(stdout)
-                    self.logger.info("finished file extraction on the test system")
-                else:
-                    self.ssh.exec_command(f"cd {directory}; tar -xzvf {filename}") # non-blocking call
-                    time.sleep(1) # exec_command does not work properly without this
-                    self.logger.info("started file extraction on the test system")
-            except paramiko.SSHException:
-                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-
-        else:
-            self.logger.error(f"no such file: {remote_file_path}")
-
-
     def move_file(self, remote_file_path, remote_dir):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"move {remote_file_path} into {remote_dir} ...")
@@ -392,32 +317,6 @@ class CrosDataLogger():
 
         self.logger.info(f"executing: mv {remote_file_path} {remote_dir}")
         self.__exec_command(f"mv {remote_file_path} {remote_dir}")
-
-
-    def mkdir(self, remote_dir):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"create directory {remote_dir} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_dir):
-            self.logger.info(f"{remote_dir} already exists")
-        else:
-            sftp = self.ssh.open_sftp()
-            sftp.mkdir(remote_dir)
-            self.logger.info(f"{remote_dir} created")
-            sftp.close()
-
-
-    def rmdir(self, remote_dir):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove directory {remote_dir} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        if self.__exist_remote(remote_dir):
-            self.logger.info(f"executing: rm -r {remote_dir}")
-            self.__exec_command(f"rm -r {remote_dir}")
-        else:
-            self.logger.error(f"no such directory: {remote_dir}")
 
 
     def ls(self, remote_dir):

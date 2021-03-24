@@ -100,6 +100,7 @@ class CrosSwCtrl():
 
 
     def install_perl(self, perl_path):
+        # tar -xvkf linuxheaders-3.18-chromeos-x86_64.tar.xz
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"install perl on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")

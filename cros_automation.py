@@ -3,6 +3,7 @@ from custom_logger_formatter import CustomLoggerFormatter
 from cros_scenario_launcher import CrosScenarioLauncher
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
+from cros_file_handler import CrosFileHandler
 from cros_hw_ctrl import CrosHwCtrl
 
 # --------------------------------------------------------------------------------
@@ -44,16 +45,19 @@ parser.add_argument(
         "uninstall-agt": uninstall agt on the test system
         "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
         "agt-log": use agt logging on the test system. support custom arguments [-i/--input].
-        "download": download file [-i/--input] to the local host system [-o/--output]
-        "upload": upload file [-i/--input] to the test system [-o/--output]
-        "remove": remove file [-i/--input] on the test system
-        "rmdir": remove directory [-d/--directory] on the test system
-        "ls": list items in the test system directory [-d/--directory]
 
         cros data parser jobs.
         "ls-local": list items in the local directory [-d/--directory]
         "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
         "keyvals-summary": summarize keyval file contents [-d/--directory] to a .csv file [-o/--output]
+
+        cros file handler jobs.
+        "ls": list items in the target system directory [-d/--directory]
+        "mkdir": create directory [-d/--directory] on the target system
+        "rm": remove file [-i/--input] on the target system
+        "rmdir": remove directory [-d/--directory] on the target system
+        "download": download file [-i/--input] to the target system [-o/--output]
+        "upload": upload file [-i/--input] to the target system [-o/--output]
 
         cros hardware control jobs.
         "cold-reset": cold reset the test system
@@ -100,15 +104,15 @@ elif args.job == "prepare-scenario":
         cs.prepare_scenario(args.scenario)
 
 elif args.job == "install-atitool":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.mkdir("/usr/local/atitool")
-        cdl.upload_file(args.input, "/usr/local/atitool/atitool.tar.gz")
-        cdl.extract_file("/usr/local/atitool/atitool.tar.gz")
-        cdl.remove_file("/usr/local/atitool/atitool.tar.gz")
+    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
+        cfh.mkdir("/usr/local/atitool")
+        cfh.upload(args.input, "/usr/local/atitool/atitool.tar.gz")
+        cfh.extract("/usr/local/atitool/atitool.tar.gz", target_is_linux=True)
+        cfh.rm("/usr/local/atitool/atitool.tar.gz")
 
 elif args.job == "uninstall-atitool":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.rmdir("/usr/local/atitool")
+    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
+        cfh.rmdir("/usr/local/atitool")
 
 elif args.job == "atitool-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
@@ -119,25 +123,15 @@ elif args.job == "atitool-prog":
         cdl.atitool_prog(args.input)
 
 elif args.job == "install-agt":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.mkdir("/usr/local/agt")
-        cdl.upload_file(args.input, "/usr/local/agt/agt.tar.gz")
-        cdl.extract_file("/usr/local/agt/agt.tar.gz")
-        cdl.remove_file("/usr/local/agt/agt.tar.gz")
-
-        items = cdl.ls("/usr/local/agt")
-        if len(items) == 1:
-            print(items)
-            print(items[0])
-            print(f"/usr/local/agt/{items[0]}/*")
-            # cdl.move_file(f"/usr/local/agt/{items[0]}/*", "/usr/local/agt")
-            # cdl.rmdir(f"/usr/local/agt/{items[0]}")
-
-
+    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
+        cfh.mkdir("/usr/local/agt")
+        cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
+        cfh.extract("/usr/local/agt/agt.tar.gz", target_is_linux=True)
+        cfh.rm("/usr/local/agt/agt.tar.gz")
 
 elif args.job == "uninstall-agt":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.rmdir("/usr/local/agt")
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.rmdir("/usr/local/agt")
 
 elif args.job == "agt-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
@@ -146,26 +140,6 @@ elif args.job == "agt-log":
 elif args.job == "agt-internal-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_internal_log(args.duration, args.index, args.input, args.output)
-
-elif args.job == "download":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.download_file(args.input, args.output)
-
-elif args.job == "upload":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.upload_file(args.input, args.output)
-
-elif args.job == "remove":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.remove_file(args.input)
-
-elif args.job == "rmdir":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.rmdir(args.directory)
-
-elif args.job == "ls":
-    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
-        cdl.ls(args.directory)
 
 elif args.job == "ls-local":
     with CrosDataParser() as cdp:
@@ -181,6 +155,29 @@ elif args.job == "keyvals-summary":
         keyval_paths = cdp.ls_local(args.directory, "*keyval*")
         cdp.keyvals_summary(keyval_paths, args.output)
 
+
+# cros file handler jobs
+elif args.job == "ls":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.ls(args.directory)
+
+elif args.job == "rm":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.rm(args.input)
+
+elif args.job == "rmdir":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.rmdir(args.directory)
+
+elif args.job == "download":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.download(args.input, args.output)
+
+elif args.job == "upload":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.upload(args.input, args.output)
+
+# cros hardware control jobs
 elif args.job == "cold-reset":
     with CrosHwCtrl(args.ip, args.username, args.keyfile, args.debug) as chc:
         pass

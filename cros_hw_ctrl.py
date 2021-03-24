@@ -83,3 +83,14 @@ class CrosHwCtrl():
         sftp = self.ssh.open_sftp()
         sftp.put(local_file_path, remote_file_path)
         sftp.close()
+
+
+    def cold_reset(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"start servo cold-reset ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        
+
+
+    
