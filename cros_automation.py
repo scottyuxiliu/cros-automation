@@ -4,7 +4,7 @@ from cros_scenario_launcher import CrosScenarioLauncher
 from cros_data_logger import CrosDataLogger
 from cros_data_parser import CrosDataParser
 from cros_file_handler import CrosFileHandler
-from cros_hw_ctrl import CrosHwCtrl
+from cros_software_controller import CrosSoftwareController
 
 # --------------------------------------------------------------------------------
 # Set up logging
@@ -58,10 +58,9 @@ parser.add_argument(
         "download": download file [-i/--input] to the target system [-o/--output]
         "upload": upload file [-i/--input] to the target system [-o/--output]
 
-        cros hardware control jobs.
+        cros software control jobs.
         "cold-reset": cold reset the test system. sudo password [--sudo] is needed.
-
-        cros software control jobs
+        "flashrom": flash coreboot firmware [-i/--input] directly on the target system [-p/--ip].
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
         '''
     )
@@ -177,12 +176,15 @@ elif args.job == "upload":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.upload(args.input, args.output)
 
-# cros hardware control jobs
-elif args.job == "cold-reset":
-    with CrosHwCtrl(args.ip, args.username, args.keyfile, args.debug) as chc:
-        chc.cold_reset(sudo_password=args.sudo)
-
 # cros software control jobs
+elif args.job == "cold-reset":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.cold_reset(sudo_password=args.sudo)
+
+elif args.job == "flashrom":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.flashrom(args.input)
+
 elif args.job == "install-agt":
     with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
         cfh.mkdir("/usr/local/agt")

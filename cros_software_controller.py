@@ -3,13 +3,13 @@ import paramiko
 
 import cros_constants
 
-class CrosHwCtrl():
+class CrosSoftwareController():
     """[summary]
     """
 
-    def __init__(self, host_system_ip_address, host_system_username, ssh_private_key_file, debug):
-        self.logger = logging.getLogger("cros_automation.CrosHwCtrl")
-        fh = logging.FileHandler("cros_hw_ctrl.log", mode="w") # overwrite existing log file
+    def __init__(self, ip, username, ssh_private_key_file, debug):
+        self.logger = logging.getLogger("cros_automation.CrosSoftwareController")
+        fh = logging.FileHandler("cros_software_controller.log", mode="w") # overwrite existing log file
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -26,14 +26,14 @@ class CrosHwCtrl():
         ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
 
         self.logger.debug(f"connect to test system with the following details")
-        self.logger.debug(f"hostname = {host_system_ip_address}")
-        self.logger.debug(f"username = {host_system_username}")
+        self.logger.debug(f"hostname = {ip}")
+        self.logger.debug(f"username = {username}")
         self.logger.debug(f"ssh_private_key_file = {ssh_private_key_file}")
 
-        self.ssh.connect(hostname=host_system_ip_address, username=host_system_username, pkey=ssh_private_key)
+        self.ssh.connect(hostname=ip, username=username, pkey=ssh_private_key)
         self.logger.debug("ssh session established!")
 
-        self.host_system_ip_address = host_system_ip_address
+        self.ip = ip
         self.debug = debug
 
 
@@ -63,17 +63,21 @@ class CrosHwCtrl():
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
 
-    def __exec_command(self, command, sudo_password=None):
+    def __exec_command(self, command, sudo_password, debug):
         """execute command using paramiko ssh.exec_command()
 
         if sudo_password is provided, command will be executed with su privileges. this will be blocking.
+
+        if debug is provided, paramiko ssh.exec_command() will be blocking and stdout will be captured.
 
         Parameters
         ----------
         command : str
             [description]
-        sudo_password : str, optional
-            [description], by default None
+        sudo_password : str
+            [description]
+        debug : bool
+            [description]
         """
 
         if sudo_password is not None:
@@ -87,7 +91,7 @@ class CrosHwCtrl():
             else:
                 self.logger.info("finished on the test system with su privileges")
         else:
-            if self.debug is True:
+            if debug is True:
                 try:
                     stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
                     self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
@@ -149,17 +153,25 @@ class CrosHwCtrl():
 
     def cold_reset(self, sudo_password):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"start servo cold-reset ...")
+        self.logger.info("start servo cold-reset ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("sudo execute: dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
-        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password)
+        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password, self.debug)
 
         self.logger.info("wait 10 seconds")
         time.sleep(10)
 
         self.logger.info("sudo execute: dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
-        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password)
+        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password, self.debug)
 
+
+    def flashrom(self, coreboot_firmware):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"flash coreboot firmware {coreboot_firmware} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info(f"execute: flashrom -p host -w {coreboot_firmware}")
+        self.__exec_command(f"flashrom -p host -w {coreboot_firmware}", sudo_password=None, debug=True)
 
     
