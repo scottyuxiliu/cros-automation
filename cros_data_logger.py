@@ -146,7 +146,7 @@ class CrosDataLogger():
         if status is True:
             self.logger.info("ssh session is active")
 
-            self.logger.info('executing echo "ssh session is active"')
+            self.logger.info('execute echo "ssh session is active"')
             try:
                 if self.debug is True:
                     stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
@@ -173,7 +173,7 @@ class CrosDataLogger():
         self.logger.info(f"atitool program with argument(s) {arguments} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f"executing: cd /usr/local/atitool; ./atitool {arguments}")
+        self.logger.info(f"execute: cd /usr/local/atitool; ./atitool {arguments}")
 
         if self.debug is True:
             try:
@@ -209,17 +209,17 @@ class CrosDataLogger():
 
         if index == 0:
             if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
-                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                 self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
         else:
             if arguments is None:
-                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
             else:
-                self.logger.info(f'executing: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                 self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
 
 
@@ -240,17 +240,17 @@ class CrosDataLogger():
         if self.__exist_remote(f"{AGT_DIR_PATH}/agt"):
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                     self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 else:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                     self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
             else:
                 if arguments is None:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                     self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 else:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                     self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
         else:
             self.logger.error(f"no such file: {AGT_DIR_PATH}/agt")
@@ -273,17 +273,17 @@ class CrosDataLogger():
         if self.__exist_remote(F"{AGT_DIR_PATH}/agt_internal"):
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                     self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 else:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                     self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
             else:
                 if arguments is None:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                     self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
                 else:
-                    self.logger.info(f'executing: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
                     self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
 
         else:
@@ -315,7 +315,7 @@ class CrosDataLogger():
         self.logger.info(f"move {remote_file_path} into {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f"executing: mv {remote_file_path} {remote_dir}")
+        self.logger.info(f"execute: mv {remote_file_path} {remote_dir}")
         self.__exec_command(f"mv {remote_file_path} {remote_dir}")
 
 

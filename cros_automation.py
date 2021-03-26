@@ -41,7 +41,6 @@ parser.add_argument(
         "uninstall-atitool": uninstall atitool on the test system
         "atitool-log": use atitool logging on the test system. support custom arguments [-i/--input].
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
-        "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "uninstall-agt": uninstall agt on the test system
         "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
         "agt-log": use agt logging on the test system. support custom arguments [-i/--input].
@@ -60,7 +59,10 @@ parser.add_argument(
         "upload": upload file [-i/--input] to the target system [-o/--output]
 
         cros hardware control jobs.
-        "cold-reset": cold reset the test system
+        "cold-reset": cold reset the test system. sudo password [--sudo] is needed.
+
+        cros software control jobs
+        "install-agt": install agt given the .tar.gz installation file [-i/--input]
         '''
     )
 )
@@ -74,6 +76,7 @@ parser.add_argument("-t", "--duration", type=int, default=60, help="data logging
 parser.add_argument("-d", "--directory", type=str, help="directory on the test system.")
 parser.add_argument("-i", "--input", type=str, help="data logging source file name, or data parsing file name, or atitool logging/programming arguments.")
 parser.add_argument("-o", "--output", type=str, help="data logging output file name.")
+parser.add_argument("--sudo", type=str, help="sudo password.")
 parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
@@ -122,13 +125,6 @@ elif args.job == "atitool-prog":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.atitool_prog(args.input)
 
-elif args.job == "install-agt":
-    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
-        cfh.mkdir("/usr/local/agt")
-        cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
-        cfh.extract("/usr/local/agt/agt.tar.gz", target_is_linux=True)
-        cfh.rm("/usr/local/agt/agt.tar.gz")
-
 elif args.job == "uninstall-agt":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.rmdir("/usr/local/agt")
@@ -161,6 +157,10 @@ elif args.job == "ls":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.ls(args.directory)
 
+elif args.job == "mkdir":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.mkdir(args.directory)
+
 elif args.job == "rm":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.rm(args.input)
@@ -180,7 +180,16 @@ elif args.job == "upload":
 # cros hardware control jobs
 elif args.job == "cold-reset":
     with CrosHwCtrl(args.ip, args.username, args.keyfile, args.debug) as chc:
-        pass
+        chc.cold_reset(sudo_password=args.sudo)
+
+# cros software control jobs
+elif args.job == "install-agt":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
+        cfh.mkdir("/usr/local/agt")
+        cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
+        cfh.extract("/usr/local/agt/agt.tar.gz", target_is_linux=True)
+        cfh.ls("/usr/local/agt")
+        cfh.rm("/usr/local/agt/agt.tar.gz")
 
 else:
     pass

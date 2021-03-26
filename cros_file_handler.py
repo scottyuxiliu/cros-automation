@@ -240,7 +240,7 @@ class CrosFileHandler():
 
         if self.__exist_remote(remote_dir):
             if self.__is_file(remote_dir) is False:
-                self.logger.info(f"executing: rm -r {remote_dir}")
+                self.logger.info(f"execute: rm -r {remote_dir}")
                 self.__exec_command(f"rm -r {remote_dir}")
             else:
                 self.logger.error(f"{remote_dir} is file. run rm instead.")
@@ -311,7 +311,7 @@ class CrosFileHandler():
             directory = str(p.parent)
             filename = p.name
 
-            self.logger.info(f"executing: cd {directory}; tar -xzvf {filename}")
+            self.logger.info(f"execute: cd {directory}; tar -xzvf {filename}")
             self.__exec_command(f"cd {directory}; tar -xzvf {filename}")
 
         else:

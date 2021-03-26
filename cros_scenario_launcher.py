@@ -168,7 +168,7 @@ class CrosScenarioLauncher():
         if status is True:
             self.logger.info("ssh session is active")
 
-            self.logger.info('executing echo "ssh session is active"')
+            self.logger.info('execute echo "ssh session is active"')
             try:
                 if self.debug is True:
                     stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
@@ -188,7 +188,7 @@ class CrosScenarioLauncher():
         self.logger.info(f"reboot the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing: /sbin/reboot -f > /dev/null 2>&1 &")
+        self.logger.info("execute: /sbin/reboot -f > /dev/null 2>&1 &")
         self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
 
 
@@ -197,7 +197,7 @@ class CrosScenarioLauncher():
         self.logger.info(f"enter s0i3 on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("executing: echo mem > /sys/power/state")
+        self.logger.info("execute: echo mem > /sys/power/state")
         self.__exec_command("echo mem > /sys/power/state")
 
 
@@ -211,7 +211,7 @@ class CrosScenarioLauncher():
 
 
         if scenario in AUTOTEST_SCENARIOS:
-            self.logger.info(f"executing: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
+            self.logger.info(f"execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
             self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
             self.logger.error(f"{scenario} not supported! supported scenarios are {AUTOTEST_SCENARIOS.keys()}")

@@ -15,7 +15,7 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 
 ## Common use cases
 
-Run graphics_WebGLAquarium
+### Run graphics_WebGLAquarium
 
 ```
 python .\cros_automation.py launch-scenario -s "aquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
@@ -23,13 +23,13 @@ python .\cros_automation.py launch-scenario -s "aquarium" -p "192.168.123.456" -
 
 ---
 
-Capture ATITOOL log
+### Capture ATITOOL log
 
 ```
 python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "atitool_log.csv"
 ```
 
-Capture AGT log
+### Capture AGT log
 
 ```
 python .\cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
@@ -37,7 +37,7 @@ python .\cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -
 
 ---
 
-List items in a directory
+### List items in a directory
 
 ```
 # list items in a test system directory
@@ -48,29 +48,46 @@ python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-au
 ```
 
 
-Download atitool_log.csv to the local host system
+### Download atitool_log.csv to the local host system
 
 ```
 python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
 ```
 
-Upload atitool_log.csv to the local host system
+### Upload atitool_log.csv to the local host system
 
 ```
 python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i "C:\Users\scottyuxiliu\Downloads\atitool_log.csv" -o "/usr/local/atitool/atitool_log.csv"
 ```
 
-Remove atitool_log.csv on the test system
+### Remove atitool_log.csv on the test system
 
 ```
 python .\cros_automation.py remove -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
 ```
 
-Remove /usr/local/atitool directory on the test system
+### Remove /usr/local/atitool directory on the test system
 
 ```
 python .\cros_automation.py rmdir -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
 ```
 
+### Cold-reset the test system through servo
+
+Servo is needed and should be connected to the host system
+
+```
+python .\cros_automation.py cold-reset -p [host_ip] -u [host_username] -k [ssh_private_key_file] --sudo [sudo_password]
+```
+
+For example,
+
+```
+python .\cros_automation.py cold-reset -p "192.168.111.111" -u "admin" -k "id_rsa" --sudo "password"
+```
+
+
 ## To-do
-1.   Add cold-reset support
+1.   Organize cros software control jobs
+2.   Add flashrom support
+3.   Add chroot support

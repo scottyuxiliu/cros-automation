@@ -47,6 +47,68 @@ class CrosHwCtrl():
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __read_stdout(self, stdout):
+        """[summary]
+
+        Parameters
+        ----------
+        stdout : [type]
+            [description]
+        """
+        if stdout.channel.recv_exit_status() == 0: # blocking call
+            self.logger.debug(f"stdout:")
+            for line in stdout.readlines():
+                self.logger.debug(line)
+        else:
+            self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+
+
+    def __exec_command(self, command, sudo_password=None):
+        """execute command using paramiko ssh.exec_command()
+
+        if sudo_password is provided, command will be executed with su privileges. this will be blocking.
+
+        Parameters
+        ----------
+        command : str
+            [description]
+        sudo_password : str, optional
+            [description], by default None
+        """
+
+        if sudo_password is not None:
+            try:
+                stdin, stdout, stderr = self.ssh.exec_command(f"sudo -S -p '' {command}") # non-blocking call
+                stdin.write(f"{sudo_password}\n")
+                stdin.flush()
+                self.__read_stdout(stdout)
+            except paramiko.SSHException:
+                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            else:
+                self.logger.info("finished on the test system with su privileges")
+        else:
+            if self.debug is True:
+                try:
+                    stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
+                    self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
+                except paramiko.SSHException:
+                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                else:
+                    self.logger.info("finished on the test system")
+            else:
+                n = len(command.split(";")) # get the number of commands that should be executed
+
+                try:
+                    self.ssh.exec_command(command) # non-blocking call, thus need to add delay after
+                except paramiko.SSHException:
+                    self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                else:
+                    time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
+                    self.logger.info("started on the test system")
+
+
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __read_path(self, path, is_linux=False):
         """read path in string format and convert it to pathlib.Path() object. if is_linux is true, convert it to Linux style path regardless of current Operating System.
 
@@ -85,12 +147,19 @@ class CrosHwCtrl():
         sftp.close()
 
 
-    def cold_reset(self):
+    def cold_reset(self, sudo_password):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"start servo cold-reset ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        
+        self.logger.info("sudo execute: dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
+        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password)
+
+        self.logger.info("wait 10 seconds")
+        time.sleep(10)
+
+        self.logger.info("sudo execute: dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
+        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password)
 
 
     
