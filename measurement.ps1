@@ -55,6 +55,9 @@ function measurement {
         Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval to $result_directory ..."
         python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
 
+        Write-Verbose "download $scenario result results-chart.json $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json" -o "$result_directory\results-chart_$($cur_file_index+$file_index_offset).json"
+
         Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result')) ..."
         python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))"
 

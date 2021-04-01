@@ -31,5 +31,9 @@ AUTOTEST_SCENARIOS = {
     "ptl-30m-1kfish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.1000_fish"
+    },
+    "pvc-25m": {
+        "method": "autotest",
+        "control": "tests/power_VideoCall.25min/control"
     }
 }
