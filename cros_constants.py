@@ -34,6 +34,6 @@ AUTOTEST_SCENARIOS = {
     },
     "pvc-25m": {
         "method": "autotest",
-        "control": "tests/power_VideoCall.25min/control"
+        "control": "tests/power_VideoCall/control.25min"
     }
 }
