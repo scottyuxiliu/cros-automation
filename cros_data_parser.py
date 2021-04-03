@@ -8,8 +8,7 @@ class CrosDataParser():
 
     def __init__(self):
         self.logger = logging.getLogger("cros_automation.CrosDataParser")
-        fh = logging.FileHandler("cros_data_parser.log", mode="w") # overwrite existing log file
-        # fh = logging.FileHandler("cros_data_parser.log")
+        fh = logging.FileHandler("cros_data_parser.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -132,4 +131,7 @@ class CrosDataParser():
 
         content_df = pd.DataFrame(dictlist)
         content_df.to_csv(summary_path, index=False)
+
+
+    
 

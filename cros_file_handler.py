@@ -21,7 +21,7 @@ class CrosFileHandler():
         """
 
         self.logger = logging.getLogger("cros_automation.CrosFileHandler")
-        fh = logging.FileHandler("cros_file_handler.log", mode="w") # overwrite existing log file
+        fh = logging.FileHandler("cros_file_handler.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)

@@ -1,7 +1,7 @@
 import os, sys, select, logging, argparse, time, errno, pathlib
 import paramiko
 
-from cros_constants import TEST_SYS_AUTOTEST_PATH, AUTOTEST_SCENARIOS
+from cros_constants import TEST_SYS_AUTOTEST_PATH, AUTOTEST_SCENARIOS, MANUAL_SCENARIOS
 
 class CrosScenarioLauncher():
     """[summary]
@@ -9,7 +9,7 @@ class CrosScenarioLauncher():
 
     def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosScenarioLauncher")
-        fh = logging.FileHandler("cros_scenario_launcher.log", mode="w") # overwrite existing log file
+        fh = logging.FileHandler("cros_scenario_launcher.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -53,6 +53,12 @@ class CrosScenarioLauncher():
 
     def __exit__(self, exit_type, exit_value, traceback):
         self.ssh.close()
+
+
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __caseless_equal(self, left, right):
+        return left.lower() == right.lower()
 
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
@@ -183,38 +189,22 @@ class CrosScenarioLauncher():
         return status
 
 
-    def reboot(self):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"reboot the test system {self.test_system_ip_address} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        self.logger.info("execute: /sbin/reboot -f > /dev/null 2>&1 &")
-        self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
-
-
-    def enter_s0i3(self):
-        self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"enter s0i3 on the test system {self.test_system_ip_address} ...")
-        self.logger.info("--------------------------------------------------------------------------------")
-
-        self.logger.info("execute: echo mem > /sys/power/state")
-        self.__exec_command("echo mem > /sys/power/state")
-
-
     def launch_scenario(self, scenario):
-        """launch the given autotest scenario on the test system
+        """launch the given scenario on the test system
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"launch {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-
-        if scenario in AUTOTEST_SCENARIOS:
+        if scenario in MANUAL_SCENARIOS:
+            self.logger.info(f"execute: {MANUAL_SCENARIOS[scenario]['command']}")
+            self.__exec_command(f"{MANUAL_SCENARIOS[scenario]['command']}")
+        elif scenario in AUTOTEST_SCENARIOS:
             self.logger.info(f"execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
             self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
 
 
     def prepare_scenario(self, scenario):
@@ -222,7 +212,9 @@ class CrosScenarioLauncher():
         self.logger.info(f"prepare {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if scenario in AUTOTEST_SCENARIOS:
+        if scenario in MANUAL_SCENARIOS:
+            pass
+        elif scenario in AUTOTEST_SCENARIOS:
             if self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
                 self.logger.info(f"file already exists: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
             else:
@@ -231,6 +223,5 @@ class CrosScenarioLauncher():
                     self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
                 else:
                     self.logger.error(f"file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
-
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")

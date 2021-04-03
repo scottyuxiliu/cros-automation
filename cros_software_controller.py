@@ -9,7 +9,7 @@ class CrosSoftwareController():
 
     def __init__(self, ip, username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosSoftwareController")
-        fh = logging.FileHandler("cros_software_controller.log", mode="w") # overwrite existing log file
+        fh = logging.FileHandler("cros_software_controller.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
         fh.setFormatter(formatter)
@@ -68,7 +68,7 @@ class CrosSoftwareController():
 
         if sudo_password is provided, command will be executed with su privileges. this will be blocking.
 
-        if debug is provided, paramiko ssh.exec_command() will be blocking and stdout will be captured.
+        if debug is provided, paramiko ssh.exec_command() stdout will be captured. this will be blocking.
 
         Parameters
         ----------
@@ -151,6 +151,15 @@ class CrosSoftwareController():
         sftp.close()
 
 
+    def reboot(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"reboot the target system {self.ip} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info("execute: /sbin/reboot -f > /dev/null 2>&1 &")
+        self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &", sudo_password=None, debug=self.debug)
+
+
     def cold_reset(self, sudo_password):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info("start servo cold-reset ...")
@@ -167,11 +176,34 @@ class CrosSoftwareController():
 
 
     def flashrom(self, coreboot_firmware):
+        """always blocking
+
+        Parameters
+        ----------
+        coreboot_firmware : [type]
+            [description]
+        """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"flash coreboot firmware {coreboot_firmware} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f"execute: flashrom -p host -w {coreboot_firmware}")
         self.__exec_command(f"flashrom -p host -w {coreboot_firmware}", sudo_password=None, debug=True)
+
+
+    def agt_prog(self, args):
+        """always blocking
+
+        Parameters
+        ----------
+        args : [type]
+            [description]
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"agt program {args} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info(f"execute: cd /usr/local/agt; ./agt_internal {args}")
+        self.__exec_command(f"cd /usr/local/agt; ./agt_internal {args}", sudo_password=None, debug=True)
 
     

@@ -45,6 +45,9 @@ python .\cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/u
 
 # list items in a local directory
 python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input"
+
+# list items in a local directory, with name "keyval*"
+python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -i "keyval*"
 ```
 
 
@@ -63,7 +66,7 @@ python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i
 ### Remove atitool_log.csv on the test system
 
 ```
-python .\cros_automation.py remove -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
+python .\cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
 ```
 
 ### Remove /usr/local/atitool directory on the test system

@@ -29,7 +29,7 @@ import logging
 logger = logging.getLogger('power_log')
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler('power_log_debug.log') # mode='w' to overwrite existing log file
+fh = logging.FileHandler('power_log_debug.log') # to overwrite existing log file, use mode="w"
 fh.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()

@@ -1,10 +1,23 @@
 $DELAY_AFTER_BOOT = 180
+$DELAY_AFTER_PROG = 900
 
 $TEST_SYS_AUTOTEST_PATH = "/usr/local/autotest"
 $TEST_SYS_ATITOOL_PATH = "/usr/local/atitool"
 $TEST_SYS_AGT_PATH = "/usr/local/agt"
 
 $SCENARIO_CONST = @{
+    "idle" = @{
+        "duration" = 300;
+        "agt_log_time" = 300;
+        "pwr_log_time" = 300;
+        "result" = "na"
+    };
+    "stress-ng" = @{
+        "duration" = 300;
+        "agt_log_time" = 360;
+        "pwr_log_time" = 300;
+        "result" = "na"
+    };
     "aquarium" = @{
         "duration" = 120;
         "agt_log_time" = 180;
