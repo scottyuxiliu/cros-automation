@@ -279,7 +279,7 @@ class CrosFileHandler():
 
     
     def upload(self, local_file_path, remote_file_path):
-        """[summary]
+        """this will be blocking.
 
         Parameters
         ----------
@@ -298,7 +298,7 @@ class CrosFileHandler():
         self.logger.info(f"uploaded {remote_file_path}")
 
 
-    def extract(self, remote_file_path, target_is_linux):
+    def extract(self, remote_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"extract {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
@@ -307,12 +307,32 @@ class CrosFileHandler():
             raise ValueError("remote_file_path is none!")
 
         if self.__exist_remote(remote_file_path):
-            p = self.__read_path(remote_file_path, target_is_linux)
+            p = self.__read_path(remote_file_path, True)
             directory = str(p.parent)
             filename = p.name
 
             self.logger.info(f"execute: cd {directory}; tar -xzvf {filename}")
             self.__exec_command(f"cd {directory}; tar -xzvf {filename}")
+
+        else:
+            self.logger.error(f"no such file: {remote_file_path}")
+
+
+    def compress(self, remote_file_path):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"compress {remote_file_path} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        if remote_file_path is None:
+            raise ValueError("remote_file_path is none!")
+
+        if self.__exist_remote(remote_file_path):
+            p = self.__read_path(remote_file_path, True)
+            directory = str(p.parent)
+            filename = p.name
+
+            self.logger.info(f"execute: cd {directory}; tar -czvf {filename}.tar.gz {filename}")
+            self.__exec_command(f"cd {directory}; tar -czvf {filename}.tar.gz {filename}")
 
         else:
             self.logger.error(f"no such file: {remote_file_path}")

@@ -18,6 +18,12 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 300;
         "result" = "na"
     };
+    "stress_ng_stop_ui" = @{
+        "duration" = 300;
+        "agt_log_time" = 360;
+        "pwr_log_time" = 300;
+        "result" = "na"
+    };
     "aquarium" = @{
         "duration" = 120;
         "agt_log_time" = 180;

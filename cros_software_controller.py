@@ -176,7 +176,7 @@ class CrosSoftwareController():
 
 
     def flashrom(self, coreboot_firmware):
-        """always blocking
+        """this will be blocking.
 
         Parameters
         ----------

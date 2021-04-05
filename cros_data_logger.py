@@ -306,7 +306,7 @@ class CrosDataLogger():
                 self.logger.info(f"{path} is a file")
                 return True
         else:
-            self.logger.info(f"no such file or directory: {path}")
+            self.logger.error(f"no such file or directory: {path}")
 
 
     def move_file(self, remote_file_path, remote_dir):

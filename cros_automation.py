@@ -45,15 +45,17 @@ parser.add_argument(
         cros data parser jobs.
         "ls-local": list items in the local directory [-d/--directory], optionally with name [-i/--input]
         "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
-        "keyvals-summary": summarize keyval file contents [-d/--directory] to a .csv file [-o/--output]
+        "keyvals-summary": summarize keyval files in a directory [-d/--directory] to a .csv file [-o/--output]
+        "results-charts-summary": summarize results-chart files in a directory [-d/--directory] to a .csv file [-o/--output]
 
         cros file handler jobs.
         "ls": list items in the target system directory [-d/--directory]
-        "mkdir": create directory [-d/--directory] on the target system
+        "mkdir": create directory [-d/--directory] on the target system [-p/--ip].
         "rm": remove file [-i/--input] on the target system
         "rmdir": remove directory [-d/--directory] on the target system
         "download": download file [-i/--input] to the target system [-o/--output]
         "upload": upload file [-i/--input] to the target system [-o/--output]
+        "extract": extract file [-i/--input] on the target system [-p/--ip].
 
         cros software control jobs.
         "reboot": reboot the target system [-p/--ip]
@@ -62,6 +64,7 @@ parser.add_argument(
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
+        "autotest-backup": back up autotest on the target system [-p/--ip].
         '''
     )
 )
@@ -98,7 +101,7 @@ elif args.job == "install-atitool":
     with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
         cfh.mkdir("/usr/local/atitool")
         cfh.upload(args.input, "/usr/local/atitool/atitool.tar.gz")
-        cfh.extract("/usr/local/atitool/atitool.tar.gz", target_is_linux=True)
+        cfh.extract("/usr/local/atitool/atitool.tar.gz")
         cfh.rm("/usr/local/atitool/atitool.tar.gz")
 
 elif args.job == "uninstall-atitool":
@@ -121,6 +124,7 @@ elif args.job == "agt-internal-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_internal_log(args.duration, args.index, args.input, args.output)
 
+# cros data parser jobs
 elif args.job == "ls-local":
     with CrosDataParser() as cdp:
         cdp.ls_local(args.directory, args.input)
@@ -134,6 +138,11 @@ elif args.job == "keyvals-summary":
     with CrosDataParser() as cdp:
         keyval_paths = cdp.ls_local(args.directory, "*keyval*")
         cdp.keyvals_summary(keyval_paths, args.output)
+
+elif args.job == "results-charts-summary":
+    with CrosDataParser() as cdp:
+        results_chart_paths = cdp.ls_local(args.directory, "*results-chart*.json")
+        cdp.results_charts_summary(results_chart_paths, args.output)
 
 
 # cros file handler jobs
@@ -161,6 +170,10 @@ elif args.job == "upload":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.upload(args.input, args.output)
 
+elif args.job == "extract":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.extract(args.input)
+
 # cros software control jobs
 elif args.job == "reboot":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
@@ -182,13 +195,18 @@ elif args.job == "install-agt":
     with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
         cfh.mkdir("/usr/local/agt")
         cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
-        cfh.extract("/usr/local/agt/agt.tar.gz", target_is_linux=True)
+        cfh.extract("/usr/local/agt/agt.tar.gz")
         cfh.ls("/usr/local/agt")
         cfh.rm("/usr/local/agt/agt.tar.gz")
 
 elif args.job == "agt-prog":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.agt_prog(args.input)
+
+elif args.job == "autotest-backup":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
+        cfh.compress("/usr/local/autotest")
+        cfh.download("/usr/local/autotest.tar.gz", args.output)
 
 else:
     pass

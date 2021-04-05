@@ -13,6 +13,9 @@ MANUAL_SCENARIOS = {
     },
     "stress-ng": {
         "command": "cd /usr/local; stress-ng -M --cpu=4 -t 300"
+    },
+    "stress_ng_stop_ui": {
+        "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300"
     }
 }
 
