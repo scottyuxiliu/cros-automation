@@ -46,7 +46,7 @@ AUTOTEST_SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.1000_fish"
     },
-    "pvc-25m": {
+    "power_videocall_25min": {
         "method": "autotest",
         "control": "tests/power_VideoCall/control.25min"
     }

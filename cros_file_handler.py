@@ -75,7 +75,7 @@ class CrosFileHandler():
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
 
-    def __exec_command(self, command):
+    def __exec_command(self, command, blocking=False):
         """execute command using paramiko ssh.exec_command()
 
         Parameters
@@ -84,7 +84,7 @@ class CrosFileHandler():
             [description]
         """
 
-        if self.debug is True:
+        if self.debug is True or blocking is True:
             try:
                 stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
                 self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
@@ -299,6 +299,18 @@ class CrosFileHandler():
 
 
     def extract(self, remote_file_path):
+        """this will be blocking.
+
+        Parameters
+        ----------
+        remote_file_path : [type]
+            [description]
+
+        Raises
+        ------
+        ValueError
+            [description]
+        """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"extract {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
@@ -311,8 +323,8 @@ class CrosFileHandler():
             directory = str(p.parent)
             filename = p.name
 
-            self.logger.info(f"execute: cd {directory}; tar -xzvf {filename}")
-            self.__exec_command(f"cd {directory}; tar -xzvf {filename}")
+            self.logger.info(f"execute (blocking): cd {directory}; tar -xzvf {filename}")
+            self.__exec_command(f"cd {directory}; tar -xzvf {filename}", blocking=True)
 
         else:
             self.logger.error(f"no such file: {remote_file_path}")

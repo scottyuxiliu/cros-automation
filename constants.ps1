@@ -54,7 +54,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 1800;
         "result" = "results/default/power_ThermalLoad.option/results"
     };
-    "pvc-25m" = @{
+    "power_videocall_25min" = @{
         "duration" = 1500;
         "agt_log_time" = 1800;
         "pwr_log_time" = 1500;
