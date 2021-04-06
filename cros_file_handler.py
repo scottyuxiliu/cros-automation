@@ -82,6 +82,8 @@ class CrosFileHandler():
         ----------
         command : str
             [description]
+        blocking : bool
+            if set, paramiko ssh.exec_command() will be blocking.
         """
 
         if self.debug is True or blocking is True:
@@ -200,7 +202,7 @@ class CrosFileHandler():
 
 
     def rm(self, remote_file_path):
-        """[summary]
+        """this will be blocking.
 
         Parameters
         ----------
@@ -343,8 +345,8 @@ class CrosFileHandler():
             directory = str(p.parent)
             filename = p.name
 
-            self.logger.info(f"execute: cd {directory}; tar -czvf {filename}.tar.gz {filename}")
-            self.__exec_command(f"cd {directory}; tar -czvf {filename}.tar.gz {filename}")
+            self.logger.info(f"execute (blocking): cd {directory}; tar -czvf {filename}.tar.gz {filename}")
+            self.__exec_command(f"cd {directory}; tar -czvf {filename}.tar.gz {filename}", blocking=True)
 
         else:
             self.logger.error(f"no such file: {remote_file_path}")

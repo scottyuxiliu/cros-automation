@@ -12,7 +12,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 300;
         "result" = "na"
     };
-    "stress-ng" = @{
+    "stress_ng" = @{
         "duration" = 300;
         "agt_log_time" = 360;
         "pwr_log_time" = 300;

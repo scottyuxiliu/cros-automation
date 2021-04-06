@@ -11,7 +11,7 @@ MANUAL_SCENARIOS = {
     "s0i3": {
         "command": "echo mem > /sys/power/state"
     },
-    "stress-ng": {
+    "stress_ng": {
         "command": "cd /usr/local; stress-ng -M --cpu=4 -t 300"
     },
     "stress_ng_stop_ui": {

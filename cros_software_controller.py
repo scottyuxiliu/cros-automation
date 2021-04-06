@@ -63,12 +63,10 @@ class CrosSoftwareController():
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
 
-    def __exec_command(self, command, sudo_password, debug):
+    def __exec_command(self, command, sudo_password=None, blocking=False):
         """execute command using paramiko ssh.exec_command()
 
         if sudo_password is provided, command will be executed with su privileges. this will be blocking.
-
-        if debug is provided, paramiko ssh.exec_command() stdout will be captured. this will be blocking.
 
         Parameters
         ----------
@@ -76,8 +74,8 @@ class CrosSoftwareController():
             [description]
         sudo_password : str
             [description]
-        debug : bool
-            [description]
+        blocking : bool
+            if set, paramiko ssh.exec_command() will be blocking.
         """
 
         if sudo_password is not None:
@@ -91,7 +89,7 @@ class CrosSoftwareController():
             else:
                 self.logger.info("finished on the test system with su privileges")
         else:
-            if debug is True:
+            if self.debug is True or blocking is True:
                 try:
                     stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
                     self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
@@ -157,7 +155,7 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("execute: /sbin/reboot -f > /dev/null 2>&1 &")
-        self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &", sudo_password=None, debug=self.debug)
+        self.__exec_command("/sbin/reboot -f > /dev/null 2>&1 &")
 
 
     def cold_reset(self, sudo_password):
@@ -166,13 +164,13 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("sudo execute: dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
-        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password, self.debug)
+        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password)
 
         self.logger.info("wait 10 seconds")
         time.sleep(10)
 
         self.logger.info("sudo execute: dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
-        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password, self.debug)
+        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password)
 
 
     def flashrom(self, coreboot_firmware):
@@ -188,11 +186,11 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f"execute: flashrom -p host -w {coreboot_firmware}")
-        self.__exec_command(f"flashrom -p host -w {coreboot_firmware}", sudo_password=None, debug=True)
+        self.__exec_command(f"flashrom -p host -w {coreboot_firmware}", blocking=True)
 
 
     def agt_prog(self, args):
-        """always blocking
+        """this will be blocking.
 
         Parameters
         ----------
@@ -204,6 +202,6 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f"execute: cd /usr/local/agt; ./agt_internal {args}")
-        self.__exec_command(f"cd /usr/local/agt; ./agt_internal {args}", sudo_password=None, debug=True)
+        self.__exec_command(f"cd /usr/local/agt; ./agt_internal {args}", blocking=True)
 
     

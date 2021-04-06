@@ -196,8 +196,8 @@ elif args.job == "install-agt":
         cfh.mkdir("/usr/local/agt")
         cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
         cfh.extract("/usr/local/agt/agt.tar.gz")
-        cfh.ls("/usr/local/agt")
         cfh.rm("/usr/local/agt/agt.tar.gz")
+        cfh.ls("/usr/local/agt")
 
 elif args.job == "agt-prog":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
