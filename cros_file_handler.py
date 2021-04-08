@@ -231,6 +231,19 @@ class CrosFileHandler():
 
 
     def rmdir(self, remote_dir):
+        """this will be blocking.
+
+        Parameters
+        ----------
+        remote_dir : [type]
+            [description]
+
+        Raises
+        ------
+        ValueError
+            [description]
+        """
+        
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"remove directory {remote_dir} ...")
         self.logger.info("--------------------------------------------------------------------------------")
@@ -242,8 +255,8 @@ class CrosFileHandler():
 
         if self.__exist_remote(remote_dir):
             if self.__is_file(remote_dir) is False:
-                self.logger.info(f"execute: rm -r {remote_dir}")
-                self.__exec_command(f"rm -r {remote_dir}")
+                self.logger.info(f"execute (blocking): rm -r {remote_dir}")
+                self.__exec_command(f"rm -r {remote_dir}", blocking=True)
             else:
                 self.logger.error(f"{remote_dir} is file. run rm instead.")
         else:

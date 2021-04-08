@@ -4,11 +4,11 @@ $DebugPreference = "Continue"
 #----------------------------------------------------------------------
 # User inputs
 
-$TEST_SYS_IP = "192.168.2.172"
+$TEST_SYS_IP = ""
 $TEST_SYS_USERNAME = "root"
 $TEST_SYS_KEYFILE = "id_rsa"
 
-$AUTOTEST_PACKAGE = "D:\dirinboz_fhd\autotest.tar.gz"
+$AUTOTEST_PACKAGE = "D:\dirinboz\autotest.tar.gz"
 
 #----------------------------------------------------------------------
 
