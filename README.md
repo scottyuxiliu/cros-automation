@@ -89,6 +89,18 @@ For example,
 python .\cros_automation.py cold-reset -p "192.168.111.111" -u "admin" -k "id_rsa" --sudo "password"
 ```
 
+### Summarize results-chart.json files to a .csv file
+
+```
+python .\cros_automation.py results-charts-summary -d [directory] -o [output_file]
+```
+
+For example,
+
+```
+python .\cros_automation.py results-charts-summary -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -o "results_charts_summary.csv"
+```
+
 
 ## To-do
 1.   Organize cros software control jobs

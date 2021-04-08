@@ -198,7 +198,7 @@ class CrosDataParser():
 
     def results_charts_summary(self, results_chart_paths, summary_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("summarize results-chart files to a .csv file ...")
+        self.logger.info("summarize results-chart.json files to a .csv file ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         df_list = []
