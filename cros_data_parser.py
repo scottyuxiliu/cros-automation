@@ -1,6 +1,8 @@
-import os, sys, select, logging, time, glob, pathlib, json, functools
+import os, sys, select, logging, time, glob, pathlib, json, functools, re
 import paramiko
 import pandas as pd
+
+from cros_constants import AGT_COLS
 
 class CrosDataParser():
     """[summary]
@@ -114,6 +116,10 @@ class CrosDataParser():
         return pd.concat(df_list, ignore_index=True)
 
 
+    def __filter_csv_cols(self, df, cols):
+        return df[cols]
+
+
     def ls_local(self, directory, name=None):
         """list all files in the local directory. if name is specified, list all files with that name.
 
@@ -133,24 +139,10 @@ class CrosDataParser():
             self.logger.info("--------------------------------------------------------------------------------")
             self.logger.info(f"list files in {directory} ...")
             self.logger.info("--------------------------------------------------------------------------------")
-
             name = "*"
-
-        elif name.startswith("*") and name.endswith("*"):
-            self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} that have {name.strip('*')} in their file names ...")
-            self.logger.info("--------------------------------------------------------------------------------")
-        elif name.startswith("*"):
-            self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} with file names ending with {name.lstrip('*')} ...")
-            self.logger.info("--------------------------------------------------------------------------------")
-        elif name.endswith("*"):
-            self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} with file names starting with {name.rstrip('*')} ...")
-            self.logger.info("--------------------------------------------------------------------------------")
         else:
             self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} with file names matching {name} ...")
+            self.logger.info(f"list files in {directory} with file names matching the pattern {name} ...")
             self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_local(directory):
@@ -213,6 +205,19 @@ class CrosDataParser():
         df = self.__concat_df_list(df_list)
         # self.logger.debug(df)
         df.to_csv(summary_path, index=False)
+
+
+    def agt_cols(self, inputpath, outputpath):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"extract agt columns from {inputpath} and save to {outputpath} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        df = pd.read_csv(inputpath)
+        cols = df.columns.values.tolist()[:2] # get the timestamp and firmware version columns
+        cols.extend(AGT_COLS) # combine timestamp and firmware version columns with AGT_COLS. list.extend() operates in-place.
+        df = self.__filter_csv_cols(df, cols)
+        df.to_csv(outputpath, index=False)
+        self.logger.info(f"saved to {outputpath}")
 
 
     

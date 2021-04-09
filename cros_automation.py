@@ -47,6 +47,7 @@ parser.add_argument(
         "keyvals-to-csv": convert keyval files [-d/--directory] to .csv files in the same directory
         "keyvals-summary": summarize keyval files in a directory [-d/--directory] to a .csv file [-o/--output]
         "results-charts-summary": summarize results-chart files in a directory [-d/--directory] to a .csv file [-o/--output]
+        "agt-cols": extract agt columns from .csv file [-i/--input] and save to .csv file [-o/--output]
 
         cros file handler jobs.
         "ls": list items in the target system directory [-d/--directory]
@@ -141,8 +142,12 @@ elif args.job == "keyvals-summary":
 
 elif args.job == "results-charts-summary":
     with CrosDataParser() as cdp:
-        results_chart_paths = cdp.ls_local(args.directory, "*results-chart*.json")
+        results_chart_paths = cdp.ls_local(args.directory, "*results_chart*.json")
         cdp.results_charts_summary(results_chart_paths, args.output)
+
+elif args.job == "agt-cols":
+    with CrosDataParser() as cdp:
+        cdp.agt_cols(args.input, args.output)
 
 
 # cros file handler jobs

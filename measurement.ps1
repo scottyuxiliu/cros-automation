@@ -53,14 +53,14 @@ function measurement {
         # output result
 
         if ($SCENARIO_CONST.Item($scenario).Item('result') -ne "na") {
-            Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval to $result_directory ..."
-            python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
+            Write-Verbose "download $scenario result keyval $($SCENARIO_CONST.Item($scenario).Item('result'))/keyval to $result_directory ..."
+            python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$($SCENARIO_CONST.Item($scenario).Item('result'))/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
     
-            Write-Verbose "download $scenario result results-chart.json $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json to $result_directory ..."
-            python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json" -o "$result_directory\results-chart_$($cur_file_index+$file_index_offset).json"
+            Write-Verbose "download $scenario result results-chart.json $($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json to $result_directory ..."
+            python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$($SCENARIO_CONST.Item($scenario).Item('result'))/results-chart.json" -o "$result_directory\results_chart_$($cur_file_index+$file_index_offset).json"
     
-            Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result')) ..."
-            python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/$($SCENARIO_CONST.Item($scenario).Item('result'))"
+            Write-Verbose "list items in $($SCENARIO_CONST.Item($scenario).Item('result')) ..."
+            python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$($SCENARIO_CONST.Item($scenario).Item('result'))"
         }
 
         if ($agt_log) {

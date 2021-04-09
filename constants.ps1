@@ -16,54 +16,54 @@ $SCENARIO_CONST = @{
         "duration" = 300;
         "agt_log_time" = 360;
         "pwr_log_time" = 300;
-        "result" = "na"
+        "result" = "/usr/local"
     };
     "stress_ng_stop_ui" = @{
         "duration" = 300;
         "agt_log_time" = 360;
         "pwr_log_time" = 300;
-        "result" = "na"
+        "result" = "/usr/local"
     };
     "aquarium" = @{
         "duration" = 120;
         "agt_log_time" = 180;
         "pwr_log_time" = 120;
-        "result" = "results/default/graphics_WebGLAquarium/results"
+        "result" = "/usr/local/autotest/results/default/graphics_WebGLAquarium/results"
     };
     "glbench" = @{
         "duration" = 1260;
         "agt_log_time" = 1260;
         "pwr_log_time" = 1260;
-        "result" = "results/default/graphics_GLBench/results"
+        "result" = "/usr/local/autotest/results/default/graphics_GLBench/results"
     };
     "plt-1h" = @{
         "duration" = 3600;
         "agt_log_time" = 3600;
         "pwr_log_time" = 3600;
-        "result" = "results/default/power_LoadTest.1hour/results"
+        "result" = "/usr/local/autotest/results/default/power_LoadTest.1hour/results"
     };
     "ptl" = @{
         "duration" = 9000;
         "agt_log_time" = 9600;
         "pwr_log_time" = 9000;
-        "result" = "results/default/power_ThermalLoad/results"
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad/results"
     };
     "ptl-30m-1kfish" = @{
         "duration" = 1800;
         "agt_log_time" = 2100;
         "pwr_log_time" = 1800;
-        "result" = "results/default/power_ThermalLoad.option/results"
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results"
     };
     "power_videocall" = @{
         "duration" = 7200;
         "agt_log_time" = 7500;
         "pwr_log_time" = 7200;
-        "result" = "results/default/power_VideoCall/results"
+        "result" = "/usr/local/autotest/results/default/power_VideoCall/results"
     };
     "power_videocall_25min" = @{
         "duration" = 1500;
         "agt_log_time" = 1800;
         "pwr_log_time" = 1500;
-        "result" = "results/default/power_VideoCall.25min/results"
+        "result" = "/usr/local/autotest/results/default/power_VideoCall.25min/results"
     }
 }
