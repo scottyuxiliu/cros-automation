@@ -57,6 +57,7 @@ parser.add_argument(
         "download": download file [-i/--input] to the target system [-o/--output]
         "upload": upload file [-i/--input] to the target system [-o/--output]
         "extract": extract file [-i/--input] on the target system [-p/--ip].
+        "compress": compress directory/file [-i/--input] on the target system [-p/--ip].
 
         cros software control jobs.
         "reboot": reboot the target system [-p/--ip]
@@ -65,7 +66,6 @@ parser.add_argument(
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
-        "autotest-backup": back up autotest on the target system [-p/--ip].
         '''
     )
 )
@@ -179,6 +179,10 @@ elif args.job == "extract":
     with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
         cfh.extract(args.input)
 
+elif args.job == "compress":
+    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
+        cfh.compress(args.input)
+
 # cros software control jobs
 elif args.job == "reboot":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
@@ -207,11 +211,6 @@ elif args.job == "install-agt":
 elif args.job == "agt-prog":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.agt_prog(args.input)
-
-elif args.job == "autotest-backup":
-    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
-        cfh.compress("/usr/local/autotest")
-        cfh.download("/usr/local/autotest.tar.gz", args.output)
 
 else:
     pass

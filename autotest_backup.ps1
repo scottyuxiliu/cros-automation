@@ -4,22 +4,19 @@ $DebugPreference = "Continue"
 #----------------------------------------------------------------------
 # User inputs
 
-$TEST_SYS_IP = "10.236.183.236"
+$TEST_SYS_IP = "10.228.31.104"
 $TEST_SYS_USERNAME = "root"
 $TEST_SYS_KEYFILE = "id_rsa"
 
-$AUTOTEST_PACKAGE = "D:\dirinboz\autotest.tar.gz"
+$AUTOTEST_BACKUP = "D:\dirinboz\autotest.tar.gz"
 
 #----------------------------------------------------------------------
 
-Write-Verbose "remove /usr/local/autotest directory on $TEST_SYS_IP ..."
-python .\cros_automation.py rmdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/autotest"
+Write-Verbose "compress /usr/local/autotest directory on $TEST_SYS_IP ..."
+python .\cros_automation.py compress -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/autotest"
 
-Write-Verbose "upload $AUTOTEST_PACKAGE to $TEST_SYS_IP ..."
-python .\cros_automation.py upload -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i $AUTOTEST_PACKAGE -o "/usr/local/autotest.tar.gz"
-
-Write-Verbose "extract /usr/local/autotest.tar.gz on $TEST_SYS_IP ..."
-python .\cros_automation.py extract -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/autotest.tar.gz"
+Write-Verbose "download /usr/local/autotest.tar.gz to $AUTOTEST_BACKUP_DIR ..."
+python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/autotest.tar.gz" -o $AUTOTEST_BACKUP
 
 Write-Verbose "remove /usr/local/autotest.tar.gz on $TEST_SYS_IP ..."
 python .\cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/autotest.tar.gz"
