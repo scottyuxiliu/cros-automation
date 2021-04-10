@@ -68,11 +68,14 @@ class CrosFileHandler():
             [description]
         """
         if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug(f"stdout:")
+            self.logger.debug("****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.debug(line)
         else:
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+            self.logger.error("****************************** stdout content ******************************")
+            for line in stdout.readlines():
+                self.logger.error(line)
 
 
     def __exec_command(self, command, blocking=False):

@@ -14,10 +14,10 @@ MANUAL_SCENARIOS = {
         "command": "echo mem > /sys/power/state"
     },
     "stress_ng": {
-        "command": "cd /usr/local; stress-ng -M --cpu=4 -t 300 --log-file keyval"
+        "command": "cd /usr/local; stress-ng -M --cpu=4 -t 30 --yaml keyval"
     },
     "stress_ng_stop_ui": {
-        "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300 --log-file keyval"
+        "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 30 --yaml keyval"
     }
 }
 

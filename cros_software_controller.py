@@ -48,19 +48,21 @@ class CrosSoftwareController():
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __read_stdout(self, stdout):
-        """[summary]
+        content = []
 
-        Parameters
-        ----------
-        stdout : [type]
-            [description]
-        """
         if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug(f"stdout:")
+            self.logger.debug("****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.debug(line)
+                content.append(line)
         else:
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+            self.logger.error("****************************** stdout content ******************************")
+            for line in stdout.readlines():
+                self.logger.error(line)
+                content.append(line)
+
+        return content
 
 
     def __exec_command(self, command, sudo_password=None, blocking=False):
@@ -79,24 +81,32 @@ class CrosSoftwareController():
         """
 
         if sudo_password is not None:
+            stdout = None
+
             try:
                 stdin, stdout, stderr = self.ssh.exec_command(f"sudo -S -p '' {command}") # non-blocking call
                 stdin.write(f"{sudo_password}\n")
                 stdin.flush()
-                self.__read_stdout(stdout)
+                stdout = self.__read_stdout(stdout)
             except paramiko.SSHException:
                 self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
                 self.logger.info("finished on the test system with su privileges")
+
+            return stdout # need to return after the try/except/else blocks. python will not go inside the else block if a value is returned in the try block.
         else:
             if self.debug is True or blocking is True:
+                stdout = None
+
                 try:
                     stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
-                    self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
+                    stdout = self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
                 except paramiko.SSHException:
                     self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
                 else:
                     self.logger.info("finished on the test system")
+
+                return stdout # need to return after the try/except/else blocks. python will not go inside the else block if a value is returned in the try block.
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
 
