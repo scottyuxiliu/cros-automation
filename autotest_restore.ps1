@@ -4,7 +4,7 @@ $DebugPreference = "Continue"
 #----------------------------------------------------------------------
 # User inputs
 
-$TEST_SYS_IP = "10.236.183.236"
+$TEST_SYS_IP = "10.236.189.17"
 $TEST_SYS_USERNAME = "root"
 $TEST_SYS_KEYFILE = "id_rsa"
 

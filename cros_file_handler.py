@@ -295,6 +295,9 @@ class CrosFileHandler():
         else:
             self.logger.error(f"no such file: {remote_file_path}")
 
+
+    def __upload_progress(self, current, total):
+        self.logger.info(f"uploaded {current} bytes out of {total} bytes")
     
     def upload(self, local_file_path, remote_file_path):
         """this will be blocking.
@@ -311,7 +314,7 @@ class CrosFileHandler():
         self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
         self.logger.info("--------------------------------------------------------------------------------")
         sftp = self.ssh.open_sftp()
-        sftp.put(local_file_path, remote_file_path)
+        sftp.put(local_file_path, remote_file_path, callback=self.__upload_progress)
         sftp.close()
         self.logger.info(f"uploaded {remote_file_path}")
 
