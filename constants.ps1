@@ -42,7 +42,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 3600;
         "result" = "/usr/local/autotest/results/default/power_LoadTest.1hour/results"
     };
-    "ptl" = @{
+    "power_thermalload" = @{
         "duration" = 9000;
         "agt_log_time" = 9600;
         "pwr_log_time" = 9000;

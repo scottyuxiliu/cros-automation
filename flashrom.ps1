@@ -4,12 +4,12 @@ $DebugPreference = "Continue"
 #----------------------------------------------------------------------
 # User inputs
 
-$TEST_SYS_IP = "10.228.31.104"
+$TEST_SYS_IP = ""
 $TEST_SYS_USERNAME = "root"
 $TEST_SYS_KEYFILE = "id_rsa"
 
-$COREBOOT_DIR = "C:\Users\$($env:UserName)\Downloads"
-$COREBOOT_FILE = "image-dirinboz.bin"
+$COREBOOT_DIR = ""
+$COREBOOT_FILE = ""
 
 #----------------------------------------------------------------------
 

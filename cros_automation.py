@@ -73,7 +73,7 @@ parser.add_argument("-p", "--ip", type=str, help="test system ip address.")
 parser.add_argument("-u", "--username", type=str, help="test system username.")
 parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path.")
 
-parser.add_argument("-s", "--scenario", type=str, help="autotest scenario. supported scenarios are plt-1h, aquarium, glbench, ptl.")
+parser.add_argument("-s", "--scenario", type=str, help="autotest scenario. supported scenarios are in cros_constants.py.")
 
 parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds, default %(default)s.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the target system.")

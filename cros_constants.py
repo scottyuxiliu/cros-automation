@@ -40,7 +40,7 @@ AUTOTEST_SCENARIOS = {
         "method": "autotest",
         "control": "tests/graphics_GLBench/control"
     },
-    "ptl": {
+    "power_thermalload": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
     },
