@@ -172,7 +172,7 @@ class CrosFileHandler():
             all items in remote_dir
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"list files in {remote_dir} ...")
+        self.logger.info(f"list files in {remote_dir} on {self.ip} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_dir is None:
@@ -266,6 +266,10 @@ class CrosFileHandler():
             self.logger.error(f"no such directory: {remote_dir}")
 
 
+    def __download_progress(self, current, total):
+        self.logger.info(f"downloaded {current} bytes / {total} bytes")
+
+
     def download(self, remote_file_path, local_file_path):
         """[summary]
 
@@ -289,7 +293,7 @@ class CrosFileHandler():
 
         if self.__exist_remote(remote_file_path):
             sftp = self.ssh.open_sftp()
-            sftp.get(remote_file_path, local_file_path)
+            sftp.get(remote_file_path, local_file_path, callback=self.__download_progress)
             self.logger.info(f"downloaded {local_file_path}")
             sftp.close()
         else:
@@ -297,8 +301,9 @@ class CrosFileHandler():
 
 
     def __upload_progress(self, current, total):
-        self.logger.info(f"uploaded {current} bytes out of {total} bytes")
+        self.logger.info(f"uploaded {current} bytes / {total} bytes")
     
+
     def upload(self, local_file_path, remote_file_path):
         """this will be blocking.
 

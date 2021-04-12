@@ -18,7 +18,7 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 ### Run graphics_WebGLAquarium
 
 ```
-python .\cros_automation.py launch-scenario -s "aquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
+python .\cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
 ---

@@ -32,7 +32,7 @@ AUTOTEST_SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_LoadTest/control.1hour"
     },
-    "aquarium": {
+    "graphics_webglaquarium": {
         "method": "autotest",
         "control": "tests/graphics_WebGLAquarium/control"
     },

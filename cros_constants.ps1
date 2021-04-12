@@ -24,7 +24,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 300;
         "result" = "/usr/local"
     };
-    "aquarium" = @{
+    "graphics_webglaquarium" = @{
         "duration" = 120;
         "agt_log_time" = 180;
         "pwr_log_time" = 120;

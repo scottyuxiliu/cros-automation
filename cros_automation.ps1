@@ -1,4 +1,4 @@
-. .\constants.ps1
+. .\cros_constants.ps1
 
 $VerbosePreference = "Continue"
 $DebugPreference = "Continue"
@@ -220,4 +220,4 @@ function example {
     }
 }
 
-example -loops 1 -scenario "aquarium" -result_directory "r87_13434.223_default_aquarium_vilboz"
+example -loops 1 -scenario "graphics_webglaquarium" -result_directory "r87_13434.223_default_graphics_webglaquarium_vilboz"
