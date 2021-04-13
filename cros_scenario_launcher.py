@@ -97,14 +97,14 @@ class CrosScenarioLauncher():
             [description]
         """
         if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug("****************************** stdout content ******************************")
+            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
-                self.logger.debug(line)
+                self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
         else:
-            self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-            self.logger.error("****************************** stdout content ******************************")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
-                self.logger.error(line)
+                self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
 
     
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
@@ -115,9 +115,9 @@ class CrosScenarioLauncher():
                 stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
                 self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
             except paramiko.SSHException:
-                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+                self.logger.error("(DEBUG MODE) paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
             else:
-                self.logger.info("finished on the test system")
+                self.logger.info("(DEBUG MODE) finished on the test system")
         else:
             n = len(command.split(";")) # get the number of commands that should be executed
 
@@ -197,14 +197,14 @@ class CrosScenarioLauncher():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"launch {scenario} on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in MANUAL_SCENARIOS:
-            self.logger.info(f"execute: {MANUAL_SCENARIOS[scenario]['command']}")
+            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: {MANUAL_SCENARIOS[scenario]['command']}")
             self.__exec_command(f"{MANUAL_SCENARIOS[scenario]['command']}")
         elif scenario in AUTOTEST_SCENARIOS:
-            self.logger.info(f"execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
+            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
             self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
             self.logger.error(f"{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
@@ -212,19 +212,19 @@ class CrosScenarioLauncher():
 
     def prepare_scenario(self, scenario):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"prepare {scenario} on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in MANUAL_SCENARIOS:
             pass
         elif scenario in AUTOTEST_SCENARIOS:
             if self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                self.logger.info(f"file already exists: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}file already exists: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
             else:
                 if self.__exist_local(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                    self.logger.info(f"upload ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']} to {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}upload ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']} to {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
                     self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
                 else:
-                    self.logger.error(f"file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                    self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")

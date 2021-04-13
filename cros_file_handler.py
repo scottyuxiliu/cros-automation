@@ -267,7 +267,7 @@ class CrosFileHandler():
 
 
     def __download_progress(self, current, total):
-        self.logger.info(f"downloaded {current} bytes / {total} bytes")
+        self.logger.debug(f"downloaded {current} bytes / {total} bytes")
 
 
     def download(self, remote_file_path, local_file_path):
@@ -301,7 +301,7 @@ class CrosFileHandler():
 
 
     def __upload_progress(self, current, total):
-        self.logger.info(f"uploaded {current} bytes / {total} bytes")
+        self.logger.debug(f"uploaded {current} bytes / {total} bytes")
     
 
     def upload(self, local_file_path, remote_file_path):
