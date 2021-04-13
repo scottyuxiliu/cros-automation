@@ -4,11 +4,11 @@ $DebugPreference = "Continue"
 #----------------------------------------------------------------------
 # User inputs
 
-$TEST_SYS_IP = "10.236.185.134"
+$TEST_SYS_IP = ""
 $TEST_SYS_USERNAME = "root"
 $TEST_SYS_KEYFILE = "id_rsa"
 
-$AUTOTEST_PACKAGE = "\\vausamd25\ppo1\ppomkserver\Depot\Applications\Benchmarks\autotest\autotest.tar.gz"
+$AUTOTEST_PACKAGE = ""
 
 #----------------------------------------------------------------------
 
