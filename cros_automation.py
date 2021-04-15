@@ -63,6 +63,7 @@ parser.add_argument(
         "reboot": reboot the target system [-p/--ip]
         "cold-reset": cold reset the test system. sudo password [--sudo] is needed.
         "flashrom": flash coreboot firmware [-i/--input] directly on the target system [-p/--ip].
+        "servo-flashrom": use servo on the host system [-p/--ip] to flash coreboot firmware [-i/--input]. sudo password [--sudo] is needed.
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
@@ -195,6 +196,10 @@ elif args.job == "cold-reset":
 elif args.job == "flashrom":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.flashrom(args.input)
+
+elif args.job == "servo-flashrom":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.servo_flashrom(args.input, sudo_password=args.sudo)
 
 elif args.job == "atitool-prog":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:

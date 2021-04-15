@@ -173,13 +173,13 @@ class CrosSoftwareController():
         self.logger.info("start servo cold-reset ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info("sudo execute: dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
+        self.logger.info("sudo execute (blocking): dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
         self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password)
 
         self.logger.info("wait 10 seconds")
         time.sleep(10)
 
-        self.logger.info("sudo execute: dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
+        self.logger.info("sudo execute (blocking): dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
         self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password)
 
 
@@ -192,11 +192,37 @@ class CrosSoftwareController():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"flash coreboot firmware {coreboot_firmware} ...")
+        self.logger.info(f"flash coreboot firmware {coreboot_firmware} on {self.ip} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f"execute: flashrom -p host -w {coreboot_firmware}")
+        self.logger.info(f"execute (blocking): flashrom -p host -w {coreboot_firmware}")
         self.__exec_command(f"flashrom -p host -w {coreboot_firmware}", blocking=True)
+
+
+    def servo_flashrom(self, coreboot_firmware, sudo_password):
+        """this will be blocking.
+
+        Parameters
+        ----------
+        coreboot_firmware : [type]
+            [description]
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"use servo on {self.ip} to flash coreboot firmware {coreboot_firmware} ...")
+        self.logger.info("--------------------------------------------------------------------------------")
+
+        self.logger.info("sudo execute (blocking): dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on")
+        self.__exec_command("dut-control servo_present:on cold_reset:on spi2_vref:pp1800 spi2_buf_en:on", sudo_password)
+
+        time.sleep(5)
+
+        self.logger.info(f"sudo execute (blocking): sudo flashrom --programmer raiden_debug_spi -w {coreboot_firmware}")
+        self.__exec_command(f"sudo flashrom --programmer raiden_debug_spi -w {coreboot_firmware}", sudo_password)
+
+        time.sleep(5)
+
+        self.logger.info("sudo execute (blocking): dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off")
+        self.__exec_command("dut-control spi2_vref:off spi2_buf_en:off cold_reset:off servo_present:off", sudo_password)
 
 
     def agt_prog(self, args):
@@ -211,7 +237,7 @@ class CrosSoftwareController():
         self.logger.info(f"agt program {args} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f"execute: cd /usr/local/agt; ./agt_internal {args}")
+        self.logger.info(f"execute (blocking): cd /usr/local/agt; ./agt_internal {args}")
         self.__exec_command(f"cd /usr/local/agt; ./agt_internal {args}", blocking=True)
 
     
