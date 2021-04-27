@@ -13,15 +13,13 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 2.   Run `python .\cros_automation.py --help` to see a list of available arguments and their usages
 
 
-## Common use cases
+## Common use cases (and if you have a Windows laptop/desktop)
 
 ### Run graphics_WebGLAquarium
 
 ```
 python .\cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
-
----
 
 ### Capture ATITOOL log
 
@@ -35,13 +33,11 @@ python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rs
 python .\cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
 ```
 
----
-
 ### List items in a directory
 
 ```
 # list items in a test system directory
-python .\cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
+python .\cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local"
 
 # list items in a local directory
 python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input"
@@ -99,6 +95,16 @@ For example,
 
 ```
 python .\cros_automation.py results-charts-summary -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -o "results_charts_summary.csv"
+```
+
+
+## Common use cases (and if you have a Ubuntu laptop/desktop)
+
+### List items in a directory
+
+
+```
+python ./cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local"
 ```
 
 
