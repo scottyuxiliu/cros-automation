@@ -38,7 +38,7 @@ parser.add_argument(
         "uninstall-atitool": uninstall atitool on the test system
         "atitool-log": use atitool logging on the test system. support custom arguments [-i/--input].
         
-        "uninstall-agt": uninstall agt on the test system
+        
         "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
         "agt-log": use agt logging on the test system. support custom arguments [-i/--input].
 
@@ -65,7 +65,6 @@ parser.add_argument(
         "flashrom": flash coreboot firmware [-i/--input] directly on the target system [-p/--ip].
         "servo-flashrom": use servo on the host system [-p/--ip] to flash coreboot firmware [-i/--input]. sudo password [--sudo] is needed.
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
-        "install-agt": install agt given the .tar.gz installation file [-i/--input]
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
         '''
     )
@@ -113,10 +112,6 @@ elif args.job == "uninstall-atitool":
 elif args.job == "atitool-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.atitool_log(args.duration, args.index, args.input, args.output)
-
-elif args.job == "uninstall-agt":
-    with CrosFileHandler(args.ip, args.username, args.keyfile, args.debug) as cfh:
-        cfh.rmdir("/usr/local/agt")
 
 elif args.job == "agt-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
@@ -204,14 +199,6 @@ elif args.job == "servo-flashrom":
 elif args.job == "atitool-prog":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.atitool_prog(args.input)
-
-elif args.job == "install-agt":
-    with CrosFileHandler(args.ip, args.username, args.keyfile, True) as cfh:
-        cfh.mkdir("/usr/local/agt")
-        cfh.upload(args.input, "/usr/local/agt/agt.tar.gz")
-        cfh.extract("/usr/local/agt/agt.tar.gz")
-        cfh.rm("/usr/local/agt/agt.tar.gz")
-        cfh.ls("/usr/local/agt")
 
 elif args.job == "agt-prog":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
