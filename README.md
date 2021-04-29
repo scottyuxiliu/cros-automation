@@ -6,12 +6,13 @@ For Windows users, a sample powershell script `cros_automation.ps1` is included 
 For Ubuntu users, sample bash script `autotest_restore.sh` is included.
 
 
-## Pre-requisites
+<!-- ## Pre-requisites
 1.   `cros_sdk` should already be set up on a host system. `cros_sdk` guide: https://chromium.googlesource.com/chromiumos/docs/+/main/developer_guide.md
-2.   `autotest` should be launched at least once. This way, `/usr/local/autotest` directory is set up on the test system. A sample scenario to run using `autotest` is shown here: https://chromium.googlesource.com/chromiumos/third_party/autotest/+/refs/heads/master/client/site_tests/power_LoadTest/README.md
+2.   `autotest` should be launched at least once. This way, `/usr/local/autotest` directory is set up on the test system. A sample scenario to run using `autotest` is shown here: https://chromium.googlesource.com/chromiumos/third_party/autotest/+/refs/heads/master/client/site_tests/power_LoadTest/README.md -->
 
 ## Quick-start guide
-1.   Install all required Python packages by running `pip install -r requirements.txt`
+1.   Download latest Python from https://www.python.org/
+1.   Install all required Python packages by running `pip install -r requirements`
 2.   Run `python .\cros_automation.py --help` to see a list of available arguments and their usages
 
 
