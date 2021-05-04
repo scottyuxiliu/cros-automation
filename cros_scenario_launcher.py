@@ -218,13 +218,18 @@ class CrosScenarioLauncher():
         if scenario in MANUAL_SCENARIOS:
             pass
         elif scenario in AUTOTEST_SCENARIOS:
-            if self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}file already exists: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+
+            # if the control file exists both locally and on the target system, replace the one on the target system
+            if self.__exist_local(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}") and self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}replace {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']} with ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+
+            # if the control file only exists on the target system, use it as is
+            elif self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}use as is: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+
+            # give error if the control file is missing both locally and on the target system
             else:
-                if self.__exist_local(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}upload ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']} to {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
-                    self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
-                else:
-                    self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
         else:
             self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
