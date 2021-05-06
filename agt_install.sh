@@ -16,6 +16,9 @@ TEST_SYS_USERNAME="root"
 TEST_SYS_KEYFILE="id_rsa"
 AGT_PACKAGE=$2
 
+echo "remove /usr/local/agt directory on $TEST_SYS_IP if it exists ..."
+python cros_automation.py rmdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/agt"
+
 echo "create /usr/local/agt directory on $TEST_SYS_IP ..."
 python cros_automation.py mkdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/agt"
 

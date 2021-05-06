@@ -1,5 +1,6 @@
 TEST_SYS_AUTOTEST_PATH = "/usr/local/autotest"
 AGT_DIR_PATH = "/usr/local/agt"
+AGT_INTERNAL_DIR_PATH = "/usr/local/agt_internal"
 PERL_DIR_PATH = "/usr/local/perl"
 GCC_DIR_PATH = "/usr/local/gcc"
 COREBOOT_DIR_PATH = "/usr/local/coreboot"
@@ -55,5 +56,11 @@ AUTOTEST_SCENARIOS = {
     "power_videocall_25min": {
         "method": "autotest",
         "control": "tests/power_VideoCall/control.25min"
+    }
+}
+
+TAST_SCENARIOS = {
+    "arc.GamePerformanceRender": {
+        "method": "tast"
     }
 }

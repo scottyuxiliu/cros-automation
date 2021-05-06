@@ -65,5 +65,11 @@ $SCENARIO_CONST = @{
         "agt_log_time" = 1800;
         "pwr_log_time" = 1500;
         "result" = "/usr/local/autotest/results/default/power_VideoCall.25min/results"
+    };
+    "arc.GamePerformanceRender" = @{
+        "duration" = 1020;
+        "agt_log_time" = 1320;
+        "pwr_log_time" = 1020;
+        "result" = ""
     }
 }

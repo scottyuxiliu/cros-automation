@@ -18,6 +18,12 @@ For Ubuntu users, sample bash script `autotest_restore.sh` is included.
 
 ## Common use cases (and if you have a Windows laptop/desktop)
 
+### Reboot
+
+```
+python .\cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
 ### Run graphics_WebGLAquarium
 
 ```
@@ -102,6 +108,12 @@ python .\cros_automation.py results-charts-summary -d "C:\Users\scottyuxiliu\Doc
 
 
 ## Common use cases (and if you have a Ubuntu laptop/desktop)
+
+### Reboot
+
+```
+python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
+```
 
 ### Run graphics_WebGLAquarium
 

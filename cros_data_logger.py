@@ -1,7 +1,7 @@
 import os, sys, select, logging, time, errno, pathlib, stat
 import paramiko
 
-from cros_constants import AGT_DIR_PATH
+from cros_constants import AGT_DIR_PATH, AGT_INTERNAL_DIR_PATH
 
 class CrosDataLogger():
     """[summary]
@@ -141,7 +141,7 @@ class CrosDataLogger():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"test connection to the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -206,7 +206,7 @@ class CrosDataLogger():
             [description], by default "pm.csv"
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"atitool log for {duration}-second on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"atitool log for {duration} seconds on {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if index == 0:
@@ -236,7 +236,7 @@ class CrosDataLogger():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"agt log for {duration}-second on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"agt log for {duration} seconds on {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(f"{AGT_DIR_PATH}/agt"):
@@ -259,7 +259,7 @@ class CrosDataLogger():
     
     
     def agt_internal_log(self, duration, index, arguments, output_file_name):
-        """agt_internal path should be {AGT_DIR_PATH}/agt_internal
+        """agt_internal path should be {AGT_INTERNAL_DIR_PATH}/agt_internal
 
         Parameters
         ----------
@@ -269,27 +269,27 @@ class CrosDataLogger():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"agt internal log for {duration}-second on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}agt internal log for {duration} seconds on {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if self.__exist_remote(F"{AGT_DIR_PATH}/agt_internal"):
+        if self.__exist_remote(F"{AGT_INTERNAL_DIR_PATH}/agt_internal"):
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"{'(DEBUG MODE) ' if self.debug else ''}cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
             else:
                 if arguments is None:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
 
         else:
-            self.logger.error(f"no such file: {AGT_DIR_PATH}/agt_internal")
+            self.logger.error(f"no such file: {AGT_INTERNAL_DIR_PATH}/agt_internal")
             
 
 
