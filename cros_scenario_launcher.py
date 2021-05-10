@@ -1,7 +1,7 @@
 import os, sys, select, logging, argparse, time, errno, pathlib
 import paramiko
 
-from cros_constants import TEST_SYS_AUTOTEST_PATH, AUTOTEST_SCENARIOS, MANUAL_SCENARIOS
+from cros_constants import TEST_SYS_AUTOTEST_PATH, SCENARIOS
 
 class CrosScenarioLauncher():
     """[summary]
@@ -96,20 +96,26 @@ class CrosScenarioLauncher():
         stdout : [type]
             [description]
         """
+        content = []
+
         if stdout.channel.recv_exit_status() == 0: # blocking call
             self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+                content.append(line)
         else:
             self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
             self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+                content.append(line)
+
+        return content
 
     
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
-    def __exec_command(self, command):
+    def __exec_command(self, command, sudo=False):
         if self.debug is True:
             try:
                 stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
@@ -128,6 +134,28 @@ class CrosScenarioLauncher():
             else:
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
+
+
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __exec_command_in_cros_sdk_chroot(self, command, password):
+        """this will be blocking.
+
+        Args:
+            command (str): [description]
+            password (str): [description]
+        """
+        channel = self.ssh.invoke_shell()
+        channel.send("cd ~/chromiumos/\n")
+        time.sleep(1)
+
+
+        channel.close()
+        # channel.send("cros_sdk\n")
+        # time.sleep(1)
+        # channel.send(f"{password}\n")
+        # time.sleep(1)
+
 
 
     def __exist_local(self, path):
@@ -200,14 +228,22 @@ class CrosScenarioLauncher():
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if scenario in MANUAL_SCENARIOS:
-            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: {MANUAL_SCENARIOS[scenario]['command']}")
-            self.__exec_command(f"{MANUAL_SCENARIOS[scenario]['command']}")
-        elif scenario in AUTOTEST_SCENARIOS:
-            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
-            self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {AUTOTEST_SCENARIOS[scenario]['control']}")
+        if scenario in SCENARIOS:
+            if SCENARIOS[scenario]["method"] == "manual":
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: {SCENARIOS[scenario]['command']}")
+                self.__exec_command(f"{SCENARIOS[scenario]['command']}")
+            elif SCENARIOS[scenario]["method"] == "autotest":
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
+                self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
+            elif SCENARIOS[scenario]["method"] == "tast":
+                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute (in chroot): tast run {self.test_system_ip_address} {SCENARIOS[scenario]}")
+
+            else:
+                pass
         else:
-            self.logger.error(f"{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{scenario} not supported! supported scenarios are:")
+            for key in SCENARIOS.keys():
+                self.logger.error(key)
 
 
     def prepare_scenario(self, scenario):
@@ -215,21 +251,21 @@ class CrosScenarioLauncher():
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on the test system {self.test_system_ip_address} ...")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        if scenario in MANUAL_SCENARIOS:
-            pass
-        elif scenario in AUTOTEST_SCENARIOS:
+        if scenario in SCENARIOS:
+            if SCENARIOS[scenario]["method"] == "autotest":
+                # if the control file exists both locally and on the target system, replace the one on the target system
+                if self.__exist_local(f"./autotest/{SCENARIOS[scenario]['control']}") and self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}"):
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}replace {TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']} with ./autotest/{SCENARIOS[scenario]['control']}")
+                    self.__upload(f"./autotest/{SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}")
 
-            # if the control file exists both locally and on the target system, replace the one on the target system
-            if self.__exist_local(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}") and self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}replace {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']} with ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
-                self.__upload(f"./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                # if the control file only exists on the target system, use it as is
+                elif self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}"):
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}use as is: {TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}")
 
-            # if the control file only exists on the target system, use it as is
-            elif self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}"):
-                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}use as is: {TEST_SYS_AUTOTEST_PATH}/{AUTOTEST_SCENARIOS[scenario]['control']}")
-
-            # give error if the control file is missing both locally and on the target system
-            else:
-                self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}file does not exist! ./autotest/{AUTOTEST_SCENARIOS[scenario]['control']}")
+                # give error if the control file is missing both locally and on the target system
+                else:
+                    self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}file does not exist! ./autotest/{SCENARIOS[scenario]['control']}")
         else:
-            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{scenario} not supported! supported scenarios are {MANUAL_SCENARIOS.keys()}, {AUTOTEST_SCENARIOS.keys()}")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{scenario} not supported! supported scenarios are:")
+            for key in SCENARIOS.keys():
+                self.logger.error(key)

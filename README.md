@@ -55,30 +55,33 @@ python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-au
 python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -i "keyval*"
 ```
 
-
-### Download atitool_log.csv to the local host system
-
-```
-python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
-```
-
-### Upload atitool_log.csv to the local host system
-
-```
-python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i "C:\Users\scottyuxiliu\Downloads\atitool_log.csv" -o "/usr/local/atitool/atitool_log.csv"
-```
-
-### Remove atitool_log.csv on the test system
+### Remove file on the DUT
 
 ```
 python .\cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
 ```
 
-### Remove /usr/local/atitool directory on the test system
+### Remove directory on the DUT
 
 ```
 python .\cros_automation.py rmdir -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local/atitool"
 ```
+
+
+### Download file to the host
+
+```
+python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
+
+python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/agt_log.csv" -o "C:\Users\scottyuxiliu\Downloads\agt_log.csv"
+```
+
+### Upload file to the DUT
+
+```
+python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i "C:\Users\scottyuxiliu\Downloads\atitool_log.csv" -o "/usr/local/atitool/atitool_log.csv"
+```
+
 
 ### Cold-reset the test system through servo
 
@@ -133,6 +136,22 @@ python cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 
 
 ```
 python cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local"
+```
+
+
+### Remove file on the DUT
+
+```
+python cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
+```
+
+
+### Download files to the host
+
+```
+python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
+
+python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/agt_log.csv" -o "C:\Users\scottyuxiliu\Downloads\agt_log.csv"
 ```
 
 

@@ -51,15 +51,15 @@ class CrosSoftwareController():
         content = []
 
         if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug("****************************** stdout content ******************************")
+            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
-                self.logger.debug(line)
+                self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
                 content.append(line)
         else:
-            self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-            self.logger.error("****************************** stdout content ******************************")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
             for line in stdout.readlines():
-                self.logger.error(line)
+                self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
                 content.append(line)
 
         return content
