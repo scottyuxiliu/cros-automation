@@ -153,7 +153,7 @@ function measurement {
     )
 
     if ($SCENARIO_CONST.ContainsKey($scenario)) {
-        Write-Verbose "start agt logging to $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
+        Write-Verbose "start agt logging to $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
         python.exe .\cros_automation.py agt-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("delay") -o "pm_log_$($cur_file_index+$file_index_offset).csv"
 
         Write-Verbose "launch $scenario ..."
@@ -171,14 +171,14 @@ function measurement {
         Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results ..."
         python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results"
 
-        Write-Verbose "download agt log $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
+        Write-Verbose "download agt log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."
+        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
         
-        Write-Verbose "remove agt log $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv on the test system ..."
-        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
+        Write-Verbose "remove agt log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv on the test system ..."
+        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
         
-        Write-Verbose "list items in $TEST_SYS_AGT_PATH ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AGT_PATH"
+        Write-Verbose "list items in $AGT_PATH ..."
+        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$AGT_PATH"
     }
     else {
         Write-Verbose "$scenario is not supported. supported scenarios are as follows:"

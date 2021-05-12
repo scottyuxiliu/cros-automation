@@ -33,7 +33,7 @@ function measurement {
             python.exe .\cros_automation.py prepare-scenario -s $scenario -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
     
             if ($agt_log) {
-                Write-Verbose "start agt internal logging to $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
+                Write-Verbose "start agt internal logging to $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
                 python.exe .\cros_automation.py agt-internal-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("agt_log_time") -o "pm_log_$($cur_file_index+$file_index_offset).csv"
             }
     
@@ -105,14 +105,14 @@ function measurement {
             }
     
             if ($agt_log) {
-                Write-Verbose "download agt internal log $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."
-                python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
+                Write-Verbose "download agt internal log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."
+                python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
                 
-                Write-Verbose "remove agt internal log $TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv on the test system ..."
-                python .\cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
+                Write-Verbose "remove agt internal log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv on the test system ..."
+                python .\cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
                 
-                Write-Verbose "list items in $TEST_SYS_AGT_PATH ..."
-                python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AGT_PATH"
+                Write-Verbose "list items in $AGT_PATH ..."
+                python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$AGT_PATH"
             }
         }
 

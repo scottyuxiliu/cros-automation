@@ -11,25 +11,27 @@
 
 # --------------------------------------------------------------------------------
 
+source cros_constants.sh
+
 TEST_SYS_IP=$1 # no whitespace is allowed between the variable name, the equals sign, and the value
 TEST_SYS_USERNAME="root"
 TEST_SYS_KEYFILE="id_rsa"
 AGT_PACKAGE=$2
 
-echo "remove /usr/local/agt directory on $TEST_SYS_IP if it exists ..."
-python cros_automation.py rmdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/agt"
+echo -e "${INFO}remove $AGT_PATH directory on $TEST_SYS_IP if it exists${ENDFORMAT}"
+python cros_automation.py rmdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d $AGT_PATH
 
-echo "create /usr/local/agt directory on $TEST_SYS_IP ..."
-python cros_automation.py mkdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/agt"
+echo -e "${INFO}create $AGT_PATH directory on ${TEST_SYS_IP}${ENDFORMAT}"
+python cros_automation.py mkdir -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d $AGT_PATH
 
-echo "upload $AGT_PACKAGE to $TEST_SYS_IP ..."
-python cros_automation.py upload -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i $AGT_PACKAGE -o "/usr/local/agt/agt.tar.gz"
+echo -e "${INFO}upload $AGT_PACKAGE to ${TEST_SYS_IP}${ENDFORMAT}"
+python cros_automation.py upload -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i $AGT_PACKAGE -o "$AGT_PATH/agt.tar.gz"
 
-echo "extract /usr/local/agt/agt.tar.gz on $TEST_SYS_IP ..."
-python cros_automation.py extract -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/agt/agt.tar.gz"
+echo -e "${INFO}extract $AGT_PATH/agt.tar.gz on ${TEST_SYS_IP}${ENDFORMAT}"
+python cros_automation.py extract -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/agt.tar.gz"
 
-echo "remove /usr/local/agt/agt.tar.gz on $TEST_SYS_IP ..."
-python cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "/usr/local/agt/agt.tar.gz"
+echo -e "${INFO}remove $AGT_PATH/agt.tar.gz on ${TEST_SYS_IP}${ENDFORMAT}"
+python cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/agt.tar.gz"
 
-echo "ls /usr/local/agt on $TEST_SYS_IP ..."
-python cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "/usr/local/agt"
+echo -e "${INFO}ls $AGT_PATH on ${TEST_SYS_IP}${ENDFORMAT}"
+python cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d $AGT_PATH

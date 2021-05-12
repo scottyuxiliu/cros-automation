@@ -3,7 +3,7 @@ $DELAY_AFTER_PROG = 900
 
 $TEST_SYS_AUTOTEST_PATH = "/usr/local/autotest"
 $TEST_SYS_ATITOOL_PATH = "/usr/local/atitool"
-$TEST_SYS_AGT_PATH = "/usr/local/agt"
+$AGT_PATH = "/usr/local/agt"
 
 $SCENARIO_CONST = @{
     "idle" = @{
