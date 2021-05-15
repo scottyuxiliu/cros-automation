@@ -37,10 +37,9 @@ parser.add_argument(
         "install-atitool": install atitool given the .tar.gz installation file [-i/--input]
         "uninstall-atitool": uninstall atitool on the test system
         "atitool-log": use atitool logging on the test system. support custom arguments [-i/--input].
-        
-        
-        "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
         "agt-log": use agt logging on the test system. support custom arguments [-i/--input].
+        "agt-internal-log": use agt internal logging on the test system. support custom arguments [-i/--input].
+        "pac-log": use pac logging on host [-p/--ip] for [-t/--duration] seconds
 
         cros data parser jobs.
         "ls-local": list items in the local directory [-d/--directory], optionally with name [-i/--input]
@@ -61,11 +60,17 @@ parser.add_argument(
 
         cros software control jobs.
         "reboot": reboot the target system [-p/--ip]
-        "cold-reset": cold reset the test system. sudo password [--sudo] is needed.
-        "flashrom": flash coreboot firmware [-i/--input] directly on the target system [-p/--ip].
-        "servo-flashrom": use servo on the host system [-p/--ip] to flash coreboot firmware [-i/--input]. sudo password [--sudo] is needed.
+        "cold-reset": cold reset the test system. sudo password [--password] is needed.
+        "flashrom": flash coreboot firmware [-i/--input] directly on the DUT [-p/--ip].
+        "servo-flashrom": use servo on the host system [-p/--ip] to flash coreboot firmware [-i/--input]. sudo password [--password] is needed.
         "atitool-prog": use atitool programming with argument(s) [-i/--input] on the test system
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
+        "get-brightness": get brightness on the DUT [-p/--ip].
+        "set-brightness": set brightness [-i/--input] nits on the DUT [-p/--ip].
+        "get-power-supply-info": get power supply info on the DUT [-p/--ip].
+        "enable-ac": enable ac on the DUT [-p/--ip].
+        "disable-ac": disable ac on the DUT [-p/--ip].
+
         '''
     )
 )
@@ -79,7 +84,7 @@ parser.add_argument("-t", "--duration", type=int, default=60, help="data logging
 parser.add_argument("-d", "--directory", type=str, help="directory on the target system.")
 parser.add_argument("-i", "--input", type=str, help="data logging source file path, or data parsing file path, or atitool logging/programming arguments.")
 parser.add_argument("-o", "--output", type=str, help="data logging output file path.")
-parser.add_argument("--sudo", type=str, help="sudo password.")
+parser.add_argument("--password", type=str, help="sudo password.")
 parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
@@ -120,6 +125,10 @@ elif args.job == "agt-log":
 elif args.job == "agt-internal-log":
     with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
         cdl.agt_internal_log(args.duration, args.index, args.input, args.output)
+
+elif args.job == "pac-log":
+    with CrosDataLogger(args.ip, args.username, args.keyfile, args.debug) as cdl:
+        cdl.pac_log(args.duration, args.password)
 
 # cros data parser jobs
 elif args.job == "ls-local":
@@ -203,6 +212,26 @@ elif args.job == "atitool-prog":
 elif args.job == "agt-prog":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.agt_prog(args.input)
+
+elif args.job == "get-brightness":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.get_brightness()
+
+elif args.job == "set-brightness":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.set_brightness(args.input)
+
+elif args.job == "get-power-supply-info":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.get_power_supply_info()
+
+elif args.job == "enable-ac":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.enable_ac()
+
+elif args.job == "disable-ac":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.disable_ac()
 
 else:
     pass

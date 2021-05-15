@@ -7,7 +7,7 @@ class CrosDataLogger():
     """[summary]
     """
 
-    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
+    def __init__(self, ip, test_system_username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosDataLogger")
         fh = logging.FileHandler("cros_data_logger.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
@@ -16,7 +16,7 @@ class CrosDataLogger():
         self.logger.addHandler(fh)
 
         self.logger.debug("--------------------------------------------------------------------------------")
-        self.logger.debug(f"establishing ssh connection with the test system ...")
+        self.logger.debug(f"establish ssh connection with the test system")
         self.logger.debug("--------------------------------------------------------------------------------")
 
         self.ssh = paramiko.SSHClient()
@@ -26,21 +26,21 @@ class CrosDataLogger():
         ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
 
         self.logger.debug(f"connect to test system with the following details")
-        self.logger.debug(f"hostname = {test_system_ip_address}")
+        self.logger.debug(f"hostname = {ip}")
         self.logger.debug(f"username = {test_system_username}")
         self.logger.debug(f"ssh_private_key_file = {ssh_private_key_file}")
 
         # try:
-        #     self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        #     self.ssh.connect(hostname=ip, username=test_system_username, pkey=ssh_private_key)
         # except paramiko.AuthenticationException:
-        #     self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+        #     self.logger.error(f"paramiko authentication failed when connecting to {ip}. it may be possible to retry with different credentials.")
         # except paramiko.SSHException:
-        #     self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+        #     self.logger.error(f"paramiko ssh exception when connecting to {ip}. there might be failures in SSH2 protocol negotiation or logic errors.")
 
-        self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        self.ssh.connect(hostname=ip, username=test_system_username, pkey=ssh_private_key)
         self.logger.debug("ssh session established!")
 
-        self.test_system_ip_address = test_system_ip_address
+        self.ip = ip
         self.debug = debug
 
 
@@ -63,12 +63,12 @@ class CrosDataLogger():
             [description]
         """
         if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug("****************************** stdout content ******************************")
+            # self.logger.debug("****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.debug(line)
         else:
             self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-            self.logger.error("****************************** stdout content ******************************")
+            # self.logger.error("****************************** stdout content ******************************")
             for line in stdout.readlines():
                 self.logger.error(line)
 
@@ -118,30 +118,30 @@ class CrosDataLogger():
             return True
 
 
-    def __exec_command(self, command):
-        if self.debug is True:
-            try:
-                stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
-                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
-            except paramiko.SSHException:
-                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("finished on the test system")
-        else:
-            n = len(command.split(";")) # get the number of commands that should be executed
+    def __exec_command(self, command, sudo=False, password=None):
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
 
-            try:
-                self.ssh.exec_command(command) # non-blocking call, thus need to add delay after
-            except paramiko.SSHException:
-                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            if sudo is True and password is not None:
+                stdin.write(f"{password}\n")
+                stdin.flush()
+            
+            if self.debug is True:
+                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command. this is blocking.
+        except paramiko.SSHException:
+            self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+        else:
+            if self.debug is True:
+                self.logger.info("finished on the test system")
             else:
+                n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
 
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -172,7 +172,7 @@ class CrosDataLogger():
             arguments passed in for atitool to program
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"atitool program with argument(s) {arguments} ...")
+        self.logger.info(f"atitool program with argument(s) {arguments}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f"execute: cd /usr/local/atitool; ./atitool {arguments}")
@@ -206,7 +206,7 @@ class CrosDataLogger():
             [description], by default "pm.csv"
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"atitool log for {duration} seconds on {self.test_system_ip_address} ...")
+        self.logger.info(f"atitool log for {duration} seconds on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if index == 0:
@@ -236,24 +236,24 @@ class CrosDataLogger():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"agt log for {duration} seconds on {self.test_system_ip_address} ...")
+        self.logger.info(f"agt log for {duration} seconds on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(f"{AGT_DIR_PATH}/agt"):
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
             else:
                 if arguments is None:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f'execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                    self.__exec_command(f'cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
         else:
             self.logger.error(f"no such file: {AGT_DIR_PATH}/agt")
     
@@ -269,33 +269,40 @@ class CrosDataLogger():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}agt internal log for {duration} seconds on {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}agt internal log for {duration} seconds on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(F"{AGT_INTERNAL_DIR_PATH}/agt_internal"):
             if index == 0:
                 if arguments is None:
                     self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
-                    self.__exec_command(f"{'(DEBUG MODE) ' if self.debug else ''}cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
                     self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
             else:
                 if arguments is None:
-                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                     self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
                     self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
 
         else:
             self.logger.error(f"no such file: {AGT_INTERNAL_DIR_PATH}/agt_internal")
             
 
+    def pac_log(self, duration, password):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}pac log for {duration} seconds on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"")
+        self.__exec_command(f"sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"", True, password)
+
 
     def is_file(self, path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"check if {path} is a file or a directory ...")
+        self.logger.info(f"check if {path} is a file or a directory")
         self.logger.info("--------------------------------------------------------------------------------")
 
         path = str( self.__read_path(path) )
@@ -314,7 +321,7 @@ class CrosDataLogger():
 
     def move_file(self, remote_file_path, remote_dir):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"move {remote_file_path} into {remote_dir} ...")
+        self.logger.info(f"move {remote_file_path} into {remote_dir}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info(f"execute: mv {remote_file_path} {remote_dir}")
@@ -335,7 +342,7 @@ class CrosDataLogger():
             all items in remote_dir
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"list files in {remote_dir} ...")
+        self.logger.info(f"list files in {remote_dir}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         sftp = self.ssh.open_sftp()

@@ -36,7 +36,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 1260;
         "result" = "/usr/local/autotest/results/default/graphics_GLBench/results"
     };
-    "plt-1h" = @{
+    "power_loadtest_1h" = @{
         "duration" = 3600;
         "agt_log_time" = 3600;
         "pwr_log_time" = 3600;

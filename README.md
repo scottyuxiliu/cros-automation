@@ -16,18 +16,24 @@ For Ubuntu users, sample bash script `autotest_restore.sh` is included.
 2.   Run `python .\cros_automation.py --help` to see a list of available arguments and their usages
 
 
-## Common use cases (and if you have a Windows laptop/desktop)
+## Common use cases
 
 ### Reboot
 
 ```
-python .\cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [ssh_private_key_file]
+
+# for example
+python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
-### Run graphics_WebGLAquarium
+### Launch scenarios
 
 ```
-python .\cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py launch-scenario -s [scenario] -p [dut_ip] -u [dut_username] -k [ssh_private_key_file]
+
+# for example
+python cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
 ### Capture ATITOOL log
@@ -39,7 +45,10 @@ python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rs
 ### Capture AGT log
 
 ```
-python .\cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
+python cros_automation.py agt-log -p [dut_ip] -u [dut_username] -k [ssh_private_key_file] -t [duration] -o [output]
+
+# for example
+python cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
 ```
 
 ### List items in a directory
@@ -109,26 +118,6 @@ For example,
 python .\cros_automation.py results-charts-summary -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -o "results_charts_summary.csv"
 ```
 
-
-## Common use cases (and if you have a Ubuntu laptop/desktop)
-
-### Reboot
-
-```
-python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
-```
-
-### Run graphics_WebGLAquarium
-
-```
-python cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
-```
-
-### Capture AGT log
-
-```
-python cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
-```
 
 
 ### List items in a directory

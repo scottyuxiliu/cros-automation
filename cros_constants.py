@@ -24,7 +24,7 @@ SCENARIOS = {
         "method": "manual",
         "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300 --yaml keyval"
     },
-    "plt-1h": {
+    "power_loadtest_1h": {
         "method": "autotest",
         "control": "tests/power_LoadTest/control.1hour"
     },
