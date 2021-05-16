@@ -3,10 +3,10 @@
 # --------------------------------------------------------------------------------
 
 # you may run this bash script from terminal as following
-# source agt_internal_log.sh [TEST_SYS_IP] [DURATION] [DIR] [OUTPUT]
+# source cleanup_logfile.sh
 
 # for example
-# source agt_internal_log.sh "192.168.123.456" "60" "/home/scottyuxiliu/Downloads/" "agt_internal_log.csv"
+# source cleanup_logfile.sh
 
 
 # --------------------------------------------------------------------------------

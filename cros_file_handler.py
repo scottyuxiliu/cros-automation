@@ -28,7 +28,7 @@ class CrosFileHandler():
         self.logger.addHandler(fh)
 
         self.logger.debug("--------------------------------------------------------------------------------")
-        self.logger.debug(f"establishing ssh connection with the host system ...")
+        self.logger.debug(f"establish ssh connection with the host system")
         self.logger.debug("--------------------------------------------------------------------------------")
 
         self.ssh = paramiko.SSHClient()
@@ -172,7 +172,7 @@ class CrosFileHandler():
             all items in remote_dir
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"list files in {remote_dir} on {self.ip} ...")
+        self.logger.info(f"list files in {remote_dir} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_dir is None:
@@ -192,7 +192,7 @@ class CrosFileHandler():
 
     def mkdir(self, remote_dir):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"create directory {remote_dir} ...")
+        self.logger.info(f"create directory {remote_dir}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(remote_dir):
@@ -213,7 +213,7 @@ class CrosFileHandler():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove file {remote_file_path} ...")
+        self.logger.info(f"remove file {remote_file_path}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_file_path is None:
@@ -248,7 +248,7 @@ class CrosFileHandler():
         """
         
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove directory {remote_dir} ...")
+        self.logger.info(f"remove directory {remote_dir}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_dir is None:
@@ -282,7 +282,7 @@ class CrosFileHandler():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"download {remote_file_path} to {local_file_path} ...")
+        self.logger.info(f"download {remote_file_path} to {local_file_path}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_file_path is None:
@@ -316,7 +316,7 @@ class CrosFileHandler():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"upload {local_file_path} to {remote_file_path} ...")
+        self.logger.info(f"upload {local_file_path} to {remote_file_path}")
         self.logger.info("--------------------------------------------------------------------------------")
         sftp = self.ssh.open_sftp()
         sftp.put(local_file_path, remote_file_path, callback=self.__upload_progress)
@@ -338,7 +338,7 @@ class CrosFileHandler():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"extract {remote_file_path} ...")
+        self.logger.info(f"extract {remote_file_path}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_file_path is None:
@@ -349,7 +349,7 @@ class CrosFileHandler():
             directory = str(p.parent)
             filename = p.name
 
-            self.logger.info(f"execute (blocking): cd {directory}; tar -xzvf {filename}")
+            self.logger.info(f"execute: cd {directory}; tar -xzvf {filename}")
             self.__exec_command(f"cd {directory}; tar -xzvf {filename}", blocking=True)
 
         else:
@@ -358,7 +358,7 @@ class CrosFileHandler():
 
     def compress(self, remote_file_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"compress {remote_file_path} ...")
+        self.logger.info(f"compress {remote_file_path}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_file_path is None:

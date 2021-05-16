@@ -44,7 +44,7 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
     },
-    "ptl-30m-1kfish": {
+    "power_thermalload_30min_1000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.1000_fish"
     },

@@ -16,7 +16,7 @@ class CrosScenarioLauncher():
         self.logger.addHandler(fh)
 
         self.logger.debug("--------------------------------------------------------------------------------")
-        self.logger.debug(f"establishing ssh connection with the test system ...")
+        self.logger.debug(f"establishing ssh connection with the test system")
         self.logger.debug("--------------------------------------------------------------------------------")
 
         self.ssh = paramiko.SSHClient()
@@ -198,25 +198,19 @@ class CrosScenarioLauncher():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"test connection to the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.test_system_ip_address}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
         if status is True:
-            self.logger.info("ssh session is active")
+            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}ssh session is active")
 
-            self.logger.info('execute echo "ssh session is active"')
-            try:
-                if self.debug is True:
-                    stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
-                    self.__read_stdout(stdout)
-                else:
-                    self.ssh.exec_command('echo "ssh session is active"') # non-blocking call
-                    
-            except paramiko.SSHException:
-                self.logger.info(f"paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute echo \"ssh session is active\"")
+            self.__exec_command(f"echo \"ssh session is active\"")
+
         else:
             self.logger.info("ssh session is closed")
+
         return status
 
 
@@ -225,7 +219,7 @@ class CrosScenarioLauncher():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on the test system {self.test_system_ip_address}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:
@@ -248,7 +242,7 @@ class CrosScenarioLauncher():
 
     def prepare_scenario(self, scenario):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on the test system {self.test_system_ip_address} ...")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on the test system {self.test_system_ip_address}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:

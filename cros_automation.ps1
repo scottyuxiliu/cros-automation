@@ -10,9 +10,9 @@ $DELAY_BETWEEN_LOOP = 60 # delay $DELAY_BETWEEN_LOOP seconds before starting the
 
 # --------------
 
-$TEST_SYS_IP = "10.4.39.203"
-$TEST_SYS_USERNAME = "root"
-$TEST_SYS_KEYFILE = "id_rsa"
+$DUT_IP = "10.4.39.203"
+$DUT_USERNAME = "root"
+$DUT_SSH_KEYFILE = "id_rsa"
 
 # --------------
 # the downloads directory on host system. when collecting data on the host system, all results are output to this directory by default.
@@ -154,10 +154,10 @@ function measurement {
 
     if ($SCENARIO_CONST.ContainsKey($scenario)) {
         Write-Verbose "start agt logging to $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv ..."
-        python.exe .\cros_automation.py agt-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("delay") -o "pm_log_$($cur_file_index+$file_index_offset).csv"
+        python.exe .\cros_automation.py agt-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("delay") -o "pm_log_$($cur_file_index+$file_index_offset).csv"
 
         Write-Verbose "launch $scenario ..."
-        python.exe .\cros_automation.py $scenario -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
+        python.exe .\cros_automation.py $scenario -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
 
         Write-Verbose "wait $($SCENARIO_CONST.Item($scenario).Item('delay')) seconds for $scenario to finish ..."
         sleep_with_progress_bar -seconds $SCENARIO_CONST.Item($scenario).Item("delay")
@@ -166,19 +166,19 @@ function measurement {
         sleep_with_progress_bar -seconds 60
 
         Write-Verbose "download $scenario result keyval $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
+        python .\cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results/keyval" -o "$result_directory\keyval_$($cur_file_index+$file_index_offset)"
 
         Write-Verbose "list items in $TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results"
+        python .\cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d "$TEST_SYS_AUTOTEST_PATH/results/default/$($SCENARIO_CONST.Item($scenario).Item('id'))/results"
 
         Write-Verbose "download agt log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv to $result_directory ..."
-        python .\cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
+        python .\cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\pm_log_$($cur_file_index+$file_index_offset).csv"
         
         Write-Verbose "remove agt log $AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv on the test system ..."
-        python .\cros_automation.py remove -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
+        python .\cros_automation.py remove -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_PATH/pm_log_$($cur_file_index+$file_index_offset).csv"
         
         Write-Verbose "list items in $AGT_PATH ..."
-        python .\cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d "$AGT_PATH"
+        python .\cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d "$AGT_PATH"
     }
     else {
         Write-Verbose "$scenario is not supported. supported scenarios are as follows:"
@@ -206,7 +206,7 @@ function example {
 
     foreach ($i in 1..$loops) {
         Write-Verbose "reboot test system for $scenario scenario, loop $i ..."
-        python.exe .\cros_automation.py reboot -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE
+        python.exe .\cros_automation.py reboot -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
 
         Write-Verbose "wait $DELAY_AFTER_BOOT seconds before running $scenario ..."
         sleep_with_progress_bar -seconds $DELAY_AFTER_BOOT

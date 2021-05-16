@@ -91,7 +91,7 @@ parser.add_argument("--debug", action="store_true", help="enable debug mode. thi
 
 args = parser.parse_args()
 
-if args.job == "test":
+if args.job == "test-connection":
     with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as csl:
         csl.test_connection()
 

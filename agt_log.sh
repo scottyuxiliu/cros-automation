@@ -3,7 +3,7 @@
 # --------------------------------------------------------------------------------
 
 # you may run this bash script from terminal as following
-# source agt_log.sh [TEST_SYS_IP] [DURATION] [DIR] [OUTPUT]
+# source agt_log.sh [DUT_IP] [DURATION] [DIR] [OUTPUT]
 
 # for example
 # source agt_log.sh "192.168.123.456" "60" "/home/scottyuxiliu/Downloads/" "agt_log.csv"
@@ -13,9 +13,9 @@
 
 source cros_constants.sh
 
-TEST_SYS_IP=$1 # no whitespace is allowed between the variable name, the equals sign, and the value
-TEST_SYS_USERNAME="root"
-TEST_SYS_KEYFILE="id_rsa"
+DUT_IP=$1 # no whitespace is allowed between the variable name, the equals sign, and the value
+DUT_USERNAME="root"
+DUT_SSH_KEYFILE="id_rsa"
 DURATION=$2
 DIR=$3
 OUTPUT=$4
@@ -30,19 +30,19 @@ else
 fi
 
 echo -e "${INFO}start agt logging to $AGT_PATH/${OUTPUT}${ENDFORMAT}"
-python cros_automation.py agt-log -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -t $DURATION -o $OUTPUT
+python cros_automation.py agt-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $DURATION -o $OUTPUT
 
 echo -e "${INFO}wait $DURATION seconds for agt logging to finish${ENDFORMAT}"
 sleep $DURATION
 
-echo -e "${INFO}wait 1 minute for agt logging to exit${ENDFORMAT}"
-sleep 1m
+echo -e "${INFO}wait 60 seconds for agt logging to exit${ENDFORMAT}"
+sleep 60s
 
 echo -e "${INFO}download $AGT_PATH/$OUTPUT to ${DIR}${ENDFORMAT}"
-python cros_automation.py download -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/$OUTPUT" -o "$DIR/$OUTPUT"
+python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_PATH/$OUTPUT" -o "$DIR/$OUTPUT"
 
-echo -e "${INFO}remove $AGT_PATH/$OUTPUT on ${TEST_SYS_IP}${ENDFORMAT}"
-python cros_automation.py rm -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -i "$AGT_PATH/$OUTPUT"
+echo -e "${INFO}remove $AGT_PATH/$OUTPUT on ${DUT_IP}${ENDFORMAT}"
+python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_PATH/$OUTPUT"
 
-echo -e "${INFO}ls $AGT_PATH on ${TEST_SYS_IP}${ENDFORMAT}"
-python cros_automation.py ls -p $TEST_SYS_IP -u $TEST_SYS_USERNAME -k $TEST_SYS_KEYFILE -d $AGT_PATH
+echo -e "${INFO}ls $AGT_PATH on ${DUT_IP}${ENDFORMAT}"
+python cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d $AGT_PATH

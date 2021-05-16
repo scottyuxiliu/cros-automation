@@ -21,7 +21,7 @@ For Ubuntu users, sample bash script `autotest_restore.sh` is included.
 ### Reboot
 
 ```
-python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [ssh_private_key_file]
+python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
 python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
@@ -30,7 +30,7 @@ python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
 ### Launch scenarios
 
 ```
-python cros_automation.py launch-scenario -s [scenario] -p [dut_ip] -u [dut_username] -k [ssh_private_key_file]
+python cros_automation.py launch-scenario -s [scenario] -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
 python cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
@@ -45,7 +45,7 @@ python .\cros_automation.py atitool-log -p "192.168.123.456" -u "root" -k "id_rs
 ### Capture AGT log
 
 ```
-python cros_automation.py agt-log -p [dut_ip] -u [dut_username] -k [ssh_private_key_file] -t [duration] -o [output]
+python cros_automation.py agt-log -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile] -t [duration] -o [output_file]
 
 # for example
 python cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 120 -o "agt_log.csv"
@@ -97,7 +97,7 @@ python .\cros_automation.py upload -p "192.168.123.456" -u "root" -k "id_rsa" -i
 Servo is needed and should be connected to the host system
 
 ```
-python .\cros_automation.py cold-reset -p [host_ip] -u [host_username] -k [ssh_private_key_file] --sudo [sudo_password]
+python .\cros_automation.py cold-reset -p [host_ip] -u [host_username] -k [dut_ssh_keyfile] --sudo [sudo_password]
 ```
 
 For example,

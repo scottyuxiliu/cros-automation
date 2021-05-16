@@ -55,22 +55,26 @@ class CrosDataLogger():
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __read_stdout(self, stdout):
-        """[summary]
+        """this will be blocking.
 
-        Parameters
-        ----------
-        stdout : [type]
-            [description]
+        Args:
+            stdout ([type]): [description]
+
+        Returns:
+            list: [description]
         """
-        if stdout.channel.recv_exit_status() == 0: # blocking call
-            # self.logger.debug("****************************** stdout content ******************************")
-            for line in stdout.readlines():
-                self.logger.debug(line)
-        else:
-            self.logger.error(f"stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-            # self.logger.error("****************************** stdout content ******************************")
-            for line in stdout.readlines():
-                self.logger.error(line)
+
+        content = []
+
+        if stdout.channel.recv_exit_status() != 0:
+            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
+
+        for line in stdout.readlines():
+            line = line.rstrip("\n")
+            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+            content.append(line)
+
+        return content
 
     
     def __read_path(self, path):
@@ -118,25 +122,42 @@ class CrosDataLogger():
             return True
 
 
-    def __exec_command(self, command, sudo=False, password=None):
+    def __exec_command(self, command, read_stdout=False, password=None):
+        """execute command using paramiko ssh.exec_command().
+
+        if self.debug is true or read_stdout is true, this will be blocking and stdout will be read.
+
+        if password is not none, password will be written through stdin.
+
+        Args:
+            command (str): [description]
+            read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
+            password (str, optional): password to be written through stdin. Defaults to None.
+
+        Returns:
+            list: stdout from paramiko ssh.exec_command()
+
+        """
+
         try:
             stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
 
-            if sudo is True and password is not None:
+            if password is not None:
                 stdin.write(f"{password}\n")
                 stdin.flush()
             
-            if self.debug is True:
-                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command. this is blocking.
         except paramiko.SSHException:
             self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+
         else:
-            if self.debug is True:
-                self.logger.info("finished on the test system")
+            if self.debug is True or read_stdout is True:
+                stdout = self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command. this is blocking.
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
+
+        return stdout # need to return after the try/except/else blocks. python will not go inside the else block if a value is returned in the try block.
 
 
     def test_connection(self):
@@ -297,7 +318,7 @@ class CrosDataLogger():
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}pac log for {duration} seconds on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"")
-        self.__exec_command(f"sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"", True, password)
+        self.__exec_command(f"sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"", False, password)
 
 
     def is_file(self, path):

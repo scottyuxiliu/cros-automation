@@ -48,7 +48,7 @@ $SCENARIO_CONST = @{
         "pwr_log_time" = 9000;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad/results"
     };
-    "ptl-30m-1kfish" = @{
+    "power_thermalload_30min_1000_fish" = @{
         "duration" = 1800;
         "agt_log_time" = 2100;
         "pwr_log_time" = 1800;

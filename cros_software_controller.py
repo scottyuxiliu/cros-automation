@@ -56,6 +56,7 @@ class CrosSoftwareController():
         Returns:
             list: [description]
         """
+
         content = []
 
         if stdout.channel.recv_exit_status() != 0:
@@ -82,7 +83,8 @@ class CrosSoftwareController():
             password (str, optional): password to be written through stdin. Defaults to None.
 
         Returns:
-            [type]: [description]
+            list: stdout from paramiko ssh.exec_command()
+            
         """
 
         try:
