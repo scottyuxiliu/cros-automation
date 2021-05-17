@@ -1,9 +1,9 @@
 # cros-automation
-Automation for scenarios on Chrome OS and Chromium OS
+Automation Chrome OS and Chromium OS.
 
 For Windows users, a sample powershell script `cros_automation.ps1` is included to show a simple flow of what this automation can achieve.
 
-For Ubuntu users, sample bash script `autotest_restore.sh` is included.
+For Ubuntu users, sample bash script `measurement.sh` is included.
 
 
 <!-- ## Pre-requisites
@@ -25,6 +25,14 @@ python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfi
 
 # for example
 python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
+### Test connection
+```
+python cros_automation.py test-connection -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
+
+# for example
+python cros_automation.py test-connection -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
 ### Launch scenarios

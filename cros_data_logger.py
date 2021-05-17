@@ -130,7 +130,7 @@ class CrosDataLogger():
         if password is not none, password will be written through stdin.
 
         Args:
-            command (str): [description]
+            command (str): command to be executed
             read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
             password (str, optional): password to be written through stdin. Defaults to None.
 

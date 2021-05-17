@@ -29,7 +29,7 @@ parser.add_argument(
     help=textwrap.dedent(
         '''\
         cros scenario launcher jobs.
-        "test": test connection to the test system
+        "test-connection": test connection to DUT [-p/--ip].
         "launch-scenario": launches an autotest scenario [-s/--scenario] on the test system
         "prepare-scenario": prepares an autotest scenario [-s/--scenario] on the test system
 

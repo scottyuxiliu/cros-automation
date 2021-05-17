@@ -114,6 +114,14 @@ class CrosScenarioLauncher():
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __exec_command(self, command, read_stdout=False):
+        """execute command using paramiko ssh.exec_command().
+
+        if self.debug is true or read_stdout is true, this will be blocking and stdout will be read.
+
+        Args:
+            command (str): command to be executed
+            read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
+        """
         try:
             stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
         except paramiko.SSHException:
