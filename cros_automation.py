@@ -24,7 +24,7 @@ logger.addHandler(ch)
 parser = argparse.ArgumentParser(description="Automation for scenarios on Chrome OS and Chromium OS", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument(
     "job",
-    metavar="job",
+    metavar="JOB",
     type=str,
     help=textwrap.dedent(
         '''\
@@ -67,6 +67,8 @@ parser.add_argument(
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
         "get-brightness": get brightness on the DUT [-p/--ip].
         "set-brightness": set brightness [-i/--input] nits on the DUT [-p/--ip].
+        "get-chrome-os-version": get chrome os version on the DUT [-p/--ip].
+        "get-coreboot-fw-version": get coreboot fw version on the DUT [-p/--ip].
         "get-power-supply-info": get power supply info on the DUT [-p/--ip].
         "enable-ac": enable ac on the DUT [-p/--ip].
         "disable-ac": disable ac on the DUT [-p/--ip].
@@ -220,6 +222,14 @@ elif args.job == "get-brightness":
 elif args.job == "set-brightness":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.set_brightness(args.input)
+
+elif args.job == "get-chrome-os-version":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.get_chrome_os_version()
+
+elif args.job == "get-coreboot-fw-version":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.get_coreboot_fw_version()
 
 elif args.job == "get-power-supply-info":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:

@@ -40,13 +40,33 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/graphics_GLBench/control"
     },
+    "power_speedometer2": {
+        "method": "autotest",
+        "control": "tests/power_Speedometer2/control"
+    },
     "power_thermalload": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
     },
+    "power_thermalload_3min_5000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.3min.5000_fish"
+    },
+    "power_thermalload_3min_20000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.3min.20000_fish"
+    },
     "power_thermalload_30min_1000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.1000_fish"
+    },
+    "power_thermalload_30min_5000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.30min.5000_fish"
+    },
+    "power_thermalload_30min_20000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.30min.20000_fish"
     },
     "power_videocall": {
         "method": "autotest",

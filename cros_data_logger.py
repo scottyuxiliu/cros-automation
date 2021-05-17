@@ -151,7 +151,7 @@ class CrosDataLogger():
 
         else:
             if self.debug is True or read_stdout is True:
-                stdout = self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command. this is blocking.
+                stdout = self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command. this is blocking.
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
@@ -169,7 +169,7 @@ class CrosDataLogger():
         if status is True:
             self.logger.info("ssh session is active")
 
-            self.logger.info('execute echo "ssh session is active"')
+            self.logger.info('execute: echo "ssh session is active"')
             try:
                 if self.debug is True:
                     stdin, stdout, stderr = self.ssh.exec_command('echo "ssh session is active"') # non-blocking call

@@ -89,49 +89,40 @@ class CrosScenarioLauncher():
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __read_stdout(self, stdout):
-        """[summary]
+        """this will be blocking.
 
-        Parameters
-        ----------
-        stdout : [type]
-            [description]
+        Args:
+            stdout ([type]): [description]
+
+        Returns:
+            list: [description]
         """
+
         content = []
 
-        if stdout.channel.recv_exit_status() == 0: # blocking call
-            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
-            for line in stdout.readlines():
-                self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
-                content.append(line)
-        else:
+        if stdout.channel.recv_exit_status() != 0:
             self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
-            self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}****************************** stdout content ******************************")
-            for line in stdout.readlines():
-                self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
-                content.append(line)
+
+        for line in stdout.readlines():
+            line = line.rstrip("\n")
+            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+            content.append(line)
 
         return content
 
     
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
-    def __exec_command(self, command, sudo=False):
-        if self.debug is True:
-            try:
-                stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
-                self.__read_stdout(stdout) # if debug flag is set, capture stdout from exec_command
-            except paramiko.SSHException:
-                self.logger.error("(DEBUG MODE) paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
-            else:
-                self.logger.info("(DEBUG MODE) finished on the test system")
+    def __exec_command(self, command, read_stdout=False):
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(command) # non-blocking call
+        except paramiko.SSHException:
+            self.logger.error("(DEBUG MODE) paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
         else:
-            n = len(command.split(";")) # get the number of commands that should be executed
-
-            try:
-                self.ssh.exec_command(command) # non-blocking call, thus need to add delay after
-            except paramiko.SSHException:
-                self.logger.error("paramiko ssh exception. there might be failures in SSH2 protocol negotiation or logic errors.")
+            if self.debug is True or read_stdout is True:
+                self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command. this is blocking.
             else:
+                n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
                 self.logger.info("started on the test system")
 
@@ -160,10 +151,13 @@ class CrosScenarioLauncher():
 
     def __exist_local(self, path):
         p = self.__read_path(path)
+        # self.logger.info(p)
 
         if p.is_file():
+            # self.logger.info("True")
             return True
         else:
+            # self.logger.info("False")
             return False
 
 
@@ -219,7 +213,7 @@ class CrosScenarioLauncher():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on the test system {self.test_system_ip_address}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on {self.test_system_ip_address}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:
@@ -242,14 +236,17 @@ class CrosScenarioLauncher():
 
     def prepare_scenario(self, scenario):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on the test system {self.test_system_ip_address}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on {self.test_system_ip_address}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:
             if SCENARIOS[scenario]["method"] == "autotest":
-                # if the control file exists both locally and on the target system, replace the one on the target system
-                if self.__exist_local(f"./autotest/{SCENARIOS[scenario]['control']}") and self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}"):
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}replace {TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']} with ./autotest/{SCENARIOS[scenario]['control']}")
+                # if the control file exists locally, replace the one on the DUT or just upload to the DUT.
+                if self.__exist_local(f"./autotest/{SCENARIOS[scenario]['control']}"):
+                    if self.__exist_remote(f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}"):
+                        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}replace {TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']} with ./autotest/{SCENARIOS[scenario]['control']}")
+                    else:
+                        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}upload ./autotest/{SCENARIOS[scenario]['control']} to {TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}")
                     self.__upload(f"./autotest/{SCENARIOS[scenario]['control']}", f"{TEST_SYS_AUTOTEST_PATH}/{SCENARIOS[scenario]['control']}")
 
                 # if the control file only exists on the target system, use it as is

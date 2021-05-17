@@ -2,19 +2,19 @@
 
 # --------------------------------------------------------------------------------
 
-# measurement function
+# measurement function and its utilities
+
 
 
 # --------------------------------------------------------------------------------
 
 function measurement {
     local scenario=$1
-    local duration=$2
-    local result_directory=$3
-    local output_file=$4
-    local agt_log=$5
-    local pwr_log=$6
-    local debug_mode=$7
+    local result_directory=$2
+    local output_file_index=$3
+    local agt_log=$4
+    local pwr_log=$5
+    local debug_mode=$6
 
     if [ "$debug_mode" = true ]
     then
@@ -29,10 +29,8 @@ function measurement {
 
         if [ "$agt_log" = true ]
         then
-            echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/${output_file}${ENDFORMAT}"
-            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $duration -o $output_file
-        else
-            :
+            echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv${ENDFORMAT}"
+            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AUTOTEST_DURATION[$scenario]} -o "agt_internal_log_$output_file_index.csv"
         fi
 
         echo -e "${INFO}launch ${scenario}${ENDFORMAT}"
@@ -42,14 +40,64 @@ function measurement {
     if [ "$debug_mode" = true ]
     then
         echo -e "${INFO}(DEBUG MODE) wait 60 seconds for $scenario to exit${ENDFORMAT}"
-        sleep 60s
+        sleep_with_progress_bar 60
     else
-        echo -e "${INFO}wait $duration seconds${ENDFORMAT}"
-        sleep $duration
+        echo -e "${INFO}wait ${AUTOTEST_DURATION[$scenario]} seconds for $scenario to finish${ENDFORMAT}"
+        sleep_with_progress_bar ${AUTOTEST_DURATION[$scenario]}
 
-        echo -e "${INFO}wait 60 seconds for data logging to finish${ENDFORMAT}"
-        sleep 60s
+        echo -e "${INFO}wait 60 seconds for data logging to exit${ENDFORMAT}"
+        sleep_with_progress_bar 60
     fi
 
+    if [ "$debug_mode" = true ]
+    then
+        echo -e "${INFO}(DEBUG MODE) download ${AUTOTEST_RESULT_DIR[$scenario]}/keyval to $result_directory${ENDFORMAT}"
+        python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/keyval" -o "$result_directory/keyval_$output_file_index"
+
+        echo -e "${INFO}(DEBUG MODE) download ${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json to $result_directory${ENDFORMAT}"
+        python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json" -o "$result_directory/results_chart_$output_file_index.json"
+
+        echo -e "${INFO}(DEBUG MODE) rm ${AUTOTEST_RESULT_DIR[$scenario]}/keyval on $DUT_IP${ENDFORMAT}"
+        python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/keyval"
+
+        echo -e "${INFO}(DEBUG MODE) rm ${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json on $DUT_IP${ENDFORMAT}"
+        python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json"
+
+        echo -e "${INFO}(DEBUG MODE) ls ${AUTOTEST_RESULT_DIR[$scenario]} on $DUT_IP${ENDFORMAT}"
+        python cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d ${AUTOTEST_RESULT_DIR[$scenario]}
+    else
+        echo -e "${INFO}download ${AUTOTEST_RESULT_DIR[$scenario]}/keyval to $result_directory${ENDFORMAT}"
+        python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/keyval" -o "$result_directory/keyval_$output_file_index"
+
+        echo -e "${INFO}download ${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json to $result_directory${ENDFORMAT}"
+        python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "${AUTOTEST_RESULT_DIR[$scenario]}/results-chart.json" -o "$result_directory/results_chart_$output_file_index.json"
+
+        if [ "$agt_log" = true ]
+        then
+            echo -e "${INFO}download $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv to $result_directory${ENDFORMAT}"
+            python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv" -o "$result_directory/agt_internal_log_$output_file_index.csv"
+
+            echo -e "${INFO}rm $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv on $DUT_IP${ENDFORMAT}"
+            python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv"
+
+            echo -e "${INFO}ls ${AUTOTEST_RESULT_DIR[$scenario]} on $DUT_IP${ENDFORMAT}"
+            python cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d $AGT_INTERNAL_PATH
+        fi
+    fi
+
+}
+
+function sleep_with_progress_bar {
+    local i
     
+    for i in `seq 1 $1`
+    do
+        bar="################################################################################"
+        barlength=${#bar}
+        n=$(($i*$barlength/$1))
+        printf "\r${INFO}[%-${barlength}s] %ds/%ds ${ENDFORMAT}" ${bar:0:n} $i $1
+        sleep 1
+    done
+
+    printf "\n"
 }

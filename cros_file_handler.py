@@ -172,7 +172,7 @@ class CrosFileHandler():
             all items in remote_dir
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"list files in {remote_dir} on {self.ip}")
+        self.logger.info(f"ls {remote_dir} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_dir is None:
@@ -213,7 +213,7 @@ class CrosFileHandler():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove file {remote_file_path}")
+        self.logger.info(f"rm {remote_file_path} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_file_path is None:
@@ -248,7 +248,7 @@ class CrosFileHandler():
         """
         
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"remove directory {remote_dir}")
+        self.logger.info(f"rmdir {remote_dir} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if remote_dir is None:

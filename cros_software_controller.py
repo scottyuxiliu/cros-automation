@@ -99,7 +99,7 @@ class CrosSoftwareController():
 
         else:
             if self.debug is True or read_stdout is True:
-                stdout = self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command
+                stdout = self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command. this is blocking.
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
@@ -150,7 +150,7 @@ class CrosSoftwareController():
 
     def reboot(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"reboot the target system {self.ip}")
+        self.logger.info(f"reboot {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         self.logger.info("execute: /sbin/reboot -f > /dev/null 2>&1 &")
@@ -245,6 +245,26 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"execute: cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
         self.__exec_command(f"cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
+
+
+    def get_chrome_os_version(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"get chrome os version on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info("execute: cat /etc/lsb-release")
+        stdout = self.__exec_command("cat /etc/lsb-release", True)
+        for line in stdout:
+            self.logger.info(line)
+
+
+    def get_coreboot_fw_version(self):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"get coreboot firmware on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info("execute: crossystem | grep fwid")
+        stdout = self.__exec_command("crossystem | grep fwid", True)
+        for line in stdout:
+            self.logger.info(line)
 
 
     def get_power_supply_info(self):
