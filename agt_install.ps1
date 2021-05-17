@@ -19,6 +19,9 @@ $DUT_SSH_KEYFILE = "id_rsa"
 
 $AGT_PACKAGE = $args[1]
 
+Write-Verbose "remove /usr/local/agt directory on $DUT_IP if it exists ..."
+python .\cros_automation.py rmdir -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d "/usr/local/agt"
+
 Write-Verbose "create /usr/local/agt directory on $DUT_IP ..."
 python .\cros_automation.py mkdir -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d "/usr/local/agt"
 
