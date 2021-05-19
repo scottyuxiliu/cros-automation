@@ -16,7 +16,7 @@ For Ubuntu users, sample bash script `measurement.sh` is included.
 2.   Run `python .\cros_automation.py --help` to see a list of available arguments and their usages
 
 
-## Common use cases
+## Available jobs
 
 ### Reboot
 
@@ -85,12 +85,13 @@ python .\cros_automation.py rmdir -p "192.168.123.456" -u "root" -k "id_rsa" -d 
 ```
 
 
-### Download file to the host
-
+### Download file
 ```
-python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
+python cros_automation.py download -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile] -i [source] -o [dest]
 
-python .\cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/agt_log.csv" -o "C:\Users\scottyuxiliu\Downloads\agt_log.csv"
+# for example
+python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "/home/scottyuxiliu/Downloads/atitool_log.csv"
+python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/agt/agt_log.csv" -o "C:\Users\scottyuxiliu\Downloads\agt_log.csv"
 ```
 
 ### Upload file to the DUT
@@ -142,13 +143,44 @@ python cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr
 python cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
 ```
 
-
-### Download files to the host
-
+### Get brightness
 ```
-python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv" -o "C:\Users\scottyuxiliu\Downloads\atitool_log.csv"
+python cros_automation.py get-brightness -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
-python cros_automation.py download -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/agt_log.csv" -o "C:\Users\scottyuxiliu\Downloads\agt_log.csv"
+# for example
+python cros_automation.py get-brightness -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
+### Set brightness
+```
+python cros_automation.py set-brightness -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile] -i [nits]
+
+# for example
+python cros_automation.py set-brightness -p "192.168.123.456" -u "root" -k "id_rsa" -i "80"
+```
+
+### Get power supply info
+```
+python cros_automation.py get-power-supply-info -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
+
+# for example
+python cros_automation.py get-power-supply-info -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
+### Enable AC
+```
+python cros_automation.py enable-ac -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
+
+# for example
+python cros_automation.py enable-ac -p "192.168.123.456" -u "root" -k "id_rsa"
+```
+
+### Disable AC
+```
+python cros_automation.py disable-ac -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
+
+# for example
+python cros_automation.py disable-ac -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
 

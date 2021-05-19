@@ -14,7 +14,7 @@ SCENARIOS = {
     },
     "s0i3": {
         "method": "manual",
-        "command": "echo mem > /sys/power/state"
+        "command": "ectool led battery off; powerd_dbus_suspend"
     },
     "stress_ng": {
         "method": "manual",
@@ -23,6 +23,10 @@ SCENARIOS = {
     "stress_ng_stop_ui": {
         "method": "manual",
         "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300 --yaml keyval"
+    },
+    "power_idle": {
+        "method": "autotest",
+        "control": "tests/power_Idle/control"
     },
     "power_loadtest_1h": {
         "method": "autotest",
@@ -47,6 +51,10 @@ SCENARIOS = {
     "power_thermalload": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
+    },
+    "power_thermalload_3min_3000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.3min.3000_fish"
     },
     "power_thermalload_3min_5000_fish": {
         "method": "autotest",

@@ -53,7 +53,7 @@ parser.add_argument(
         "mkdir": create directory [-d/--directory] on the target system [-p/--ip].
         "rm": remove file [-i/--input] on the target system
         "rmdir": remove directory [-d/--directory] on the target system
-        "download": download file [-i/--input] to the target system [-o/--output]
+        "download": download file [-i/--input] to [-o/--output]
         "upload": upload file [-i/--input] to the target system [-o/--output]
         "extract": extract file [-i/--input] on the target system [-p/--ip].
         "compress": compress directory/file [-i/--input] on the target system [-p/--ip].

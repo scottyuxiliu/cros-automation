@@ -318,7 +318,7 @@ class CrosDataLogger():
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}pac log for {duration} seconds on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"")
-        self.__exec_command(f"sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"", False, password)
+        self.__exec_command(f"sudo -S sh -c \"cd ~/pac-db; python3 pac_db2.py -c guybrush_r0_pacs_mainsmt.py -t {duration}\"", True, password)
 
 
     def is_file(self, path):
