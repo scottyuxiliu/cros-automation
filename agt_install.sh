@@ -6,7 +6,7 @@
 # source agt_install.sh [DUT_IP] [AGT_PACKAGE]
 
 # for example
-# source agt_install.sh "192.168.123.456" "/media/scottyuxiliu/crosdata/agt.tar.gz"
+# source agt_install.sh 192.168.123.456 /media/scottyuxiliu/crosdata/agt.tar.gz
 
 
 # --------------------------------------------------------------------------------

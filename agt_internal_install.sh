@@ -6,7 +6,7 @@
 # source agt_internal_install.sh [DUT_IP] [AGT_INTERNAL_PACKAGE]
 
 # for example
-# source agt_internal_install.sh "192.168.123.456" "/media/scottyuxiliu/crosdata/agt_internal.tar.gz"
+# source agt_internal_install.sh 192.168.123.456 /media/scottyuxiliu/crosdata/agt_internal.tar.gz
 
 
 # --------------------------------------------------------------------------------

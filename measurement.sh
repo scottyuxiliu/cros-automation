@@ -14,7 +14,26 @@ function measurement {
     local output_file_index=$3
     local agt_log=$4
     local pwr_log=$5
-    local debug_mode=$6
+    local dc_mode=$6
+    local debug_mode=$7
+
+    if [ "$dc_mode" = true ]
+    then
+        if [ "$debug_mode" = true ]
+        then
+            echo -e "${INFO}(DEBUG MODE) disable ac${ENDFORMAT}"
+            python cros_automation.py disable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE --debug
+
+            echo -e "${INFO}(DEBUG MODE) wait 60 seconds for disabling ac to exit${ENDFORMAT}"
+            sleep_with_progress_bar 60
+        else
+            echo -e "${INFO}disable ac${ENDFORMAT}"
+            python cros_automation.py disable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
+
+            echo -e "${INFO}wait 60 seconds for disabling ac to exit${ENDFORMAT}"
+            sleep_with_progress_bar 60
+        fi
+    fi
 
     if [ "$debug_mode" = true ]
     then
@@ -27,14 +46,14 @@ function measurement {
         echo -e "${INFO}prepare ${scenario}${ENDFORMAT}"
         python cros_automation.py prepare-scenario -s $scenario -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
 
+        echo -e "${INFO}launch ${scenario}${ENDFORMAT}"
+        python cros_automation.py launch-scenario -s $scenario -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
+
         if [ "$agt_log" = true ]
         then
             echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv${ENDFORMAT}"
             python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AUTOTEST_DURATION[$scenario]} -o "agt_internal_log_$output_file_index.csv"
         fi
-
-        echo -e "${INFO}launch ${scenario}${ENDFORMAT}"
-        python cros_automation.py launch-scenario -s $scenario -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
     fi
 
     if [ "$debug_mode" = true ]
@@ -85,6 +104,24 @@ function measurement {
         fi
     fi
 
+
+    if [ "$dc_mode" = true ]
+    then
+        if [ "$debug_mode" = true ]
+        then
+            echo -e "${INFO}(DEBUG MODE) re-enable ac${ENDFORMAT}"
+            python cros_automation.py enable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE --debug
+
+            echo -e "${INFO}(DEBUG MODE) wait 60 seconds for enabling ac to exit${ENDFORMAT}"
+            sleep_with_progress_bar 60
+        else
+            echo -e "${INFO}re-enable ac${ENDFORMAT}"
+            python cros_automation.py enable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
+
+            echo -e "${INFO}wait 60 seconds for enabling ac to exit${ENDFORMAT}"
+            sleep_with_progress_bar 60
+        fi
+    fi
 }
 
 function sleep_with_progress_bar {

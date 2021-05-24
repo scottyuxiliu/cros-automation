@@ -31,7 +31,7 @@ function measurement {
         if ($dc_mode) {
             if ($debug_mode) {
                 Write-Host "INFO`t: (DEBUG MODE) disable ac" -ForegroundColor Green
-                python cros_automation.py disable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
+                python cros_automation.py disable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE --debug
 
                 Write-Host "INFO`t: (DEBUG MODE) wait 60 seconds for disabling ac to exit" -ForegroundColor Green
                 sleep_with_progress_bar -seconds 60
@@ -180,7 +180,7 @@ function measurement {
         if ($dc_mode) {
             if ($debug_mode) {
                 Write-Host "INFO`t: (DEBUG MODE) re-enable ac" -ForegroundColor Green
-                python cros_automation.py enable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE
+                python cros_automation.py enable-ac -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE --debug
 
                 Write-Host "INFO`t: (DEBUG MODE) wait 60 seconds for enabling ac to exit" -ForegroundColor Green
                 sleep_with_progress_bar -seconds 60

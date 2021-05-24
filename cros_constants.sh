@@ -8,7 +8,8 @@
 # --------------------------------------------------------------------------------
 
 INFO="\e[1;32mINFO\t: "
-ERROR="\e[1;31m"
+WARNING="\e[1;33mWARNING\t: "
+ERROR="\e[1;31mERROR\t: "
 ENDFORMAT="\e[0m"
 
 AUTOTEST_PATH="/usr/local/autotest"
