@@ -1,3 +1,5 @@
+. .\cros_constants.ps1
+
 $VerbosePreference = "Continue"
 $DebugPreference = "Continue"
 
@@ -51,21 +53,12 @@ function remove_file {
     }
 }
 
-$logfiles = @(
-    ".\cros_data_logger.log",
-    ".\cros_data_parser.log",
-    ".\cros_file_handler.log",
-    ".\cros_scenario_launcher.log",
-    ".\cros_software_controller.log"
-)
-
-foreach ($logfile in $logfiles) {
+foreach ($logfile in $LOGS) {
     if (check_file_exist -file $logfile) {
-        Write-Host -NoNewline "remove $logfile ... "
+        Write-Host "INFO`t: remove $logfile" -ForegroundColor Green
         remove_file -filepath $logfile
-        Write-Host "done"
     }
     else {
-        Write-Host "no such file: $logfile"
+        Write-Host "ERROR`t: no such file: $logfile" -ForegroundColor Red
     }
 }

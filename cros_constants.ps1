@@ -6,6 +6,14 @@ $TEST_SYS_ATITOOL_PATH = "/usr/local/atitool"
 $AGT_PATH = "/usr/local/agt"
 $AGT_INTERNAL_PATH = "/usr/local/agt_internal"
 
+$LOGS = @(
+    "cros_data_logger.log",
+    "cros_data_parser.log",
+    "cros_file_handler.log",
+    "cros_scenario_launcher.log",
+    "cros_software_controller.log"
+)
+
 $SCENARIO_CONST = @{
     "idle" = @{
         "duration" = 300;
@@ -133,7 +141,7 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_VideoCall.25min/results";
         "delay" = 0;
     };
-    "arc.GamePerformanceRender" = @{
+    "arc_gameperformancerender" = @{
         "duration" = 1020;
         "agt_log_time" = 1320;
         "pwr_log_time" = 1020;

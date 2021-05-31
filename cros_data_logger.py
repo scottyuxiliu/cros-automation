@@ -290,7 +290,7 @@ class CrosDataLogger():
             [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}agt internal log for {duration} seconds on {self.ip}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}agt internal log for {duration}s on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(F"{AGT_INTERNAL_DIR_PATH}/agt_internal"):

@@ -6,7 +6,7 @@
 # source agt_internal_log.sh [DUT_IP] [DURATION] [DIR] [OUTPUT]
 
 # for example
-# source agt_internal_log.sh "192.168.123.456" "60" "/home/scottyuxiliu/Downloads/" "agt_internal_log.csv"
+# source agt_internal_log.sh 192.168.123.456 60 /home/scottyuxiliu/Downloads/ agt_internal_log.csv
 
 
 # --------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_S
 echo -e "${INFO}wait $DURATION seconds for agt internal logging to finish${ENDFORMAT}"
 sleep $DURATION
 
-echo -e "${INFO}wait 60 seconds for agt internal logging to exit${ENDFORMAT}"
+echo -e "${INFO}wait 60 seconds for operation to exit${ENDFORMAT}"
 sleep 60s
 
 echo -e "${INFO}download $AGT_INTERNAL_PATH/$OUTPUT to ${DIR}${ENDFORMAT}"
