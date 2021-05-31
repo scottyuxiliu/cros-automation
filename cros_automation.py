@@ -84,7 +84,10 @@ parser.add_argument("-s", "--scenario", type=str, help="autotest scenario. suppo
 
 parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds, default %(default)s.")
 parser.add_argument("-d", "--directory", type=str, help="directory on the target system.")
-parser.add_argument("-i", "--input", type=str, help="data logging source file path, or data parsing file path, or atitool logging/programming arguments.")
+parser.add_argument(
+    "-i", "--input", type=str,
+    help="data logging source file path, or data parsing file path, or atitool logging/programming arguments."
+)
 parser.add_argument("-o", "--output", type=str, help="data logging output file path.")
 parser.add_argument("--password", type=str, help="sudo password.")
 parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")

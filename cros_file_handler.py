@@ -5,7 +5,7 @@ class CrosFileHandler():
     """set debug to True to enable debug mode
     """
 
-    def __init__(self, ip, username, ssh_private_key_file, debug):
+    def __init__(self, ip, username, ssh_private_key_file, debug) -> None:
         """[summary]
 
         Parameters

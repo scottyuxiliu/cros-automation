@@ -41,7 +41,7 @@ python cros_automation.py test-connection -p "192.168.123.456" -u "root" -k "id_
 python cros_automation.py launch-scenario -s [scenario] -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py launch-scenario -s "graphics_webglaquarium" -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py launch-scenario -s graphics_webglaquarium -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Capture ATITOOL log
