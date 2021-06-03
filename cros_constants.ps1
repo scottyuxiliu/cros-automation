@@ -141,10 +141,17 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_VideoCall.25min/results";
         "delay" = 0;
     };
-    "arc_gameperformancerender" = @{
+    "arc.GamePerformanceRender" = @{
         "duration" = 1020;
         "agt_log_time" = 1320;
         "pwr_log_time" = 1020;
+        "result" = "";
+        "delay" = 0;
+    };
+    "ui.MeetCUJ.16p_notes" = @{
+        "duration" = 220;
+        "agt_log_time" = 280;
+        "pwr_log_time" = 220;
         "result" = "";
         "delay" = 0;
     }

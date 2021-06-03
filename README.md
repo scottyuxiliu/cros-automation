@@ -13,19 +13,12 @@ For Ubuntu users, sample bash script `measurement.sh` is included.
 ## Quick-start guide
 1.   Download latest Python from https://www.python.org/
 1.   Install all required Python packages by running `pip install -r requirements`
-2.   Run `python .\cros_automation.py --help` to see a list of available arguments and their usages
+2.   Run `python cros_automation.py --help` to see a list of available arguments and their usages
 
 
 ## Available jobs
 
-### Reboot
 
-```
-python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
-
-# for example
-python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
-```
 
 ### Test connection
 ```
@@ -62,14 +55,14 @@ python cros_automation.py agt-log -p "192.168.123.456" -u "root" -k "id_rsa" -t 
 ### List items in a directory
 
 ```
-# list items in a test system directory
-python .\cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr/local"
+# list items in a DUT directory
+python cros_automation.py ls -p 192.168.123.456 -u root -k id_rsa -d /usr/local
 
 # list items in a local directory
-python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input"
+python cros_automation.py ls-local -d C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input
 
 # list items in a local directory, with name "keyval*"
-python .\cros_automation.py ls-local -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -i "keyval*"
+python cros_automation.py ls-local -d C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input -i "keyval*"
 ```
 
 ### Remove file on the DUT
@@ -117,14 +110,13 @@ python .\cros_automation.py cold-reset -p "192.168.111.111" -u "admin" -k "id_rs
 
 ### Summarize results-chart.json files to a .csv file
 
-```
-python .\cros_automation.py results-charts-summary -d [directory] -o [output_file]
-```
-
-For example,
 
 ```
-python .\cros_automation.py results-charts-summary -d "C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input" -o "results_charts_summary.csv"
+python cros_automation.py results-charts-summary -d [directory] -o [output_file]
+
+# for example
+python cros_automation.py results-charts-summary -d ~/Downloads/test/ -o ~/Downloads/test/results_charts_summary.csv
+python cros_automation.py results-charts-summary -d C:\Users\scottyuxiliu\Documents\cros-automation\unittest\input -o results_charts_summary.csv
 ```
 
 
@@ -141,6 +133,15 @@ python cros_automation.py ls -p "192.168.123.456" -u "root" -k "id_rsa" -d "/usr
 
 ```
 python cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr/local/atitool/atitool_log.csv"
+```
+
+### Reboot
+
+```
+python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
+
+# for example
+python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
 ```
 
 ### Get brightness
@@ -164,7 +165,7 @@ python cros_automation.py set-brightness -p "192.168.123.456" -u "root" -k "id_r
 python cros_automation.py get-power-supply-info -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py get-power-supply-info -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py get-power-supply-info -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Enable AC
@@ -172,7 +173,7 @@ python cros_automation.py get-power-supply-info -p "192.168.123.456" -u "root" -
 python cros_automation.py enable-ac -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py enable-ac -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py enable-ac -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Disable AC
@@ -180,7 +181,7 @@ python cros_automation.py enable-ac -p "192.168.123.456" -u "root" -k "id_rsa"
 python cros_automation.py disable-ac -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py disable-ac -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py disable-ac -p 192.168.123.456 -u root -k id_rsa
 ```
 
 

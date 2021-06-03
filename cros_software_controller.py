@@ -259,7 +259,7 @@ class CrosSoftwareController():
 
     def get_coreboot_fw_version(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"get coreboot firmware on {self.ip}")
+        self.logger.info(f"get apfw version on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info("execute: crossystem | grep fwid")
         stdout = self.__exec_command("crossystem | grep fwid", True)

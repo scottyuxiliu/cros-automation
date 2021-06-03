@@ -86,5 +86,8 @@ SCENARIOS = {
     },
     "arc.GamePerformanceRender": {
         "method": "tast"
+    },
+    "ui.MeetCUJ.16p_notes": {
+        "method": "tast"
     }
 }

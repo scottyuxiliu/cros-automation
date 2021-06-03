@@ -137,12 +137,12 @@ class CrosDataParser():
         """
         if name is None:
             self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} ...")
+            self.logger.info(f"ls {directory}")
             self.logger.info("--------------------------------------------------------------------------------")
             name = "*"
         else:
             self.logger.info("--------------------------------------------------------------------------------")
-            self.logger.info(f"list files in {directory} with file names matching the pattern {name} ...")
+            self.logger.info(f"ls {directory} with pattern matching {name}")
             self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_local(directory):
@@ -161,7 +161,7 @@ class CrosDataParser():
 
     def keyvals_to_csv(self, keyval_paths):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("convert keyval files to .csv files ...")
+        self.logger.info("convert keyval files to .csv files")
         self.logger.info("--------------------------------------------------------------------------------")
 
         for keyval_path in keyval_paths:
@@ -174,7 +174,7 @@ class CrosDataParser():
 
     def keyvals_summary(self, keyval_paths, summary_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("summarize keyval files to a .csv file ...")
+        self.logger.info("summarize keyval files to a .csv file")
         self.logger.info("--------------------------------------------------------------------------------")
 
         dictlist = []
@@ -190,7 +190,7 @@ class CrosDataParser():
 
     def results_charts_summary(self, results_chart_paths, summary_path):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info("summarize results-chart.json files to a .csv file ...")
+        self.logger.info("summarize results-chart.json files to a .csv file")
         self.logger.info("--------------------------------------------------------------------------------")
 
         df_list = []
@@ -209,7 +209,7 @@ class CrosDataParser():
 
     def agt_cols(self, inputpath, outputpath):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"extract agt columns from {inputpath} and save to {outputpath} ...")
+        self.logger.info(f"extract agt columns from {inputpath} and save to {outputpath}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         df = pd.read_csv(inputpath)
