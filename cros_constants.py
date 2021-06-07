@@ -44,7 +44,7 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/graphics_GLBench/control"
     },
-    "power_speedometer2": {
+    "power_Speedometer2": {
         "method": "autotest",
         "control": "tests/power_Speedometer2/control"
     },
@@ -52,42 +52,56 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
     },
-    "power_thermalload_3min_3000_fish": {
+    "power_ThermalLoad.3min.3000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.3min.3000_fish"
     },
-    "power_thermalload_3min_5000_fish": {
+    "power_ThermalLoad.3min.5000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.3min.5000_fish"
     },
-    "power_thermalload_3min_20000_fish": {
+    "power_ThermalLoad.3min.20000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.3min.20000_fish"
     },
-    "power_thermalload_30min_1000_fish": {
+    "power_ThermalLoad.30min.1000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.1000_fish"
     },
-    "power_thermalload_30min_5000_fish": {
+    "power_ThermalLoad.30min.3000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.30min.3000_fish"
+    },
+    "power_ThermalLoad.30min.5000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.5000_fish"
     },
-    "power_thermalload_30min_20000_fish": {
+    "power_ThermalLoad.30min.20000_fish": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.30min.20000_fish"
     },
-    "power_videocall": {
+    "power_ThermalLoad.60min.3000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.60min.3000_fish"
+    },
+    "power_ThermalLoad.60min.5000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.60min.5000_fish"
+    },
+    "power_VideoCall": {
         "method": "autotest",
         "control": "tests/power_VideoCall/control"
     },
-    "power_videocall_25min": {
+    "power_VideoCall.25min": {
         "method": "autotest",
         "control": "tests/power_VideoCall/control.25min"
     },
     "arc.GamePerformanceRender": {
-        "method": "tast"
+        "method": "tast",
+        "local": True
     },
     "ui.MeetCUJ.16p_notes": {
-        "method": "tast"
+        "method": "tast",
+        "local": True
     }
 }

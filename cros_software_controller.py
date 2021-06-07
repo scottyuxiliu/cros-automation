@@ -225,8 +225,8 @@ class CrosSoftwareController():
         self.logger.info(f"agt program {args}")
         self.logger.info("--------------------------------------------------------------------------------")
 
-        self.logger.info(f"execute: cd /usr/local/agt; ./agt_internal {args}")
-        self.__exec_command(f"cd /usr/local/agt; ./agt_internal {args}", True)
+        self.logger.info(f"execute: cd /usr/local/agt_internal; ./agt_internal {args}")
+        self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal {args}", True)
 
 
     def get_brightness(self):

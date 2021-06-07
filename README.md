@@ -25,7 +25,7 @@ For Ubuntu users, sample bash script `measurement.sh` is included.
 python cros_automation.py test-connection -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py test-connection -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py test-connection -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Launch scenarios
@@ -141,7 +141,7 @@ python cros_automation.py rm -p "192.168.123.456" -u "root" -k "id_rsa" -i "/usr
 python cros_automation.py reboot -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py reboot -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Get brightness
@@ -149,7 +149,7 @@ python cros_automation.py reboot -p "192.168.123.456" -u "root" -k "id_rsa"
 python cros_automation.py get-brightness -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile]
 
 # for example
-python cros_automation.py get-brightness -p "192.168.123.456" -u "root" -k "id_rsa"
+python cros_automation.py get-brightness -p 192.168.123.456 -u root -k id_rsa
 ```
 
 ### Set brightness
@@ -157,7 +157,7 @@ python cros_automation.py get-brightness -p "192.168.123.456" -u "root" -k "id_r
 python cros_automation.py set-brightness -p [dut_ip] -u [dut_username] -k [dut_ssh_keyfile] -i [nits]
 
 # for example
-python cros_automation.py set-brightness -p "192.168.123.456" -u "root" -k "id_rsa" -i "80"
+python cros_automation.py set-brightness -p 192.168.123.456 -u root -k id_rsa -i 80
 ```
 
 ### Get power supply info

@@ -1,4 +1,4 @@
-import os, sys, select, logging, argparse, time, errno, pathlib
+import os, sys, select, logging, argparse, time, errno, pathlib, subprocess
 import paramiko
 
 from cros_constants import TEST_SYS_AUTOTEST_PATH, SCENARIOS
@@ -7,7 +7,7 @@ class CrosScenarioLauncher():
     """[summary]
     """
 
-    def __init__(self, test_system_ip_address, test_system_username, ssh_private_key_file, debug):
+    def __init__(self, ip, username, ssh_private_key_file, debug):
         self.logger = logging.getLogger("cros_automation.CrosScenarioLauncher")
         fh = logging.FileHandler("cros_scenario_launcher.log") # to overwrite existing log file, use mode="w"
         fh.setLevel(logging.DEBUG)
@@ -26,24 +26,24 @@ class CrosScenarioLauncher():
         ssh_private_key = paramiko.RSAKey.from_private_key_file(ssh_private_key_file)
 
         self.logger.debug(f"connect to test system with the following details")
-        self.logger.debug(f"hostname = {test_system_ip_address}")
-        self.logger.debug(f"username = {test_system_username}")
+        self.logger.debug(f"hostname = {ip}")
+        self.logger.debug(f"username = {username}")
         self.logger.debug(f"ssh_private_key_file = {ssh_private_key_file}")
 
         # try:
-        #     self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        #     self.ssh.connect(hostname=ip, username=username, pkey=ssh_private_key)
         #     self.logger.debug("ssh session established!")
         # except paramiko.AuthenticationException:
-        #     self.logger.error(f"paramiko authentication failed when connecting to {test_system_ip_address}. it may be possible to retry with different credentials.")
+        #     self.logger.error(f"paramiko authentication failed when connecting to {ip}. it may be possible to retry with different credentials.")
         #     sys.exit(1)
         # except paramiko.SSHException:
-        #     self.logger.error(f"paramiko ssh exception when connecting to {test_system_ip_address}. there might be failures in SSH2 protocol negotiation or logic errors.")
+        #     self.logger.error(f"paramiko ssh exception when connecting to {ip}. there might be failures in SSH2 protocol negotiation or logic errors.")
         #     sys.exit(1)
 
-        self.ssh.connect(hostname=test_system_ip_address, username=test_system_username, pkey=ssh_private_key)
+        self.ssh.connect(hostname=ip, username=username, pkey=ssh_private_key)
         self.logger.debug("ssh session established!")
 
-        self.test_system_ip_address = test_system_ip_address
+        self.ip = ip
         self.debug = debug
 
 
@@ -137,6 +137,24 @@ class CrosScenarioLauncher():
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
+    def __exec_command_local(self, command, read_stdout=False, password=None):
+        """execute command locally using subprocess.
+
+        if self.debug is true or read_stdout is true, this will be blocking and stdout will be read.
+
+        Args:
+            command (str): command to be executed
+            read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
+        """
+        if read_stdout is True:
+            content = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+            self.logger.info(content)
+        else:
+            subprocess.Popen(command, shell=True)
+
+
+    # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
+    # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
     def __exec_command_in_cros_sdk_chroot(self, command, password):
         """this will be blocking.
 
@@ -200,7 +218,7 @@ class CrosScenarioLauncher():
 
     def test_connection(self):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.test_system_ip_address}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}test connection to {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         status = self.ssh.get_transport().is_active()
@@ -221,7 +239,7 @@ class CrosScenarioLauncher():
         """
 
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on {self.test_system_ip_address}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}launch {scenario} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:
@@ -232,7 +250,11 @@ class CrosScenarioLauncher():
                 self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
                 self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
             elif SCENARIOS[scenario]["method"] == "tast":
-                self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute (in chroot): tast run {self.test_system_ip_address} {SCENARIOS[scenario]}")
+                if SCENARIOS[scenario]["local"] is True:
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute locally: cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}")
+                    self.__exec_command_local(f"cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}")
+                else:
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute remotely (in chroot): tast run {self.ip} {SCENARIOS[scenario]}")
 
             else:
                 pass
@@ -244,7 +266,7 @@ class CrosScenarioLauncher():
 
     def prepare_scenario(self, scenario):
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on {self.test_system_ip_address}")
+        self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}prepare {scenario} on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
 
         if scenario in SCENARIOS:

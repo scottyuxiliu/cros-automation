@@ -71,7 +71,7 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_LoadTest.1hour/results";
         "delay" = 0;
     };
-    "power_speedometer2" = @{
+    "power_Speedometer2" = @{
         "duration" = 120;
         "agt_log_time" = 300;
         "pwr_log_time" = 120;
@@ -85,56 +85,77 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad/results";
         "delay" = 0;
     };
-    "power_thermalload_3min_3000_fish" = @{
+    "power_ThermalLoad.3min.3000_fish" = @{
         "duration" = 180;
         "agt_log_time" = 300;
         "pwr_log_time" = 180;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_thermalload_3min_5000_fish" = @{
+    "power_ThermalLoad.3min.5000_fish" = @{
         "duration" = 180;
         "agt_log_time" = 300;
         "pwr_log_time" = 180;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_thermalload_3min_20000_fish" = @{
+    "power_ThermalLoad.3min.20000_fish" = @{
         "duration" = 180;
         "agt_log_time" = 300;
         "pwr_log_time" = 180;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_thermalload_30min_1000_fish" = @{
+    "power_ThermalLoad.30min.1000_fish" = @{
         "duration" = 1800;
         "agt_log_time" = 2100;
         "pwr_log_time" = 1800;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_thermalload_30min_5000_fish" = @{
+    "power_ThermalLoad.30min.3000_fish" = @{
         "duration" = 1800;
         "agt_log_time" = 2100;
         "pwr_log_time" = 1800;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_thermalload_30min_20000_fish" = @{
+    "power_ThermalLoad.30min.5000_fish" = @{
         "duration" = 1800;
         "agt_log_time" = 2100;
         "pwr_log_time" = 1800;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
-    "power_videocall" = @{
+    "power_ThermalLoad.30min.20000_fish" = @{
+        "duration" = 1800;
+        "agt_log_time" = 2100;
+        "pwr_log_time" = 1800;
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
+        "delay" = 0;
+    };
+    "power_ThermalLoad.60min.3000_fish" = @{
+        "duration" = 3600;
+        "agt_log_time" = 3700;
+        "pwr_log_time" = 3600;
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
+        "delay" = 0;
+    };
+    "power_ThermalLoad.60min.5000_fish" = @{
+        "duration" = 3600;
+        "agt_log_time" = 3700;
+        "pwr_log_time" = 3600;
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
+        "delay" = 0;
+    };
+    "power_VideoCall" = @{
         "duration" = 7200;
         "agt_log_time" = 7500;
         "pwr_log_time" = 7200;
         "result" = "/usr/local/autotest/results/default/power_VideoCall/results";
         "delay" = 0;
     };
-    "power_videocall_25min" = @{
+    "power_VideoCall.25min" = @{
         "duration" = 1500;
         "agt_log_time" = 1800;
         "pwr_log_time" = 1500;
@@ -143,7 +164,7 @@ $SCENARIO_CONST = @{
     };
     "arc.GamePerformanceRender" = @{
         "duration" = 1020;
-        "agt_log_time" = 1320;
+        "agt_log_time" = 1080;
         "pwr_log_time" = 1020;
         "result" = "";
         "delay" = 0;

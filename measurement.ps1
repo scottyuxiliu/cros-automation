@@ -68,8 +68,8 @@ function measurement {
             }
             
             if ($agt_log) {
-                Write-Host "INFO`t: start agt internal logging to $AGT_INTERNAL_PATH/agt_internal_log_$($cur_file_index+$file_index_offset).csv" -ForegroundColor Green
-                python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("agt_log_time") -o "agt_internal_log_$($cur_file_index+$file_index_offset).csv"
+                Write-Host "INFO`t: start agt internal logging to $AGT_INTERNAL_PATH/agt_int_$($cur_file_index+$file_index_offset).csv" -ForegroundColor Green
+                python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $SCENARIO_CONST.Item($scenario).Item("agt_log_time") -o "agt_int_$($cur_file_index+$file_index_offset).csv"
             }
 
             if ($pwr_log) {
@@ -164,11 +164,11 @@ function measurement {
             }
     
             if ($agt_log) {
-                Write-Host "INFO`t: download $AGT_INTERNAL_PATH/agt_internal_log_$($cur_file_index+$file_index_offset).csv to $result_directory" -ForegroundColor Green
-                python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\agt_internal_log_$($cur_file_index+$file_index_offset).csv"
+                Write-Host "INFO`t: download $AGT_INTERNAL_PATH/agt_int_$($cur_file_index+$file_index_offset).csv to $result_directory" -ForegroundColor Green
+                python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_int_$($cur_file_index+$file_index_offset).csv" -o "$result_directory\agt_int_$($cur_file_index+$file_index_offset).csv"
                 
-                Write-Host "INFO`t: remove $AGT_INTERNAL_PATH/agt_internal_log_$($cur_file_index+$file_index_offset).csv on the test system" -ForegroundColor Green
-                python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$($cur_file_index+$file_index_offset).csv"
+                Write-Host "INFO`t: remove $AGT_INTERNAL_PATH/agt_int_$($cur_file_index+$file_index_offset).csv on the test system" -ForegroundColor Green
+                python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_int_$($cur_file_index+$file_index_offset).csv"
                 
                 Write-Host "INFO`t: list items in $AGT_INTERNAL_PATH" -ForegroundColor Green
                 python cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d $AGT_INTERNAL_PATH

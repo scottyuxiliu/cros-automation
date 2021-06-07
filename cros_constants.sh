@@ -33,23 +33,29 @@ DELAY_AFTER_PROG=900
 declare -A AUTOTEST_DURATION
 AUTOTEST_DURATION["graphics_webglaquarium"]=120
 AUTOTEST_DURATION["power_idle"]=660
-AUTOTEST_DURATION["power_speedometer2"]=300
-AUTOTEST_DURATION["power_thermalload_3min_3000_fish"]=300
-AUTOTEST_DURATION["power_thermalload_3min_5000_fish"]=300
-AUTOTEST_DURATION["power_thermalload_3min_20000_fish"]=300
-AUTOTEST_DURATION["power_thermalload_30min_1000_fish"]=2100
-AUTOTEST_DURATION["power_thermalload_30min_5000_fish"]=2100
-AUTOTEST_DURATION["power_thermalload_30min_20000_fish"]=2100
+AUTOTEST_DURATION["power_Speedometer2"]=300
+AUTOTEST_DURATION["power_ThermalLoad.3min.3000_fish"]=300
+AUTOTEST_DURATION["power_ThermalLoad.3min.5000_fish"]=300
+AUTOTEST_DURATION["power_ThermalLoad.3min.20000_fish"]=300
+AUTOTEST_DURATION["power_ThermalLoad.30min.1000_fish"]=2100
+AUTOTEST_DURATION["power_ThermalLoad.30min.3000_fish"]=2100
+AUTOTEST_DURATION["power_ThermalLoad.30min.5000_fish"]=2100
+AUTOTEST_DURATION["power_ThermalLoad.30min.20000_fish"]=2100
+AUTOTEST_DURATION["power_ThermalLoad.60min.3000_fish"]=3700
+AUTOTEST_DURATION["power_ThermalLoad.60min.5000_fish"]=3700
 
 
 declare -A AUTOTEST_RESULT_DIR
 AUTOTEST_RESULT_DIR["graphics_webglaquarium"]="/usr/local/autotest/results/default/graphics_WebGLAquarium/results"
 AUTOTEST_RESULT_DIR["power_idle"]="/usr/local/autotest/results/default/power_Idle/results"
-AUTOTEST_RESULT_DIR["power_speedometer2"]="/usr/local/autotest/results/default/power_Speedometer2/results"
-AUTOTEST_RESULT_DIR["power_thermalload_3min_3000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
-AUTOTEST_RESULT_DIR["power_thermalload_3min_5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
-AUTOTEST_RESULT_DIR["power_thermalload_3min_20000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
-AUTOTEST_RESULT_DIR["power_thermalload_30min_1000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
-AUTOTEST_RESULT_DIR["power_thermalload_30min_5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
-AUTOTEST_RESULT_DIR["power_thermalload_30min_20000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_Speedometer2"]="/usr/local/autotest/results/default/power_Speedometer2/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.3min.3000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.3min.5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.3min.20000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.30min.1000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.30min.3000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.30min.5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.30min.20000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.60min.3000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
+AUTOTEST_RESULT_DIR["power_ThermalLoad.60min.5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
 

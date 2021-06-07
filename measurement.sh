@@ -51,8 +51,8 @@ function measurement {
 
         if [ "$agt_log" = true ]
         then
-            echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv${ENDFORMAT}"
-            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AUTOTEST_DURATION[$scenario]} -o "agt_internal_log_$output_file_index.csv"
+            echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/agt_int_$output_file_index.csv${ENDFORMAT}"
+            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AUTOTEST_DURATION[$scenario]} -o "agt_int_$output_file_index.csv"
         fi
     fi
 
@@ -93,11 +93,11 @@ function measurement {
 
         if [ "$agt_log" = true ]
         then
-            echo -e "${INFO}download $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv to $result_directory${ENDFORMAT}"
-            python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv" -o "$result_directory/agt_internal_log_$output_file_index.csv"
+            echo -e "${INFO}download $AGT_INTERNAL_PATH/agt_int_$output_file_index.csv to $result_directory${ENDFORMAT}"
+            python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_int_$output_file_index.csv" -o "$result_directory/agt_int_$output_file_index.csv"
 
-            echo -e "${INFO}rm $AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv on $DUT_IP${ENDFORMAT}"
-            python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_internal_log_$output_file_index.csv"
+            echo -e "${INFO}rm $AGT_INTERNAL_PATH/agt_int_$output_file_index.csv on $DUT_IP${ENDFORMAT}"
+            python cros_automation.py rm -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/agt_int_$output_file_index.csv"
 
             echo -e "${INFO}ls ${AUTOTEST_RESULT_DIR[$scenario]} on $DUT_IP${ENDFORMAT}"
             python cros_automation.py ls -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -d $AGT_INTERNAL_PATH
