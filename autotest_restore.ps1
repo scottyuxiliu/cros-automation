@@ -4,7 +4,7 @@
 # .\autotest_restore.ps1 [DUT_IP] [AUTOTEST_PACKAGE]
 
 # for example
-# .\autotest_restore.ps1 "192.168.123.456" "C:\Users\scottyuxiliu\Downloads\autotest.tar.gz"
+# .\autotest_restore.ps1 192.168.123.456 C:\Users\scottyuxiliu\Downloads\autotest.tar.gz
 
 
 # --------------------------------------------------------------------------------
