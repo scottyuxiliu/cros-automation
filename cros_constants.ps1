@@ -78,7 +78,7 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_Speedometer2/results";
         "delay" = 0;
     };
-    "power_thermalload" = @{
+    "power_ThermalLoad" = @{
         "duration" = 9000;
         "agt_log_time" = 9600;
         "pwr_log_time" = 9000;

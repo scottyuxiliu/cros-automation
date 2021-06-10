@@ -48,7 +48,7 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_Speedometer2/control"
     },
-    "power_thermalload": {
+    "power_ThermalLoad": {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control"
     },
