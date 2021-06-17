@@ -58,14 +58,14 @@ function measurement {
 
     if [ "$debug_mode" = true ]
     then
-        echo -e "${INFO}(DEBUG MODE) wait 60 seconds for $scenario to exit${ENDFORMAT}"
-        sleep_with_progress_bar 60
+        echo -e "${INFO}(DEBUG MODE) wait 300 seconds for $scenario to exit${ENDFORMAT}"
+        sleep_with_progress_bar 300
     else
         echo -e "${INFO}wait ${AUTOTEST_DURATION[$scenario]} seconds for $scenario to finish${ENDFORMAT}"
         sleep_with_progress_bar ${AUTOTEST_DURATION[$scenario]}
 
-        echo -e "${INFO}wait 60 seconds for data logging to exit${ENDFORMAT}"
-        sleep_with_progress_bar 60
+        echo -e "${INFO}wait 300 seconds for data logging to exit${ENDFORMAT}"
+        sleep_with_progress_bar 300
     fi
 
     if [ "$debug_mode" = true ]

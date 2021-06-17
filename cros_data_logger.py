@@ -1,7 +1,7 @@
 import os, sys, select, logging, time, errno, pathlib, stat
 import paramiko
 
-from cros_constants import AGT_DIR_PATH, AGT_INTERNAL_DIR_PATH
+from cros_constants import AGT_DIR_PATH, AGT_INTERNAL_DIR_PATH, AGT_PERIOD
 
 class CrosDataLogger():
     """[summary]
@@ -232,18 +232,18 @@ class CrosDataLogger():
 
         if index == 0:
             if arguments is None:
-                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}"')
             else:
-                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}" {arguments}')
         else:
             if arguments is None:
-                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}"')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}"')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}"')
             else:
-                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
-                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput="{output_file_name}" {arguments}')
+                self.logger.info(f'execute: cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}" {arguments}')
+                self.__exec_command(f'cd /usr/local/atitool; ./atitool -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput="{output_file_name}" {arguments}')
 
 
     def agt_log(self, duration, index, arguments, output_file_name):
@@ -263,18 +263,18 @@ class CrosDataLogger():
         if self.__exist_remote(f"{AGT_DIR_PATH}/agt"):
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
-                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
-                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
             else:
                 if arguments is None:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
-                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
-                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt; ./agt -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
         else:
             self.logger.error(f"no such file: {AGT_DIR_PATH}/agt")
     
@@ -294,20 +294,21 @@ class CrosDataLogger():
         self.logger.info("--------------------------------------------------------------------------------")
 
         if self.__exist_remote(F"{AGT_INTERNAL_DIR_PATH}/agt_internal"):
+            
             if index == 0:
                 if arguments is None:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
-                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
-                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
             else:
                 if arguments is None:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
-                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\"")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\"")
                 else:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
-                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={duration} -pmperiod=1000 -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
+                    self.__exec_command(f"cd /usr/local/agt_internal; ./agt_internal -i={index} -pmlogall -pmcount={int(duration*1000/AGT_PERIOD)} -pmperiod={AGT_PERIOD} -pmoutput=\"{output_file_name}\" {arguments}")
 
         else:
             self.logger.error(f"no such file: {AGT_INTERNAL_DIR_PATH}/agt_internal")

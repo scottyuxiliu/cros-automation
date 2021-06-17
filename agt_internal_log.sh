@@ -12,6 +12,7 @@
 # --------------------------------------------------------------------------------
 
 source cros_constants.sh
+source cros_utils.sh
 
 DUT_IP=$1 # no whitespace is allowed between the variable name, the equals sign, and the value
 DUT_USERNAME="root"
@@ -33,10 +34,10 @@ echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/${OUTPUT}${ENDF
 python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t $DURATION -o $OUTPUT
 
 echo -e "${INFO}wait $DURATION seconds for agt internal logging to finish${ENDFORMAT}"
-sleep $DURATION
+sleep_with_progress_bar $DURATION
 
 echo -e "${INFO}wait 60 seconds for operation to exit${ENDFORMAT}"
-sleep 60s
+sleep_with_progress_bar 60
 
 echo -e "${INFO}download $AGT_INTERNAL_PATH/$OUTPUT to ${DIR}${ENDFORMAT}"
 python cros_automation.py download -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -i "$AGT_INTERNAL_PATH/$OUTPUT" -o "$DIR/$OUTPUT"

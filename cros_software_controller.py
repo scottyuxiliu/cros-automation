@@ -233,8 +233,8 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"get panel brightness on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"execute: cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; cat brightness")
-        stdout = self.__exec_command(f"cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; cat brightness", True)
+        self.logger.info(f"execute: cd /sys/devices/pci0000:00/0000:00:08.1/0000:04:00.0/backlight/amdgpu_bl0; cat brightness")
+        stdout = self.__exec_command(f"cd /sys/devices/pci0000:00/0000:00:08.1/0000:04:00.0/backlight/amdgpu_bl0; cat brightness", True)
         for line in stdout:
             self.logger.info(line)
 
@@ -243,8 +243,8 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"set panel brightness {nit} nits on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
-        self.logger.info(f"execute: cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
-        self.__exec_command(f"cd /sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
+        self.logger.info(f"execute: cd /sys/devices/pci0000:00/0000:00:08.1/0000:04:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
+        self.__exec_command(f"cd /sys/devices/pci0000:00/0000:00:08.1/0000:04:00.0/backlight/amdgpu_bl0; echo {nit} > brightness")
 
 
     def get_chrome_os_version(self):

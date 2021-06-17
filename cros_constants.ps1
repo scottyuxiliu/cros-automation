@@ -64,7 +64,7 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_Idle/results";
         "delay" = 0;
     };
-    "power_loadtest_1h" = @{
+    "power_LoadTest.1hour" = @{
         "duration" = 3600;
         "agt_log_time" = 3900;
         "pwr_log_time" = 3500;
@@ -73,12 +73,12 @@ $SCENARIO_CONST = @{
     };
     "power_Speedometer2" = @{
         "duration" = 120;
-        "agt_log_time" = 300;
+        "agt_log_time" = 180;
         "pwr_log_time" = 120;
         "result" = "/usr/local/autotest/results/default/power_Speedometer2/results";
         "delay" = 0;
     };
-    "power_thermalload" = @{
+    "power_ThermalLoad" = @{
         "duration" = 9000;
         "agt_log_time" = 9600;
         "pwr_log_time" = 9000;
@@ -150,7 +150,7 @@ $SCENARIO_CONST = @{
     };
     "power_VideoCall" = @{
         "duration" = 7200;
-        "agt_log_time" = 7500;
+        "agt_log_time" = 7300;
         "pwr_log_time" = 7200;
         "result" = "/usr/local/autotest/results/default/power_VideoCall/results";
         "delay" = 0;
