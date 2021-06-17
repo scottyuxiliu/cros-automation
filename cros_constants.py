@@ -15,7 +15,8 @@ SCENARIOS = {
     },
     "s0i3": {
         "method": "manual",
-        "command": "ectool led battery off; powerd_dbus_suspend"
+        # "command": "ectool led battery off; powerd_dbus_suspend"
+        "command": "powerd_dbus_suspend"
     },
     "stress_ng": {
         "method": "manual",
