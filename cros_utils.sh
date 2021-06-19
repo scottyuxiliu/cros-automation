@@ -13,9 +13,14 @@ function sleep_with_progress_bar {
     
     for i in `seq 1 $1`
     do
-        bar="################################################################################"
-        barlength=${#bar}
-        n=$(($i*$barlength/$1))
+        local bar="################################################################################"
+        local barlength=${#bar}
+        local n=$(($i*$barlength/$1)) # arithmetic requires double brackets
+        if [ $n -lt 1 ]
+        then
+            n=1
+        fi
+        # echo "$barlength"
         printf "\r${INFO}[%-${barlength}s] %ds/%ds ${ENDFORMAT}" ${bar:0:n} $i $1
         sleep 1
     done

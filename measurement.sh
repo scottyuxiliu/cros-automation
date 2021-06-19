@@ -56,6 +56,7 @@ function measurement {
         fi
     fi
 
+    # wait 300s before downloading results
     if [ "$debug_mode" = true ]
     then
         echo -e "${INFO}(DEBUG MODE) wait 300 seconds for $scenario to exit${ENDFORMAT}"
@@ -122,19 +123,4 @@ function measurement {
             sleep_with_progress_bar 60
         fi
     fi
-}
-
-function sleep_with_progress_bar {
-    local i
-    
-    for i in `seq 1 $1`
-    do
-        bar="################################################################################"
-        barlength=${#bar}
-        n=$(($i*$barlength/$1))
-        printf "\r${INFO}[%-${barlength}s] %ds/%ds ${ENDFORMAT}" ${bar:0:n} $i $1
-        sleep 1
-    done
-
-    printf "\n"
 }

@@ -6,7 +6,7 @@ GCC_DIR_PATH = "/usr/local/gcc"
 COREBOOT_DIR_PATH = "/usr/local/coreboot"
 
 AGT_COLS = ["CPU0 CORES Core0 Temp","CPU0 CORES Core1 Temp","CPU0 CORES Core2 Temp","CPU0 CORES Core3 Temp","CPU0 CORES Core0 Freq Eff","CPU0 CORES Core1 Freq Eff","CPU0 CORES Core2 Freq Eff","CPU0 CORES Core3 Freq Eff","CPU0 CORES Core0 C0","CPU0 CORES Core1 C0","CPU0 CORES Core2 C0","CPU0 CORES Core3 C0","CPU0 CORES Core0 OS Pstate","CPU0 CORES Core1 OS Pstate","CPU0 CORES Core2 OS Pstate","CPU0 CORES Core3 OS Pstate","CPU0 GFX GFX Temp","CPU0 GFX GFX Freq Eff","CPU0 GFX GFX Busy","CPU0 MISC APU Power","CPU0 MISC Skin Temp Margin","CPU0 MISC Peak Temperature","CPU0 MISC PROCHOT (%)","CPU0 MISC STAPM Time Constant","CPU0 MISC Slow PPT Time Constant","CPU0 STAPM Sustained Power Limit","CPU0 STAPM STAPM Value","CPU0 PPT PPT Limit FAST","CPU0 PPT PPT Value FAST","CPU0 PPT PPT Limit SLOW","CPU0 PPT PPT Value SLOW","CPU0 TDC TDC Limit VDDCR_VDD","CPU0 TDC TDC Limit VDDCR_SOC","CPU0 EDC EDC Limit VDDCR_VDD","CPU0 EDC EDC Limit VDDCR_SOC"]
-AGT_PERIOD = 50 # agt log period in ms
+AGT_PERIOD = 1000 # agt log period in ms
 
 SCENARIOS = {
     "idle": {
