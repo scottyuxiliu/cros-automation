@@ -148,6 +148,13 @@ $SCENARIO_CONST = @{
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };
+    "power_ThermalLoad.150min.3000_fish" = @{
+        "duration" = 9000;
+        "agt_log_time" = 9100;
+        "pwr_log_time" = 9000;
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
+        "delay" = 0;
+    };
     "power_VideoCall" = @{
         "duration" = 7200;
         "agt_log_time" = 7300;

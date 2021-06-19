@@ -90,6 +90,10 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_ThermalLoad/control.60min.5000_fish"
     },
+    "power_ThermalLoad.150min.3000_fish": {
+        "method": "autotest",
+        "control": "tests/power_ThermalLoad/control.150min.3000_fish"
+    },
     "power_VideoCall": {
         "method": "autotest",
         "control": "tests/power_VideoCall/control"
