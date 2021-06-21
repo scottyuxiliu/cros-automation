@@ -66,7 +66,7 @@ $SCENARIO_CONST = @{
     };
     "power_LoadTest.1hour" = @{
         "duration" = 3600;
-        "agt_log_time" = 3900;
+        "agt_log_time" = 3700;
         "pwr_log_time" = 3500;
         "result" = "/usr/local/autotest/results/default/power_LoadTest.1hour/results";
         "delay" = 0;
@@ -80,7 +80,7 @@ $SCENARIO_CONST = @{
     };
     "power_ThermalLoad" = @{
         "duration" = 9000;
-        "agt_log_time" = 9600;
+        "agt_log_time" = 9100;
         "pwr_log_time" = 9000;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad/results";
         "delay" = 0;
