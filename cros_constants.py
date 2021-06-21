@@ -26,7 +26,7 @@ SCENARIOS = {
         "method": "manual",
         "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300 --yaml keyval"
     },
-    "power_idle": {
+    "power_Idle": {
         "method": "autotest",
         "control": "tests/power_Idle/control"
     },
@@ -34,7 +34,7 @@ SCENARIOS = {
         "method": "autotest",
         "control": "tests/power_LoadTest/control.1hour"
     },
-    "graphics_webglaquarium": {
+    "graphics_WebGLAquarium": {
         # graphics_WebGLAquarium
         #     20s: preparation
         #     45s: 50 fishes

@@ -56,18 +56,28 @@ function measurement {
         fi
     fi
 
-    # wait 300s before downloading results
+    # --------------------------------------------------------------------------------
+    # wait for logging or scenario to finish
+
     if [ "$debug_mode" = true ]
     then
-        echo -e "${INFO}(DEBUG MODE) wait 300 seconds for $scenario to exit${ENDFORMAT}"
-        sleep_with_progress_bar 300
+        echo -e "${INFO}(DEBUG MODE) wait 60s for operation to exit${ENDFORMAT}"
+        sleep_with_progress_bar 60
     else
-        echo -e "${INFO}wait ${AUTOTEST_DURATION[$scenario]} seconds for $scenario to finish${ENDFORMAT}"
-        sleep_with_progress_bar ${AUTOTEST_DURATION[$scenario]}
+        if [ "$agt_log" = true ]
+        then
+            echo -e "${INFO}wait ${AGT_LOG_TIME[$scenario]}s for agt logging to finish${ENDFORMAT}"
+            sleep_with_progress_bar ${AGT_LOG_TIME[$scenario]}
+        else
+            echo -e "${INFO}wait ${AUTOTEST_DURATION[$scenario]}s for $scenario to finish${ENDFORMAT}"
+            sleep_with_progress_bar ${AUTOTEST_DURATION[$scenario]}
+        fi
 
-        echo -e "${INFO}wait 300 seconds for data logging to exit${ENDFORMAT}"
-        sleep_with_progress_bar 300
+        echo -e "${INFO}wait 60s for operation to exit${ENDFORMAT}"
+        sleep_with_progress_bar 60
     fi
+
+    # --------------------------------------------------------------------------------
 
     if [ "$debug_mode" = true ]
     then

@@ -45,7 +45,7 @@ function measurement {
             }
         }
 
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
         # launch sequence: prepare scenario -> launch scenario -> agt -> pwr
 
         if ($debug_mode) {
@@ -78,13 +78,13 @@ function measurement {
             }
         }
 
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        # ----------------------------------------------------------------------
-        # wait
+        # --------------------------------------------------------------------------------
+        # wait for logging or scenario to finish
 
         if ($debug_mode) {
-            Write-Host "INFO`t: (DEBUG MODE) wait 60 seconds for operation to exit" -ForegroundColor Green
+            Write-Host "INFO`t: (DEBUG MODE) wait 60s for operation to exit" -ForegroundColor Green
             sleep_with_progress_bar -seconds 60
         }
         else {
@@ -101,11 +101,11 @@ function measurement {
 
             if ($pwr_log) {
                 if ( $agt_log -and ($longest -eq $SCENARIO_CONST.Item($scenario).Item('agt_log_time')) ) {
-                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('agt_log_time') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time')) seconds for agt internal logging to finish" -ForegroundColor Green
+                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('agt_log_time') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time'))s for agt logging to finish" -ForegroundColor Green
                     sleep_with_progress_bar -seconds $($SCENARIO_CONST.Item($scenario).Item('agt_log_time') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time'))
                 }
                 elseif ( ($longest -eq $SCENARIO_CONST.Item($scenario).Item('duration')) -and ($SCENARIO_CONST.Item($scenario).Item('duration') -ne $SCENARIO_CONST.Item($scenario).Item('pwr_log_time')) ) {
-                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('duration') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time')) seconds for $scenario to finish" -ForegroundColor Green
+                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('duration') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time'))s for $scenario to finish" -ForegroundColor Green
                     sleep_with_progress_bar -seconds $($SCENARIO_CONST.Item($scenario).Item('duration') - $SCENARIO_CONST.Item($scenario).Item('pwr_log_time'))
                 }
                 else {
@@ -115,24 +115,24 @@ function measurement {
             }
             else {
                 if ($agt_log) {
-                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('agt_log_time')) seconds for agt internal logging to finish" -ForegroundColor Green
+                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('agt_log_time'))s for agt logging to finish" -ForegroundColor Green
                     sleep_with_progress_bar -seconds $($SCENARIO_CONST.Item($scenario).Item('agt_log_time'))
                 }
                 else {
-                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('duration')) seconds for $scenario to finish" -ForegroundColor Green
+                    Write-Host "INFO`t: wait $($SCENARIO_CONST.Item($scenario).Item('duration'))s for $scenario to finish" -ForegroundColor Green
                     sleep_with_progress_bar -seconds $($SCENARIO_CONST.Item($scenario).Item('duration'))
                 }
             }
 
             
     
-            Write-Host "INFO`t: wait 60 seconds for operation to exit" -ForegroundColor Green
+            Write-Host "INFO`t: wait 60s for operation to exit" -ForegroundColor Green
             sleep_with_progress_bar -seconds 60
         }
 
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
         # output result
 
         if ($debug_mode) {
@@ -175,7 +175,7 @@ function measurement {
             }
         }
 
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
         if ($dc_mode) {
             if ($debug_mode) {
