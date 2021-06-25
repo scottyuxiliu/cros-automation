@@ -13,7 +13,7 @@ function sleep_with_progress_bar {
     
     for i in `seq 1 $1`
     do
-        local bar="################################################################################"
+        local bar="##############################"
         local barlength=${#bar}
         local n=$(($i*$barlength/$1)) # arithmetic requires double brackets
         if [ $n -lt 1 ]

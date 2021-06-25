@@ -105,7 +105,7 @@ class CrosScenarioLauncher():
 
         for line in stdout.readlines():
             line = line.rstrip("\n")
-            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
             content.append(line)
 
         return content
@@ -132,12 +132,12 @@ class CrosScenarioLauncher():
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
-                self.logger.info("started on the test system")
+                self.logger.info("started on the DUT")
 
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
-    def __exec_command_local(self, command, read_stdout=False, password=None):
+    def __exec_command_local(self, command, read_stdout, password):
         """execute command locally using subprocess.
 
         if self.debug is true or read_stdout is true, this will be blocking and stdout will be read.
@@ -146,11 +146,21 @@ class CrosScenarioLauncher():
             command (str): command to be executed
             read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
         """
-        if read_stdout is True:
-            content = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
-            self.logger.info(content)
+        if self.debug is True or read_stdout is True:
+            # content = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+            # self.logger.info(content)
+            if password is not None:
+                p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE)
+                p.communicate(f"{password}\n".encode())
+            else:
+                subprocess.Popen(command, shell=True)
         else:
-            subprocess.Popen(command, shell=True)
+            if password is not None:
+                p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE)
+                p.communicate(f"{password}\n".encode())
+            else:
+                subprocess.Popen(command, shell=True)
+
 
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
@@ -234,7 +244,7 @@ class CrosScenarioLauncher():
         return status
 
 
-    def launch_scenario(self, scenario):
+    def launch_scenario(self, scenario, password):
         """launch the given scenario on the test system
         """
 
@@ -249,10 +259,14 @@ class CrosScenarioLauncher():
             elif SCENARIOS[scenario]["method"] == "autotest":
                 self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute: cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
                 self.__exec_command(f"cd {TEST_SYS_AUTOTEST_PATH}; bin/autotest {SCENARIOS[scenario]['control']}")
+
             elif SCENARIOS[scenario]["method"] == "tast":
                 if SCENARIOS[scenario]["local"] is True:
-                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute locally: cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}")
-                    self.__exec_command_local(f"cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}")
+                    # self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute locally: cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}")
+                    # self.__exec_command_local(f"cd ~/chromiumos; cros_sdk tast run {self.ip} {scenario}", read_stdout=False, password=password)
+                    self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute locally: cd ~/chromiumos; cros_sdk")
+                    self.__exec_command_local(f"cd ~/chromiumos; cros_sdk", read_stdout=False, password=password)
+                    self.logger.info("test complete")
                 else:
                     self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}execute remotely (in chroot): tast run {self.ip} {SCENARIOS[scenario]}")
 

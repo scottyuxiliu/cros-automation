@@ -89,7 +89,7 @@ parser.add_argument(
     help="data logging source file path, or data parsing file path, or atitool logging/programming arguments."
 )
 parser.add_argument("-o", "--output", type=str, help="data logging output file path.")
-parser.add_argument("--password", type=str, help="sudo password.")
+parser.add_argument("--password", type=str, default=None, help="sudo password.")
 parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")
 
 parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
@@ -102,7 +102,7 @@ if args.job == "test-connection":
 
 elif args.job == "launch-scenario":
     with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as csl:
-        csl.launch_scenario(args.scenario)
+        csl.launch_scenario(args.scenario, args.password)
 
 elif args.job == "prepare-scenario":
     with CrosScenarioLauncher(args.ip, args.username, args.keyfile, args.debug) as csl:

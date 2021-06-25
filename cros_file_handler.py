@@ -101,7 +101,7 @@ class CrosFileHandler():
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
-                self.logger.info("started on the test system")
+                self.logger.info("started on the DUT")
 
 
     def __exist_remote(self, path):
