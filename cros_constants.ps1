@@ -15,7 +15,7 @@ $LOGS = @(
 )
 
 $SCENARIO_CONST = @{
-    "idle" = @{
+    "login_GaiaLogin" = @{
         "duration" = 300;
         "agt_log_time" = 300;
         "pwr_log_time" = 300;

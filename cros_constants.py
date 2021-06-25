@@ -9,10 +9,6 @@ AGT_COLS = ["CPU0 CORES Core0 Temp","CPU0 CORES Core1 Temp","CPU0 CORES Core2 Te
 AGT_PERIOD = 1000 # agt log period in ms
 
 SCENARIOS = {
-    "idle": {
-        "method": "manual",
-        "command": ""
-    },
     "s0i3": {
         "method": "manual",
         # "command": "ectool led battery off; powerd_dbus_suspend"
@@ -25,6 +21,10 @@ SCENARIOS = {
     "stress_ng_stop_ui": {
         "method": "manual",
         "command": "cd /usr/local; stop ui; stress-ng -M --cpu=4 -t 300 --yaml keyval"
+    },
+    "login_GaiaLogin": {
+        "method": "autotest",
+        "control": "tests/login_GaiaLogin/control"
     },
     "power_Idle": {
         "method": "autotest",

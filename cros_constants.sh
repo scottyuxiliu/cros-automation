@@ -31,6 +31,7 @@ DELAY_AFTER_PROG=900
 
 # Associative arrays can be created in the same way: the only thing we need to change is the option used: instead of lowercase -a we must use the -A option of the declare command:
 declare -A AUTOTEST_DURATION
+AUTOTEST_DURATION["login_GaiaLogin"]=300
 AUTOTEST_DURATION["graphics_WebGLAquarium"]=120
 AUTOTEST_DURATION["power_Idle"]=660
 AUTOTEST_DURATION["power_Speedometer2"]=120
@@ -47,6 +48,7 @@ AUTOTEST_DURATION["power_VideoCall"]=7200
 
 
 declare -A AUTOTEST_RESULT_DIR
+AUTOTEST_RESULT_DIR["login_GaiaLogin"]="na"
 AUTOTEST_RESULT_DIR["graphics_WebGLAquarium"]="/usr/local/autotest/results/default/graphics_WebGLAquarium/results"
 AUTOTEST_RESULT_DIR["power_Idle"]="/usr/local/autotest/results/default/power_Idle/results"
 AUTOTEST_RESULT_DIR["power_Speedometer2"]="/usr/local/autotest/results/default/power_Speedometer2/results"
@@ -63,6 +65,7 @@ AUTOTEST_RESULT_DIR["power_VideoCall"]="/usr/local/autotest/results/default/powe
 
 
 declare -A AGT_LOG_TIME
+AGT_LOG_TIME["login_GaiaLogin"]=300
 AGT_LOG_TIME["graphics_WebGLAquarium"]=180
 AGT_LOG_TIME["power_Idle"]=760
 AGT_LOG_TIME["power_Speedometer2"]=180
