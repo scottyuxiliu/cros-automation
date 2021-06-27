@@ -105,7 +105,7 @@ class CrosScenarioLauncher():
 
         for line in stdout.readlines():
             line = line.rstrip("\n")
-            self.logger.info(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
             content.append(line)
 
         return content
@@ -129,6 +129,7 @@ class CrosScenarioLauncher():
         else:
             if self.debug is True or read_stdout is True:
                 self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command. this is blocking.
+                self.logger.info("command completed on the DUT")
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
