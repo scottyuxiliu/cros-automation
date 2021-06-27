@@ -15,7 +15,7 @@ $LOGS = @(
 )
 
 $SCENARIO_CONST = @{
-    "idle" = @{
+    "login_GaiaLogin" = @{
         "duration" = 300;
         "agt_log_time" = 300;
         "pwr_log_time" = 300;
@@ -145,6 +145,13 @@ $SCENARIO_CONST = @{
         "duration" = 3600;
         "agt_log_time" = 3700;
         "pwr_log_time" = 3600;
+        "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
+        "delay" = 0;
+    };
+    "power_ThermalLoad.150min.3000_fish" = @{
+        "duration" = 9000;
+        "agt_log_time" = 9100;
+        "pwr_log_time" = 9000;
         "result" = "/usr/local/autotest/results/default/power_ThermalLoad.option/results";
         "delay" = 0;
     };

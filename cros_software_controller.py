@@ -62,10 +62,13 @@ class CrosSoftwareController():
         if stdout.channel.recv_exit_status() != 0:
             self.logger.error(f"{'(DEBUG MODE) ' if self.debug else ''}stdout.channel.recv_exit_status() returned {stdout.channel.recv_exit_status()}")
 
-        for line in stdout.readlines():
-            line = line.rstrip("\n")
-            self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
-            content.append(line)
+        try:
+            for line in stdout.readlines():
+                line = line.rstrip("\n")
+                self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
+                content.append(line)
+        except UnicodeDecodeError as ude:
+            self.logger.error(f"{ude.__class__} stdout has garbage. error message: {ude}")
 
         return content
 

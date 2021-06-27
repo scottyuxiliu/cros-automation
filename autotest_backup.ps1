@@ -4,7 +4,7 @@
 # .\autotest_backup.ps1 [DUT_IP] [AUTOTEST_BACKUP]
 
 # for example
-# .\autotest_backup.ps1 "192.168.123.456" "C:\Users\scottyuxiliu\Downloads\autotest_backup.tar.gz"
+# .\autotest_backup.ps1 192.168.123.456 C:\Users\scottyuxiliu\Downloads\autotest_backup.tar.gz
 
 
 # --------------------------------------------------------------------------------
