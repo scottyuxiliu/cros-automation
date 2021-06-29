@@ -45,6 +45,7 @@ AUTOTEST_DURATION["power_ThermalLoad.30min.20000_fish"]=1800
 AUTOTEST_DURATION["power_ThermalLoad.60min.3000_fish"]=3600
 AUTOTEST_DURATION["power_ThermalLoad.60min.5000_fish"]=3600
 AUTOTEST_DURATION["power_VideoCall"]=7200
+AUTOTEST_DURATION["power_LoadTest.1hour"]=3600
 
 
 declare -A AUTOTEST_RESULT_DIR
@@ -62,6 +63,7 @@ AUTOTEST_RESULT_DIR["power_ThermalLoad.30min.20000_fish"]="/usr/local/autotest/r
 AUTOTEST_RESULT_DIR["power_ThermalLoad.60min.3000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
 AUTOTEST_RESULT_DIR["power_ThermalLoad.60min.5000_fish"]="/usr/local/autotest/results/default/power_ThermalLoad.option/results"
 AUTOTEST_RESULT_DIR["power_VideoCall"]="/usr/local/autotest/results/default/power_VideoCall/results"
+AUTOTEST_RESULT_DIR["power_LoadTest.1hour"]="/usr/local/autotest/results/default/power_LoadTest.1hour/results"
 
 
 declare -A AGT_LOG_TIME
@@ -79,4 +81,5 @@ AGT_LOG_TIME["power_ThermalLoad.30min.20000_fish"]=1900
 AGT_LOG_TIME["power_ThermalLoad.60min.3000_fish"]=3700
 AGT_LOG_TIME["power_ThermalLoad.60min.5000_fish"]=3700
 AGT_LOG_TIME["power_VideoCall"]=7300
+AGT_LOG_TIME["power_LoadTest.1hour"]=3700
 

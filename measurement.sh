@@ -52,7 +52,7 @@ function measurement {
         if [ "$agt_log" = true ]
         then
             echo -e "${INFO}start agt internal logging to $AGT_INTERNAL_PATH/agt_int_$output_file_index.csv${ENDFORMAT}"
-            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AUTOTEST_DURATION[$scenario]} -o "agt_int_$output_file_index.csv"
+            python cros_automation.py agt-internal-log -p $DUT_IP -u $DUT_USERNAME -k $DUT_SSH_KEYFILE -t ${AGT_LOG_TIME[$scenario]} -o "agt_int_$output_file_index.csv"
         fi
     fi
 
