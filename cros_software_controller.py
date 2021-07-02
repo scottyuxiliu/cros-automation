@@ -47,7 +47,7 @@ class CrosSoftwareController():
 
     # The double underscore __ prefixed to a variable makes it private. It gives a strong suggestion not to touch it from outside the class.
     # Python performs name mangling of private variables. Every member with a double underscore will be changed to _object._class__variable. So, it can still be accessed from outside the class, but the practice should be refrained.
-    def __read_stdout(self, stdout):
+    def __read_stdout(self, stdout) -> list:
         """this will be blocking.
 
         Args:
@@ -73,7 +73,7 @@ class CrosSoftwareController():
         return content
 
 
-    def __exec_command(self, command, read_stdout=False, password=None):
+    def __exec_command(self, command, read_stdout=False, password=None, verbose=True) -> list:
         """execute command using paramiko ssh.exec_command().
 
         if self.debug is true or read_stdout is true, this will be blocking and stdout will be read.
@@ -84,9 +84,10 @@ class CrosSoftwareController():
             command (str): [description]
             read_stdout (bool, optional): if true, paramiko ssh.exec_command() will be blocking and stdout will be read. Defaults to False.
             password (str, optional): password to be written through stdin. Defaults to None.
+            verbose (bool, optional): output to console if True, suppress output if False. Defaults to True.
 
         Returns:
-            list: stdout from paramiko ssh.exec_command()
+            list: stdout from paramiko ssh.exec_command() parsed by self.__read_stdout
             
         """
 
@@ -103,11 +104,17 @@ class CrosSoftwareController():
         else:
             if self.debug is True or read_stdout is True:
                 stdout = self.__read_stdout(stdout) # if debug flag is true or read_stdout is true, capture stdout from exec_command. this is blocking.
-                self.logger.info("command completed on the DUT")
+                if verbose is True:
+                    self.logger.info("command completed on the DUT")
+                else:
+                    self.logger.debug("command completed on the DUT")
             else:
                 n = len(command.split(";")) # get the number of commands that should be executed
                 time.sleep(n) # exec_command does not work properly without this. every additional command requires one more second of wait time.
-                self.logger.info("started on the DUT")
+                if verbose is True:
+                    self.logger.info("started on the DUT")
+                else:
+                    self.logger.debug("started on the DUT")
 
         return stdout # need to return after the try/except/else blocks. python will not go inside the else block if a value is returned in the try block.
 
@@ -295,5 +302,123 @@ class CrosSoftwareController():
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"execute: ectool usbpd 0 source")
         self.__exec_command(f"ectool usbpd 0 source")
+
+
+    def __get_offline_cpu_cores(self) -> int:
+        core_info = self.__exec_command("cat /sys/devices/system/cpu/offline", read_stdout=True, verbose=False)
+        core_info = core_info[0]
+
+        if not core_info:
+            self.logger.info("currently cores [] are offline")
+            return []
+
+        elif "-" in core_info:
+            cores = core_info.split("-")
+            core_min = int(cores[0])
+            core_max = int(cores[-1])
+            self.logger.info(f"currently cores {list(range(core_min, core_max+1))} are offline")
+            return range(core_min, core_max+1) # In Python 2.x, range returns a list, but in Python 3.x range returns an immutable sequence, of type range. Since range objects in Python 3 are immutable sequences, they support indexing as well.
+        else:
+            core_min = int(core_info)
+            self.logger.info(f"currently core {[core_min]} is offline")
+            return [core_min]
+
+    
+    def get_offline_cpu_cores(self) -> int:
+        core_info = self.__exec_command("cat /sys/devices/system/cpu/offline", read_stdout=True, verbose=False)
+        core_info = core_info[0]
+
+        if not core_info:
+            self.logger.info("currently cores [] are offline")
+            return []
+
+        elif "-" in core_info:
+            cores = core_info.split("-")
+            core_min = int(cores[0])
+            core_max = int(cores[-1])
+            self.logger.info(f"currently cores {list(range(core_min, core_max+1))} are offline")
+            return range(core_min, core_max+1) # In Python 2.x, range returns a list, but in Python 3.x range returns an immutable sequence, of type range. Since range objects in Python 3 are immutable sequences, they support indexing as well.
+        else:
+            core_min = int(core_info)
+            self.logger.info(f"currently core {[core_min]} is offline")
+            return [core_min]
+
+
+    def enable_cpu_cores(self, num_cores: int):
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"enable {num_cores} cpu cores on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        core_list = self.__get_offline_cpu_cores()
+        max_num_cores = len(core_list)
+
+        if num_cores > max_num_cores:
+            raise ValueError(f"user tries to enable {num_cores} {'core' if num_cores==1 else 'cores'}, but the maximum allowed {'core' if max_num_cores==1 else 'cores'} {max_num_cores} {'core' if max_num_cores==1 else 'cores'}.")
+        else:
+            for i in range(num_cores):
+                self.logger.info(f"execute: echo 1 > /sys/devices/system/cpu/cpu{core_list[i]}/online")
+                self.__exec_command(f"echo 1 > /sys/devices/system/cpu/cpu{core_list[i]}/online", read_stdout=True)
+
+
+    def __get_online_cpu_cores(self) -> list:
+        core_info = self.__exec_command("cat /sys/devices/system/cpu/online", read_stdout=True, verbose=False)
+        core_info = core_info[0]
+
+        if "-" in core_info:
+            cores = core_info.split("-")
+            core_min = int(cores[0])
+            core_max = int(cores[-1])
+            self.logger.info(f"currently cores {list(range(core_max, core_min-1, -1))} are online")
+            return range(core_max, core_min-1, -1)
+        else:
+            core_max = int(core_info)
+            self.logger.info(f"currently core {[core_max]} is online")
+            return [core_max]
+
+
+    def get_online_cpu_cores(self) -> list:
+        """get list of online cores. for example, [2,1,0] means cores 0-2 are online.
+
+        Returns:
+            list: list of online cores
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"get list of online cpu cores on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        core_info = self.__exec_command("cat /sys/devices/system/cpu/online", read_stdout=True, verbose=False)
+        core_info = core_info[0]
+
+        if "-" in core_info:
+            cores = core_info.split("-")
+            core_min = int(cores[0])
+            core_max = int(cores[-1])
+            self.logger.info(f"currently cores {list(range(core_max, core_min-1, -1))} are online")
+            return range(core_max, core_min-1, -1)
+        else:
+            core_max = int(core_info)
+            self.logger.info(f"currently core {[core_max]} is online")
+            return [core_max]
+
+
+    def disable_cpu_cores(self, num_cores: int) -> None:
+        """
+
+        Args:
+            num_cores (int): [description]
+
+        Raises:
+            ValueError: 
+        """
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"disable {num_cores} cpu cores on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        core_list = self.__get_online_cpu_cores()
+        max_num_cores = len(core_list) - 1 # can not disable core 0
+
+        if num_cores > max_num_cores:
+            raise ValueError(f"user tries to disable {num_cores} {'core' if num_cores==1 else 'cores'}, but the maximum allowed {'is' if max_num_cores==1 else 'are'} {max_num_cores} {'core' if max_num_cores==1 else 'cores'}. note that core 0 can not be disabled.")
+        else:
+            for i in range(num_cores):
+                self.logger.info(f"execute: echo 0 > /sys/devices/system/cpu/cpu{core_list[i]}/online")
+                self.__exec_command(f"echo 0 > /sys/devices/system/cpu/cpu{max_num_cores-i}/online", read_stdout=True)
 
     

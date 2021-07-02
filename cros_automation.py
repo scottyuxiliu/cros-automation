@@ -72,6 +72,9 @@ parser.add_argument(
         "get-power-supply-info": get power supply info on the DUT [-p/--ip].
         "enable-ac": enable ac on the DUT [-p/--ip].
         "disable-ac": disable ac on the DUT [-p/--ip].
+        "get-online-cpu-cores": get list of online cpu cores on the DUT [-p/--ip].
+        "enable-cpu-cores": enable [-i/--input] number of cores on the DUT [-p/--ip].
+        "disable-cpu-cores": disable [-i/--input] number of cores on the DUT [-p/--ip].
 
         '''
     )
@@ -245,6 +248,18 @@ elif args.job == "enable-ac":
 elif args.job == "disable-ac":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.disable_ac()
+
+elif args.job == "get-online-cpu-cores":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.get_online_cpu_cores()
+
+elif args.job == "enable-cpu-cores":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.enable_cpu_cores(num_cores=int(args.input))
+
+elif args.job == "disable-cpu-cores":
+    with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
+        csc.disable_cpu_cores(num_cores=int(args.input))
 
 else:
     pass
