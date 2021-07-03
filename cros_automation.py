@@ -67,7 +67,7 @@ parser.add_argument(
         "agt-prog": use agt programming with argument(s) [-i/--input] on the test system
         "get-brightness": get brightness on the DUT [-p/--ip].
         "set-brightness": set brightness [-i/--input] nits on the DUT [-p/--ip].
-        "get-chromeos-ver": get chrome os version on the DUT [-p/--ip].
+        "get-os-ver": get chrome os version on the DUT [-p/--ip].
         "get-apfw-ver": get apfw version on the DUT [-p/--ip].
         "get-power-supply-info": get power supply info on the DUT [-p/--ip].
         "enable-ac": enable ac on the DUT [-p/--ip].
@@ -229,7 +229,7 @@ elif args.job == "set-brightness":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.set_brightness(args.input)
 
-elif args.job == "get-chromeos-ver":
+elif args.job == "get-os-ver":
     with CrosSoftwareController(args.ip, args.username, args.keyfile, args.debug) as csc:
         csc.get_chrome_os_version()
 
