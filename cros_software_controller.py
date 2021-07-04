@@ -400,13 +400,17 @@ class CrosSoftwareController():
 
 
     def disable_cpu_cores(self, num_cores: int) -> None:
-        """
+        """[summary]
 
-        Args:
-            num_cores (int): [description]
+        Parameters
+        ----------
+        num_cores : int
+            [description]
 
-        Raises:
-            ValueError: 
+        Raises
+        ------
+        ValueError
+            [description]
         """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"disable {num_cores} cpu cores on {self.ip}")
