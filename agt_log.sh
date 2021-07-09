@@ -6,7 +6,7 @@
 # source agt_log.sh [DUT_IP] [DURATION] [DIR] [OUTPUT]
 
 # for example
-# source agt_log.sh "192.168.123.456" "60" "/home/scottyuxiliu/Downloads/" "agt_log.csv"
+# source agt_log.sh 192.168.123.456 60 ~/Downloads/ agt_log.csv
 
 
 # --------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ DIR=$3
 OUTPUT=$4
 
 echo -e "${INFO}check ${DIR}${ENDFORMAT}"
-if [ -d $DIR ] # need to have spaces after "[" and before "]"
+if [ -d "$DIR" ] # need to have spaces after "[" and before "]"
 then
     :
 else

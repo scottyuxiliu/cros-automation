@@ -14,14 +14,18 @@ logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s') # output method name too
+# output method name too
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s')
 ch.setFormatter(formatter)
 
 logger.addHandler(ch)
 # --------------------------------------------------------------------------------
 
 
-parser = argparse.ArgumentParser(description="Automation for scenarios on Chrome OS and Chromium OS", formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(
+    description="Automation for scenarios on Chrome OS and Chromium OS",
+    formatter_class=argparse.RawTextHelpFormatter
+)
 parser.add_argument(
     "job",
     metavar="JOB",
@@ -83,9 +87,13 @@ parser.add_argument("-p", "--ip", type=str, help="test system ip address.")
 parser.add_argument("-u", "--username", type=str, help="test system username.")
 parser.add_argument("-k", "--keyfile", type=str, help="ssh private key file path.")
 
-parser.add_argument("-s", "--scenario", type=str, help="autotest scenario. supported scenarios are in cros_constants.py.")
+parser.add_argument("-s", "--scenario", type=str,
+                    help="autotest scenario. supported scenarios are in cros_constants.py."
+                    )
 
-parser.add_argument("-t", "--duration", type=int, default=60, help="data logging duration in seconds, default %(default)s.")
+parser.add_argument("-t", "--duration", type=int, default=60,
+                    help="data logging duration in seconds, default %(default)s."
+                    )
 parser.add_argument("-d", "--directory", type=str, help="directory on the target system.")
 parser.add_argument(
     "-i", "--input", type=str,
@@ -95,7 +103,9 @@ parser.add_argument("-o", "--output", type=str, help="data logging output file p
 parser.add_argument("--password", type=str, default=None, help="sudo password.")
 parser.add_argument("--index", type=int, default=1, help="atitool logging device index, default %(default)s.")
 
-parser.add_argument("--debug", action="store_true", help="enable debug mode. this captures stdout from all ssh commands executed.") # the store actions create default values of False and True respectively.
+parser.add_argument("--debug", action="store_true",
+                    help="enable debug mode. this captures stdout from all ssh commands executed."
+                    )  # the store actions create default values of False and True respectively.
 
 args = parser.parse_args()
 
@@ -263,6 +273,3 @@ elif args.job == "disable-cpu-cores":
 
 else:
     pass
-
-
-

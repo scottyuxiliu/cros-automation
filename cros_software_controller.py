@@ -343,8 +343,17 @@ class CrosSoftwareController():
             self.logger.info(f"currently core {[core_min]} is offline")
             return [core_min]
 
+    def enable_cpu_cores(self, num_cores: int) -> None:
+        """
 
-    def enable_cpu_cores(self, num_cores: int):
+        Parameters
+        ----------
+        num_cores : int
+
+        Returns
+        -------
+        object
+        """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"enable {num_cores} cpu cores on {self.ip}")
         self.logger.info("--------------------------------------------------------------------------------")
@@ -358,8 +367,14 @@ class CrosSoftwareController():
                 self.logger.info(f"execute: echo 1 > /sys/devices/system/cpu/cpu{core_list[i]}/online")
                 self.__exec_command(f"echo 1 > /sys/devices/system/cpu/cpu{core_list[i]}/online", read_stdout=True)
 
-
     def __get_online_cpu_cores(self) -> list:
+        """
+
+        Returns
+        -------
+        list
+
+        """
         core_info = self.__exec_command("cat /sys/devices/system/cpu/online", read_stdout=True, verbose=False)
         core_info = core_info[0]
 
@@ -374,12 +389,9 @@ class CrosSoftwareController():
             self.logger.info(f"currently core {[core_max]} is online")
             return [core_max]
 
+    def get_online_cpu_cores(self) -> None:
+        """
 
-    def get_online_cpu_cores(self) -> list:
-        """get list of online cores. for example, [2,1,0] means cores 0-2 are online.
-
-        Returns:
-            list: list of online cores
         """
         self.logger.info("--------------------------------------------------------------------------------")
         self.logger.info(f"get list of online cpu cores on {self.ip}")
@@ -387,17 +399,26 @@ class CrosSoftwareController():
         core_info = self.__exec_command("cat /sys/devices/system/cpu/online", read_stdout=True, verbose=False)
         core_info = core_info[0]
 
-        if "-" in core_info:
-            cores = core_info.split("-")
-            core_min = int(cores[0])
-            core_max = int(cores[-1])
-            self.logger.info(f"currently cores {list(range(core_max, core_min-1, -1))} are online")
-            return range(core_max, core_min-1, -1)
-        else:
-            core_max = int(core_info)
-            self.logger.info(f"currently core {[core_max]} is online")
-            return [core_max]
+        cores = []
+        if "," in core_info:
+            for group in core_info.split(","):  # online cores in comma-delimited groups, for example, 0-3, 5
+                if "-" in group:
+                    group_min = int(group.split("-")[0])
+                    group_max = int(group.split("-")[-1])
+                    cores.extend([*range(group_min, group_max+1)])  # unpack range to list and add to cores
+                else:  # there's only one number in the group
+                    cores.append(int(group))
 
+            cores.sort(reverse=True)  # sort in descending order
+            self.logger.info(f"currently cores {cores} are online")
+        else:
+            if "-" in core_info:
+                core_min = int(core_info.split("-")[0])
+                core_max = int(core_info.split("-")[-1])
+                cores.extend([*range(core_max, core_min-1, -1)])
+                self.logger.info(f"currently cores {cores} are online")
+            else:
+                self.logger.info(f"currently core {int(core_info)} is online")
 
     def disable_cpu_cores(self, num_cores: int) -> None:
         """[summary]
@@ -419,10 +440,20 @@ class CrosSoftwareController():
         max_num_cores = len(core_list) - 1 # can not disable core 0
 
         if num_cores > max_num_cores:
-            raise ValueError(f"user tries to disable {num_cores} {'core' if num_cores==1 else 'cores'}, but the maximum allowed {'is' if max_num_cores==1 else 'are'} {max_num_cores} {'core' if max_num_cores==1 else 'cores'}. note that core 0 can not be disabled.")
+            raise ValueError(
+                f"user tries to disable {num_cores} {'core' if num_cores==1 else 'cores'}, "
+                f"but the maximum allowed {'is' if max_num_cores==1 else 'are'}"
+                f"{max_num_cores} {'core' if max_num_cores==1 else 'cores'}. "
+                f"note that core 0 can not be disabled."
+            )
         else:
             for i in range(num_cores):
                 self.logger.info(f"execute: echo 0 > /sys/devices/system/cpu/cpu{core_list[i]}/online")
                 self.__exec_command(f"echo 0 > /sys/devices/system/cpu/cpu{max_num_cores-i}/online", read_stdout=True)
 
-    
+    def disable_hyper_threading(self) -> None:
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"disable hyper threading on {self.ip}")
+        self.logger.info("--------------------------------------------------------------------------------")
+        self.logger.info(f"execute: /usr/libexec/debugd/helpers/scheduler_configuration_helper --policy=conservative")
+        self.__exec_command("/usr/libexec/debugd/helpers/scheduler_configuration_helper --policy=conservative")
