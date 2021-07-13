@@ -1,5 +1,5 @@
 # cros-automation
-Automation Chrome OS and Chromium OS.
+Automate benchmarks and tasks in Chrome OS and Chromium OS.
 
 For Windows users, a sample powershell script `cros_automation.ps1` is included to show a simple flow of what this automation can achieve.
 
