@@ -68,7 +68,8 @@ class CrosSoftwareController():
                 self.logger.debug(f"{'(DEBUG MODE) ' if self.debug else ''}{line}")
                 content.append(line)
         except UnicodeDecodeError as ude:
-            self.logger.error(f"{ude.__class__} stdout has garbage. error message: {ude}")
+            self.logger.error(f"{ude.__class__} stdout has garbage")
+            self.logger.error(f"original error message: {ude}")
 
         return content
 
